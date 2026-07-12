@@ -3260,72 +3260,96 @@ function renderAllCharts(){
         // خالی، skip
       } else {
         // محدودیت: حداکثر ۱۲ هفته اخیر
-        const MAX_WEEKS = 12;
+                // موبایل: کمتر هفته
+        const MAX_WEEKS = window.innerWidth < 760 ? 6 : 12;
         const weeksToShow = weeks.length > MAX_WEEKS 
           ? weeks.slice(-MAX_WEEKS) 
           : weeks;
         
+                const isMobile = window.innerWidth < 760;
         chartInstances.weekly = new Chart(cW, {
           type: 'bar',
           data: {
             labels: weeksToShow.map(w => w.label),
             datasets: [
               {
-                label: '😴 خواب (ساعت)',
+                label: '😴 خواب',
                 data: weeksToShow.map(w => w.avgSleep || 0),
                 backgroundColor: 'rgba(139,92,246,.75)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.9,
+                categoryPercentage: 0.85
               },
               {
                 label: '⚡ انرژی',
                 data: weeksToShow.map(w => w.avgEnergy || 0),
                 backgroundColor: 'rgba(16,185,129,.75)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.9,
+                categoryPercentage: 0.85
               },
               {
                 label: '🙂 حال',
                 data: weeksToShow.map(w => w.avgMood || 0),
                 backgroundColor: 'rgba(236,72,153,.75)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.9,
+                categoryPercentage: 0.85
               },
               {
-                label: '🏃 دویدن (÷۵)',
+                label: '🏃 دویدن÷۵',
                 data: weeksToShow.map(w => (w.totalRun || 0) / 5),
                 backgroundColor: 'rgba(245,158,11,.65)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.9,
+                categoryPercentage: 0.85
               },
               {
-                label: '✅ روزهای فعال',
+                label: '✅ فعال',
                 data: weeksToShow.map(w => w.completedCount || 0),
                 backgroundColor: 'rgba(14,165,233,.65)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.9,
+                categoryPercentage: 0.85
               }
             ]
           },
           options: {
-            ...opts,
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {duration: 900, easing: 'easeOutQuart'},
             scales: {
-              x: {...opts.scales.x},
-              y: {
-                ...opts.scales.y,
-                beginAtZero: true,
-                title: {
-                  display: true,
-                  text: 'مقدار',
+              x: {
+                ticks: {
                   color: '#aaa',
-                  font: font
-                }
+                  font: {...font, size: isMobile ? 9 : 11},
+                  maxRotation: isMobile ? 45 : 0,
+                  minRotation: isMobile ? 45 : 0
+                },
+                grid: {color: 'rgba(255,255,255,.05)'}
+              },
+              y: {
+                ticks: {color: '#aaa', font: font},
+                grid: {color: 'rgba(255,255,255,.06)'},
+                beginAtZero: true
               }
             },
             plugins: {
-              ...opts.plugins,
+              legend: {
+                labels: {
+                  color: '#ddd',
+                  font: {...font, size: isMobile ? 10 : 12},
+                  padding: isMobile ? 8 : 12,
+                  boxWidth: isMobile ? 12 : 16
+                },
+                position: 'top'
+              },
               tooltip: {
                 titleFont: font,
                 bodyFont: font,
                 callbacks: {
                   label: function(ctx){
                     let value = ctx.parsed.y;
-                    // برای دویدن (÷۵)، عدد واقعی رو نشون بده
                     if(ctx.dataset.label.includes('دویدن')){
                       value = (value * 5).toFixed(0) + ' دقیقه';
                     } else {
@@ -3338,8 +3362,7 @@ function renderAllCharts(){
             }
           }
         });
-      }
-    }
+        
   }catch(e){
     console.warn('weekly chart error:', e);
   }
