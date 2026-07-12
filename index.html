@@ -536,7 +536,7 @@ font-family:var(--font-family);color:var(--text);
 
 /* SETTINGS DROPDOWN */
 .dropdown-menu{
-position:fixed;z-index:150;
+position:fixed;z-index:1000;
 background:var(--bg2);border:1px solid var(--border);border-radius:12px;
 padding:6px;display:none;box-shadow:0 16px 48px rgba(0,0,0,.6);min-width:220px;
 max-height:80vh;overflow-y:auto;
@@ -552,6 +552,41 @@ border-radius:8px;font-size:.9rem;font-family:var(--font-family);
 .dropdown-menu hr{border:none;border-top:1px solid var(--border);margin:4px 0}
 .dropdown-menu .menu-label{font-size:.7rem;color:var(--muted);padding:6px 14px 2px;font-weight:700}
 
+/* SETTINGS BACKDROP + MOBILE */
+.settings-backdrop{
+display:none;position:fixed;inset:0;z-index:999;
+background:rgba(0,0,0,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.settings-backdrop.open{display:block}
+.dropdown-menu{z-index:1000!important}
+@media(max-width:759px){
+  .dropdown-menu#settingsMenu{
+    position:fixed !important;
+    top:auto !important;
+    bottom:0 !important;
+    left:0 !important;
+    right:0 !important;
+    max-width:100% !important;
+    border-radius:20px 20px 0 0;
+    padding:16px 12px calc(env(safe-area-inset-bottom,0) + 20px);
+    max-height:70vh;
+    box-shadow:0 -8px 40px rgba(0,0,0,.6);
+    animation:slideUpMenu .3s ease;
+  }
+  .dropdown-menu#settingsMenu button{
+    padding:14px 16px;
+    font-size:.95rem;
+    min-height:48px;
+  }
+  .dropdown-menu#settingsMenu .menu-label{
+    padding:8px 16px 4px;
+    font-size:.75rem;
+  }
+  @keyframes slideUpMenu{
+    from{transform:translateY(100%)}
+    to{transform:translateY(0)}
+  }
+}
 .font-scale-controls{display:flex;align-items:center;gap:6px;padding:4px}
 .font-scale-controls button{width:36px;height:36px;border-radius:8px;background:rgba(var(--accent-rgb),.15);border:none;color:var(--accent2);font-size:1rem;cursor:pointer;font-weight:700}
 
@@ -805,7 +840,7 @@ margin-top:10px;font-family:var(--font-family);
 <span class="cloud-badge" id="cloudBadge">☁️ آفلاین</span>
 <button class="header-btn" id="settingsBtn" type="button">⚙️</button>
 </header>
-
+<div class="settings-backdrop" id="settingsBackdrop"></div>
 <div class="dropdown-menu" id="settingsMenu" style="top:calc(var(--header-h) + 4px);left:8px">
 <div class="menu-label">📅 امروز</div>
 <div style="padding:4px 14px 8px;font-size:.78rem;color:var(--accent2)" id="settingsToday"></div>
@@ -4454,6 +4489,101 @@ function applyTheme(a,a2,a3,rgb){
   const r=document.documentElement.style;
   r.setProperty('--accent',a);r.setProperty('--accent2',a2);r.setProperty('--accent3',a3);r.setProperty('--accent-rgb',rgb);
 }
+// ============================================================
+// SETTINGS MENU FIX (Universal - v3)
+// ============================================================
+(function fixSettingsMenu(){
+  let attempts = 0;
+  const tryBind = ()=>{
+    attempts++;
+    if(attempts > 20) return; // بعد ۱۰ ثانیه صرف نظر
+    
+    const btn = document.getElementById('settingsBtn');
+    const menu = document.getElementById('settingsMenu');
+    const backdrop = document.getElementById('settingsBackdrop');
+    
+    if(!btn || !menu){
+      setTimeout(tryBind, 500);
+      return;
+    }
+    
+    if(btn.hasAttribute('data-fixed-v3')){
+      console.log('⚠️ Settings menu قبلاً fixed شده');
+      return;
+    }
+    btn.setAttribute('data-fixed-v3', '1');
+    
+    // clone برای پاک کردن listener های قبلی
+    const newBtn = btn.cloneNode(true);
+    btn.parentNode.replaceChild(newBtn, btn);
+    
+    function openMenu(){
+      const el = document.getElementById('settingsToday');
+      if(el){
+        try{
+          const t = Jalali.today();
+          const p = Jalali.parseKey(t);
+          el.textContent = Jalali.weekdayName(t)+' '+p.jd+' '+Jalali.monthName(p.jm)+' '+p.jy;
+        }catch(e){}
+      }
+      menu.classList.add('open');
+      if(window.innerWidth < 760 && backdrop){
+        backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+    
+    function closeMenu(){
+      menu.classList.remove('open');
+      if(backdrop) backdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    
+    newBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      e.preventDefault();
+      if(menu.classList.contains('open')){
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+    
+    if(backdrop){
+      backdrop.addEventListener('click', closeMenu);
+    }
+    
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && menu.classList.contains('open')){
+        closeMenu();
+      }
+    });
+    
+    document.addEventListener('click', function(e){
+      if(!menu.classList.contains('open')) return;
+      if(window.innerWidth < 760) return;
+      if(menu.contains(e.target)) return;
+      if(newBtn.contains(e.target)) return;
+      closeMenu();
+    });
+    
+    menu.addEventListener('click', function(e){
+      const clicked = e.target.closest('button');
+      if(!clicked) return;
+      if(clicked.hasAttribute('data-font')) return;
+      if(clicked.id === 'fontUp' || clicked.id === 'fontDown' || clicked.id === 'fontReset') return;
+      setTimeout(closeMenu, 200);
+    });
+    
+    console.log('✅ Settings menu fixed v3');
+  };
+  
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ()=>setTimeout(tryBind, 300));
+  } else {
+    setTimeout(tryBind, 300);
+  }
+})();
 
 // ============================================================
 // ۷. Font & Font Scale
