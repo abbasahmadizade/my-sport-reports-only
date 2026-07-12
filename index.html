@@ -3976,7 +3976,6 @@ async function cloudDownload(){
 function scheduleCloudSync(){
   if(cloudSyncPending) return;
   cloudSyncPending = true;
-  // 10 ثانیه تأخیر (بجای 3) — تغییرات متعدد یکجا sync میشن
   setTimeout(()=>{
     cloudSyncPending = false;
     if(cloudConfig.binId && cloudConfig.apiKey) cloudUpload(true);
@@ -3987,22 +3986,14 @@ let __lastSyncedHash = null;
 function startAutoSync(){
   if(cloudSyncTimer) clearInterval(cloudSyncTimer);
   if(cloudConfig.autoSync && cloudConfig.binId && cloudConfig.apiKey){
-    __lastSyncedHash = JSON.stringify(state()).length + '_' + Object.keys(state().rows||[]).length;
-    // هر ۱۵ دقیقه چک — فقط اگه تغییری باشه upload
+    __lastSyncedHash = JSON.stringify(state()).length + '_' + (state().rows||[]).length;
     cloudSyncTimer = setInterval(()=>{
-      const currentHash = JSON.stringify(state()).length + '_' + Object.keys(state().rows||[]).length;
+      const currentHash = JSON.stringify(state()).length + '_' + (state().rows||[]).length;
       if(currentHash !== __lastSyncedHash){
         cloudUpload(true);
         __lastSyncedHash = currentHash;
       }
     }, 15*60*1000);
-  }
-}
-
-function startAutoSync(){
-  if(cloudSyncTimer) clearInterval(cloudSyncTimer);
-  if(cloudConfig.autoSync && cloudConfig.binId && cloudConfig.apiKey){
-    cloudSyncTimer = setInterval(()=>{cloudUpload(true)}, 5*60*1000);
   }
 }
 
