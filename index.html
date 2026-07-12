@@ -387,6 +387,30 @@ width:5px;height:5px;border-radius:50%;background:var(--green);
 .cal-day.empty{visibility:hidden}
 .cal-footer{margin-top:10px;display:flex;gap:6px}
 .cal-footer button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--accent2);font-family:var(--font-family);font-size:.8rem;cursor:pointer;font-weight:700}
+/* SLEEP HEATMAP */
+.heatmap-container{padding:16px 8px}
+.heatmap-title{font-weight:700;margin-bottom:14px;font-size:.95rem;text-align:center;color:var(--accent2)}
+.heatmap-info{font-size:.7rem;color:var(--muted);text-align:center;margin-bottom:10px}
+.heatmap-grid{display:grid;grid-template-columns:auto repeat(7,1fr);gap:4px;max-width:100%;overflow-x:auto}
+.heatmap-label{font-size:.65rem;color:var(--muted);text-align:center;padding:4px 2px;font-weight:700}
+.heatmap-row-label{font-size:.7rem;color:var(--muted);padding:6px 4px;text-align:right;font-weight:700;white-space:nowrap}
+.heatmap-cell{aspect-ratio:1;border-radius:6px;position:relative;transition:.2s;cursor:pointer;min-height:32px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.9)}
+.heatmap-cell:active{transform:scale(1.15)}
+.heatmap-cell.empty{background:rgba(255,255,255,.03);color:transparent;cursor:default}
+.heatmap-cell.hm-0{background:rgba(239,68,68,.6)}
+.heatmap-cell.hm-1{background:rgba(245,158,11,.55)}
+.heatmap-cell.hm-2{background:rgba(139,92,246,.4)}
+.heatmap-cell.hm-3{background:rgba(139,92,246,.6)}
+.heatmap-cell.hm-4{background:rgba(16,185,129,.65)}
+.heatmap-cell.hm-5{background:rgba(16,185,129,.85)}
+.heatmap-legend{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:14px;font-size:.68rem;color:var(--muted);flex-wrap:wrap}
+.heatmap-legend-item{display:flex;align-items:center;gap:3px}
+.heatmap-legend-box{width:12px;height:12px;border-radius:3px}
+@media(max-width:480px){
+.heatmap-cell{min-height:26px;font-size:.55rem}
+.heatmap-row-label{font-size:.6rem;padding:4px 2px}
+.heatmap-label{font-size:.55rem}
+}
 
 /* CHART */
 .chart-tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px}
@@ -923,12 +947,18 @@ margin-top:10px;font-family:var(--font-family);
 <button type="button" class="chart-tab" data-chart="energy">⚡ انرژی</button>
 <button type="button" class="chart-tab" data-chart="activity">🏃 فعالیت</button>
 <button type="button" class="chart-tab" data-chart="radar">🕸️ رادار</button>
+<button type="button" class="chart-tab" data-chart="heatmap">🔥 هیت‌مپ</button>
+<button type="button" class="chart-tab" data-chart="bedtime">🌙 ساعت خواب</button>
+<button type="button" class="chart-tab" data-chart="weekly">📅 هفتگی</button>
 <button type="button" class="chart-tab" data-chart="scatter">🔬 همبستگی</button>
 </div>
 <div class="chart-panel active" id="chartPanel-sleep"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="sleep">⛶</button><canvas id="chartSleep"></canvas></div></div>
 <div class="chart-panel" id="chartPanel-energy"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="energy">⛶</button><canvas id="chartEnergy"></canvas></div></div>
 <div class="chart-panel" id="chartPanel-activity"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="activity">⛶</button><canvas id="chartActivity"></canvas></div></div>
 <div class="chart-panel" id="chartPanel-radar"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="radar">⛶</button><canvas id="chartRadar"></canvas></div></div>
+<div class="chart-panel" id="chartPanel-bedtime"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="bedtime">⛶</button><canvas id="chartBedtime"></canvas></div></div>
+<div class="chart-panel" id="chartPanel-weekly"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="weekly">⛶</button><canvas id="chartWeekly"></canvas></div></div>
+<div class="chart-panel" id="chartPanel-heatmap"><div class="card chart-card"><div id="heatmapContainer" style="min-height:200px"></div></div></div>
 <div class="chart-panel" id="chartPanel-scatter"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="scatter">⛶</button><canvas id="chartScatter"></canvas></div></div>
 </div>
 
@@ -2932,6 +2962,155 @@ function renderChartsIfReady(){
   if(typeof Chart==='undefined'){setTimeout(renderChartsIfReady,300);return}
   renderAllCharts();
 }
+// ============================================================
+// SLEEP HEATMAP (Safe & Limited)
+// ============================================================
+function renderSleepHeatmap(){
+  const container = document.getElementById('heatmapContainer');
+  if(!container) return;
+  
+  try{
+    const sorted = [...state().rows].sort((a,b)=>Jalali.cmp(a.jdate, b.jdate));
+    
+    if(!sorted.length){
+      container.innerHTML = '<div class="empty-state"><span class="emoji">📭</span><p>هنوز داده‌ای نیست</p></div>';
+      return;
+    }
+    
+    // محدودیت: فقط ۹۰ روز اخیر (~۳ ماه)
+    const MAX_DAYS = 90;
+    let dataToShow = sorted;
+    if(sorted.length > MAX_DAYS){
+      dataToShow = sorted.slice(-MAX_DAYS);
+    }
+    
+    const firstDay = dataToShow[0].jdate;
+    const lastDay = dataToShow[dataToShow.length-1].jdate;
+    
+    // ساخت map از دیتا
+    const dateMap = {};
+    dataToShow.forEach(r => {
+      if(r && r.jdate) dateMap[r.jdate] = r;
+    });
+    
+    // پیدا کردن اولین شنبه (شروع هفته اول)
+    const firstWeekday = Jalali.weekday(firstDay);
+    let startDate = firstDay;
+    for(let i=0; i<firstWeekday; i++){
+      startDate = Jalali.addDays(startDate, -1);
+    }
+    
+    // ساخت هفته‌ها
+    const weeks = [];
+    let currentWeek = [];
+    let cursor = startDate;
+    let iterations = 0;
+    const MAX_ITER = 200; // safety limit
+    
+    while(Jalali.cmp(cursor, lastDay) <= 0 && iterations < MAX_ITER){
+      const wd = Jalali.weekday(cursor);
+      currentWeek[wd] = {jdate: cursor, row: dateMap[cursor] || null};
+      
+      if(wd === 6){ // پنجشنبه = آخر هفته
+        // پر کردن null های خالی
+        for(let i=0; i<7; i++){
+          if(!currentWeek[i]) currentWeek[i] = null;
+        }
+        weeks.push(currentWeek);
+        currentWeek = [];
+      }
+      
+      cursor = Jalali.addDays(cursor, 1);
+      iterations++;
+    }
+    
+    // اضافه کردن هفته آخر ناقص
+    if(currentWeek.length > 0){
+      for(let i=0; i<7; i++){
+        if(!currentWeek[i]) currentWeek[i] = null;
+      }
+      weeks.push(currentWeek);
+    }
+    
+    // محدودیت: حداکثر ۱۵ هفته
+    if(weeks.length > 15){
+      weeks.splice(0, weeks.length - 15);
+    }
+    
+    // ساخت HTML
+    let html = '<div class="heatmap-container">';
+    html += `<div class="heatmap-title">🔥 نقشه حرارتی خواب</div>`;
+    html += `<div class="heatmap-info">${dataToShow.length} روز • ${weeks.length} هفته</div>`;
+    html += '<div class="heatmap-grid">';
+    
+    // هدر روزهای هفته
+    html += '<div class="heatmap-label"></div>';
+    Jalali.WEEK_DAYS.forEach(d => {
+      html += `<div class="heatmap-label">${d.slice(0,1)}</div>`;
+    });
+    
+    // ردیف‌های هفته
+    weeks.forEach((week) => {
+      // پیدا کردن اولین روز غیر null برای label
+      const firstCell = week.find(x => x !== null);
+      const label = firstCell ? firstCell.jdate.slice(5) : '';
+      html += `<div class="heatmap-row-label">${label}</div>`;
+      
+      week.forEach(cell => {
+        if(!cell){
+          html += '<div class="heatmap-cell empty"></div>';
+          return;
+        }
+        
+        if(!cell.row){
+          html += `<div class="heatmap-cell empty" title="${cell.jdate} - بدون ثبت"></div>`;
+          return;
+        }
+        
+        try{
+          const si = sleepInfo(cell.row.sleepBlocks);
+          const h = si.totalH || 0;
+          
+          let level;
+          if(h === 0) level = 'empty';
+          else if(h < 4) level = '0';
+          else if(h < 5.5) level = '1';
+          else if(h < 6.5) level = '2';
+          else if(h < 7.5) level = '3';
+          else if(h < 9) level = '4';
+          else level = '5';
+          
+          const displayText = h > 0 ? h.toFixed(1) : '';
+          const tooltip = `${cell.jdate} • ${si.totalDisplay || '0:00'}`;
+          
+          html += `<div class="heatmap-cell hm-${level}" title="${tooltip}">${displayText}</div>`;
+        }catch(e){
+          console.warn('heatmap cell error:', e);
+          html += '<div class="heatmap-cell empty"></div>';
+        }
+      });
+    });
+    
+    html += '</div>';
+    
+    // Legend
+    html += `<div class="heatmap-legend">
+      <span class="heatmap-legend-item"><span class="heatmap-legend-box hm-0"></span>&lt;4h</span>
+      <span class="heatmap-legend-item"><span class="heatmap-legend-box hm-1"></span>4-5.5h</span>
+      <span class="heatmap-legend-item"><span class="heatmap-legend-box hm-2"></span>5.5-6.5h</span>
+      <span class="heatmap-legend-item"><span class="heatmap-legend-box hm-3"></span>6.5-7.5h</span>
+      <span class="heatmap-legend-item"><span class="heatmap-legend-box hm-4"></span>7.5-9h</span>
+      <span class="heatmap-legend-item"><span class="heatmap-legend-box hm-5"></span>9h+</span>
+    </div>`;
+    html += '</div>';
+    
+    container.innerHTML = html;
+  }catch(e){
+    console.error('renderSleepHeatmap error:', e);
+    container.innerHTML = '<div class="empty-state"><span class="emoji">⚠️</span><p>خطا در نمایش هیت‌مپ</p><p style="font-size:.7rem">' + e.message + '</p></div>';
+  }
+}
+
 function renderAllCharts(){
   const sorted=[...state().rows].sort((a,b)=>Jalali.cmp(a.jdate,b.jdate));
   const labels=sorted.map(r=>r.jdate.slice(5));
@@ -2986,7 +3165,220 @@ function renderAllCharts(){
         scales:{r:{grid:{color:'rgba(255,255,255,.1)'},angleLines:{color:'rgba(255,255,255,.08)'},ticks:{color:'#aaa',backdropColor:'transparent',font},pointLabels:{color:'#ddd',font}}},
         plugins:{legend:{labels:{color:'#ddd',font,padding:12}}}}});
   }
-
+  // Sleep Heatmap
+  try{
+    renderSleepHeatmap();
+  }catch(e){console.warn('heatmap render error:', e)}
+    // Bedtime Pattern
+  try{
+    destroyChart('bedtime');
+    const cB = document.getElementById('chartBedtime');
+    if(cB && sorted.length > 0){
+      // محدودیت: فقط ۳۰ روز اخیر برای خوانایی
+      const MAX_BEDTIME_DAYS = 30;
+      const bedtimeSorted = sorted.length > MAX_BEDTIME_DAYS 
+        ? sorted.slice(-MAX_BEDTIME_DAYS) 
+        : sorted;
+      
+      const bedtimeLabels = [];
+      const bedtimeData = [];
+      const wakeData = [];
+      
+      bedtimeSorted.forEach(r => {
+        try{
+          const si = sleepInfo(r.sleepBlocks);
+          bedtimeLabels.push(r.jdate.slice(5));
+          
+          // ساعت خواب
+          if(si.bedtime && si.bedtime !== '--:--'){
+            let btMin = timeToMin(si.bedtime);
+            // اگه بین 12 ظهر تا 12 شب بود، همینه
+            // اگه بعد نصف شب بود، +24
+            if(btMin < 720) btMin += 1440; // 12*60=720
+            bedtimeData.push(btMin/60);
+          } else {
+            bedtimeData.push(null);
+          }
+          
+          // ساعت بیداری
+          if(si.wakeTime && si.wakeTime !== '--:--'){
+            const wtMin = timeToMin(si.wakeTime);
+            wakeData.push(wtMin/60);
+          } else {
+            wakeData.push(null);
+          }
+        }catch(e){
+          console.warn('bedtime data error:', e);
+          bedtimeLabels.push(r.jdate.slice(5));
+          bedtimeData.push(null);
+          wakeData.push(null);
+        }
+      });
+        // Weekly Comparison
+  try{
+    destroyChart('weekly');
+    const cW = document.getElementById('chartWeekly');
+    if(cW){
+      const weeks = weeklyBreakdown();
+      
+      if(weeks.length === 0){
+        // خالی، skip
+      } else {
+        // محدودیت: حداکثر ۱۲ هفته اخیر
+        const MAX_WEEKS = 12;
+        const weeksToShow = weeks.length > MAX_WEEKS 
+          ? weeks.slice(-MAX_WEEKS) 
+          : weeks;
+        
+        chartInstances.weekly = new Chart(cW, {
+          type: 'bar',
+          data: {
+            labels: weeksToShow.map(w => w.label),
+            datasets: [
+              {
+                label: '😴 خواب (ساعت)',
+                data: weeksToShow.map(w => w.avgSleep || 0),
+                backgroundColor: 'rgba(139,92,246,.75)',
+                borderRadius: 6
+              },
+              {
+                label: '⚡ انرژی',
+                data: weeksToShow.map(w => w.avgEnergy || 0),
+                backgroundColor: 'rgba(16,185,129,.75)',
+                borderRadius: 6
+              },
+              {
+                label: '🙂 حال',
+                data: weeksToShow.map(w => w.avgMood || 0),
+                backgroundColor: 'rgba(236,72,153,.75)',
+                borderRadius: 6
+              },
+              {
+                label: '🏃 دویدن (÷۵)',
+                data: weeksToShow.map(w => (w.totalRun || 0) / 5),
+                backgroundColor: 'rgba(245,158,11,.65)',
+                borderRadius: 6
+              },
+              {
+                label: '✅ روزهای فعال',
+                data: weeksToShow.map(w => w.completedCount || 0),
+                backgroundColor: 'rgba(14,165,233,.65)',
+                borderRadius: 6
+              }
+            ]
+          },
+          options: {
+            ...opts,
+            scales: {
+              x: {...opts.scales.x},
+              y: {
+                ...opts.scales.y,
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'مقدار',
+                  color: '#aaa',
+                  font: font
+                }
+              }
+            },
+            plugins: {
+              ...opts.plugins,
+              tooltip: {
+                titleFont: font,
+                bodyFont: font,
+                callbacks: {
+                  label: function(ctx){
+                    let value = ctx.parsed.y;
+                    // برای دویدن (÷۵)، عدد واقعی رو نشون بده
+                    if(ctx.dataset.label.includes('دویدن')){
+                      value = (value * 5).toFixed(0) + ' دقیقه';
+                    } else {
+                      value = value.toFixed(1);
+                    }
+                    return ctx.dataset.label + ': ' + value;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+  }catch(e){
+    console.warn('weekly chart error:', e);
+  }
+      chartInstances.bedtime = new Chart(cB, {
+        type: 'line',
+        data: {
+          labels: bedtimeLabels,
+          datasets: [
+            {
+              label: '🛏️ ساعت خواب',
+              data: bedtimeData,
+              borderColor: '#8b5cf6',
+              backgroundColor: 'rgba(139,92,246,.15)',
+              fill: false,
+              tension: 0.3,
+              pointRadius: 4,
+              pointBackgroundColor: '#8b5cf6',
+              borderWidth: 2.5,
+              spanGaps: true
+            },
+            {
+              label: '⏰ ساعت بیداری',
+              data: wakeData,
+              borderColor: '#f59e0b',
+              backgroundColor: 'rgba(245,158,11,.15)',
+              fill: false,
+              tension: 0.3,
+              pointRadius: 4,
+              pointBackgroundColor: '#f59e0b',
+              borderWidth: 2.5,
+              spanGaps: true
+            }
+          ]
+        },
+        options: {
+          ...opts,
+          scales: {
+            ...opts.scales,
+            y: {
+              ...opts.scales.y,
+              min: 0,
+              max: 32,
+              ticks: {
+                ...opts.scales.y.ticks,
+                stepSize: 4,
+                callback: function(v){
+                  const h = Math.floor(v) % 24;
+                  return String(h).padStart(2, '0') + ':00';
+                }
+              }
+            }
+          },
+          plugins: {
+            ...opts.plugins,
+            tooltip: {
+              titleFont: font,
+              bodyFont: font,
+              callbacks: {
+                label: function(ctx){
+                  if(ctx.parsed.y === null) return ctx.dataset.label + ': --';
+                  const v = ctx.parsed.y;
+                  const h = Math.floor(v) % 24;
+                  const m = Math.round((v - Math.floor(v)) * 60);
+                  return ctx.dataset.label + ': ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  }catch(e){
+    console.warn('bedtime chart error:', e);
+  }
   destroyChart('scatter');
   const c5=document.getElementById('chartScatter');
   if(c5){
