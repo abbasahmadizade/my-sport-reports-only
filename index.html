@@ -438,36 +438,25 @@ color:#c4b5fd;direction:ltr;text-align:left;white-space:pre-wrap;word-break:brea
 width:42px;height:42px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:.2s;
 }
 .theme-btn.active{border-color:rgba(255,255,255,.85);box-shadow:0 0 14px rgba(255,255,255,.25)}
-/* BACKUP REMINDER BANNER */
+/* BACKUP REMINDER */
 .backup-reminder{
 grid-column:1/-1;
 background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.05));
 border:1px solid rgba(245,158,11,.35);
-border-radius:14px;padding:14px 16px;margin-bottom:8px;
+border-radius:14px;padding:14px 16px;margin-bottom:12px;
 display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-animation:slideDown .4s ease;
-box-shadow:0 4px 20px rgba(245,158,11,.15);
+animation:slideDown .4s ease;box-shadow:0 4px 20px rgba(245,158,11,.15);
 }
-@keyframes slideDown{
-from{opacity:0;transform:translateY(-10px)}
-to{opacity:1;transform:translateY(0)}
-}
-.backup-reminder-icon{
-font-size:1.8rem;flex-shrink:0;
-filter:drop-shadow(0 2px 8px rgba(245,158,11,.4));
-}
-.backup-reminder-content{flex:1;min-width:150px}
-.backup-reminder-title{
-font-weight:800;color:#fbbf24;font-size:.95rem;margin-bottom:2px;
-}
-.backup-reminder-desc{
-font-size:.78rem;color:#a69dc6;
-}
-.backup-reminder-actions{display:flex;gap:6px;flex-wrap:wrap}
-.backup-reminder-actions .btn{min-height:38px;font-size:.8rem;padding:9px 14px}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.backup-reminder .br-icon{font-size:1.8rem;flex-shrink:0}
+.backup-reminder .br-content{flex:1;min-width:150px}
+.backup-reminder .br-title{font-weight:800;color:#fbbf24;font-size:.95rem;margin-bottom:2px}
+.backup-reminder .br-desc{font-size:.78rem;color:#a69dc6}
+.backup-reminder .br-actions{display:flex;gap:6px;flex-wrap:wrap}
+.backup-reminder .br-actions .btn{min-height:38px;font-size:.8rem;padding:9px 14px}
 @media(max-width:480px){
-.backup-reminder{flex-direction:column;align-items:stretch;text-align:center}
-.backup-reminder-actions{justify-content:center}
+.backup-reminder{flex-direction:column;text-align:center}
+.backup-reminder .br-actions{justify-content:center;width:100%}
 }
 
 /* TOAST */
@@ -814,6 +803,9 @@ margin-top:10px;font-family:var(--font-family);
 <button type="button" id="cloudSetupBtn">🔑 تنظیمات</button>
 <button type="button" id="cloudUpBtn">⬆️ ذخیره آنلاین</button>
 <button type="button" id="cloudDownBtn">⬇️ بارگذاری</button>
+<hr>
+<div class="menu-label">🔧 عیب‌یابی</div>
+<button type="button" id="healthCheckBtn">🩺 تست سلامت</button>
 <hr>
 <div class="menu-label">🔐 حساب</div>
 <button type="button" onclick="window.resetAppPassword()">🔑 تغییر رمز</button>
@@ -1387,6 +1379,23 @@ margin-top:10px;font-family:var(--font-family);
 
 <!-- Calendar -->
 <div id="calendarPopup" class="cal-popup" style="display:none"></div>
+<!-- MODAL: Health Check -->
+<div class="modal-overlay" id="modalHealth">
+<div class="modal" style="max-width:520px">
+<div class="modal-header">
+<h2>🩺 تست سلامت سیستم</h2>
+<button type="button" class="modal-close" id="modalHealthClose">✕</button>
+</div>
+<div class="modal-body">
+<div id="healthResults" style="font-family:'Courier New',monospace;font-size:.82rem;line-height:1.9;direction:ltr;text-align:left"></div>
+<hr>
+<div class="flex gap-2 flex-wrap mt-3">
+<button type="button" class="btn btn-primary btn-sm" id="healthRefreshBtn">🔄 مجدد</button>
+<button type="button" class="btn btn-ghost btn-sm" id="healthCopyBtn">📋 کپی</button>
+</div>
+</div>
+</div>
+</div>
 
 <div class="toast-container" id="toastContainer"></div>
 
@@ -3051,6 +3060,126 @@ A.dismissBackupReminder = function(){
   document.getElementById('backupReminderBanner')?.remove();
   toast('باشه، هفته دیگه یادآوری میشه','default', 2000);
 };
+// ============================================================
+// HEALTH CHECK
+// ============================================================
+A.testSyncFunc = function(){
+  try{
+    return startAutoSync.toString();
+  }catch(e){return null}
+};
+
+A.runHealthCheck = function(){
+  const results = [];
+  const ok = '<span style="color:#10b981">✅</span>';
+  const bad = '<span style="color:#ef4444">❌</span>';
+  const warn = '<span style="color:#f59e0b">⚠️</span>';
+  const info = '<span style="color:#8b5cf6">ℹ️</span>';
+  
+  results.push('<b style="color:#a78bfa;font-size:1rem">📦 نسخه</b>');
+  results.push(`${info} Version: v4.2`);
+  results.push(`${info} Build: 1405-04-25`);
+  results.push('');
+  
+  // Login
+  results.push('<b style="color:#a78bfa">🔐 لاگین</b>');
+  const auth = safeStorage.getItem('sport_auth_v1');
+  const sess = safeStorage.getItem('sport_session_v1');
+  results.push(`${auth ? ok : warn} Auth: ${auth ? 'setup شده' : 'ست نشده'}`);
+  results.push(`${sess ? ok : warn} Session: ${sess ? 'فعال' : 'غیرفعال'}`);
+  results.push('');
+  
+  // Data
+  results.push('<b style="color:#a78bfa">📊 دیتا</b>');
+  const data = JSON.parse(safeStorage.getItem('sport_report_v2') || '{}');
+  results.push(`${data.rows?.length > 0 ? ok : warn} Rows: ${data.rows?.length || 0} روز`);
+  results.push(`${info} Futsal: ${data.futsal?.length || 0} جلسه`);
+  results.push(`${info} Sleep Goal: ${data.goals?.sleepGoalHours || '-'}h`);
+  results.push(`${info} Activity Goal: ${data.goals?.activityGoalMin || '-'}m`);
+  results.push('');
+  
+  // Cloud
+  results.push('<b style="color:#a78bfa">☁️ ابری</b>');
+  const cc = JSON.parse(safeStorage.getItem('sport_cloud_v2') || '{}');
+  results.push(`${cc.apiKey ? ok : bad} API Key: ${cc.apiKey ? 'set' : 'missing'}`);
+  results.push(`${cc.binId ? ok : bad} Bin ID: ${cc.binId ? cc.binId.substring(0,15)+'...' : 'missing'}`);
+  results.push(`${cc.autoSync ? ok : warn} Auto Sync: ${cc.autoSync ? 'on' : 'off'}`);
+  if(cc.lastSync){
+    const mins = Math.floor((Date.now() - cc.lastSync) / 60000);
+    results.push(`${info} Last Sync: ${mins < 60 ? mins+'m ago' : Math.floor(mins/60)+'h ago'}`);
+  }
+  results.push('');
+  
+  // Sync Optimization
+  results.push('<b style="color:#a78bfa">⚡ بهینه‌سازی Sync</b>');
+  try{
+    const funcStr = A.testSyncFunc();
+    const has15m = funcStr && funcStr.includes('15*60*1000');
+    const hasHash = funcStr && funcStr.includes('lastStateHash');
+    results.push(`${has15m ? ok : bad} Auto 15min: ${has15m ? 'yes' : 'still 5min'}`);
+    results.push(`${hasHash ? ok : bad} Hash Check: ${hasHash ? 'yes' : 'no'}`);
+  }catch(e){
+    results.push(`${warn} Cannot verify sync functions`);
+  }
+  results.push('');
+  
+  // Backup Reminder
+  results.push('<b style="color:#a78bfa">💾 یادآور Backup</b>');
+  const lastBk = safeStorage.getItem('sport_last_backup_v1');
+  const hasBackupFunc = typeof A.doBackupNow === 'function';
+  results.push(`${hasBackupFunc ? ok : bad} تابع Backup: ${hasBackupFunc ? 'موجود' : 'نصب نشده'}`);
+  if(!lastBk){
+    results.push(`${warn} هرگز backup محلی نگرفتی`);
+  } else {
+    const days = Math.floor((Date.now() - parseInt(lastBk)) / (24*60*60*1000));
+    results.push(`${info} ${days} روز از آخرین backup`);
+    results.push(`${days >= 7 ? warn : ok} بنر: ${days >= 7 ? 'باید نمایش داده شه' : (7-days)+' روز دیگه'}`);
+  }
+  results.push('');
+  
+  // Storage
+  results.push('<b style="color:#a78bfa">💽 حافظه</b>');
+  let total = 0;
+  Object.keys(safeStorage).forEach(k => {
+    if(k.startsWith('sport_')){
+      total += (safeStorage.getItem(k) || '').length;
+    }
+  });
+  results.push(`${info} Total: ${(total/1024).toFixed(2)} KB`);
+  results.push(`${info} Rows size: ${(JSON.stringify(data.rows||[]).length/1024).toFixed(2)} KB`);
+  results.push('');
+  
+  // Theme
+  results.push('<b style="color:#a78bfa">🎨 ظاهر</b>');
+  const theme = safeStorage.getItem('sport_accent_v3');
+  const font = safeStorage.getItem('sport_font_v1');
+  const scale = safeStorage.getItem('sport_font_scale_v1');
+  results.push(`${info} Theme: ${theme ? 'custom' : 'default'}`);
+  results.push(`${info} Font: ${font || 'Vazirmatn'}`);
+  results.push(`${info} Font Scale: ${scale || '1.0'}x`);
+  results.push('');
+  
+  // Browser
+  results.push('<b style="color:#a78bfa">🌐 مرورگر</b>');
+  results.push(`${info} Screen: ${window.innerWidth}×${window.innerHeight}`);
+  results.push(`${info} Mobile: ${window.innerWidth < 760 ? 'yes' : 'no'}`);
+  results.push('');
+  
+  // Summary
+  const critical = [!!auth, !!(cc.apiKey && cc.binId), (data.rows?.length > 0)];
+  const okCount = critical.filter(x=>x).length;
+  results.push('<b style="color:#a78bfa">📋 خلاصه</b>');
+  if(okCount === 3){
+    results.push(`${ok} <b>همه چیز عالیه!</b>`);
+  } else if(okCount === 2){
+    results.push(`${warn} <b>یه مورد ناقصه</b>`);
+  } else {
+    results.push(`${bad} <b>چند مورد ناقصه</b>`);
+  }
+  
+  const el = document.getElementById('healthResults');
+  if(el) el.innerHTML = results.join('<br>');
+};
 A.renderLog = renderLog;
 A.renderFutsal = renderFutsal;
 A.renderAIView = renderAIView;
@@ -3847,25 +3976,26 @@ async function cloudDownload(){
 function scheduleCloudSync(){
   if(cloudSyncPending) return;
   cloudSyncPending = true;
-  // 10 ثانیه تأخیر (بجای 3) — که تغییرات متعدد یکجا sync شن
+  // 10 ثانیه تأخیر (بجای 3) — تغییرات متعدد یکجا sync میشن
   setTimeout(()=>{
     cloudSyncPending = false;
     if(cloudConfig.binId && cloudConfig.apiKey) cloudUpload(true);
   }, 10000);
 }
 
+let __lastSyncedHash = null;
 function startAutoSync(){
   if(cloudSyncTimer) clearInterval(cloudSyncTimer);
   if(cloudConfig.autoSync && cloudConfig.binId && cloudConfig.apiKey){
-    // فقط اگه تغییری باشه sync میشه، هر 15 دقیقه چک میشه
-    let lastStateHash = JSON.stringify(state()).length;
+    __lastSyncedHash = JSON.stringify(state()).length + '_' + Object.keys(state().rows||[]).length;
+    // هر ۱۵ دقیقه چک — فقط اگه تغییری باشه upload
     cloudSyncTimer = setInterval(()=>{
-      const currentHash = JSON.stringify(state()).length;
-      if(currentHash !== lastStateHash){
+      const currentHash = JSON.stringify(state()).length + '_' + Object.keys(state().rows||[]).length;
+      if(currentHash !== __lastSyncedHash){
         cloudUpload(true);
-        lastStateHash = currentHash;
+        __lastSyncedHash = currentHash;
       }
-    }, 15*60*1000); // 15 دقیقه
+    }, 15*60*1000);
   }
 }
 
@@ -4193,6 +4323,27 @@ function bindEvents(){
 
   // Cloud
   document.getElementById('cloudSetupBtn')?.addEventListener('click',openCloudModal);
+    // Health Check
+  document.getElementById('healthCheckBtn')?.addEventListener('click', ()=>{
+    A.runHealthCheck();
+    document.getElementById('modalHealth')?.classList.add('open');
+  });
+  document.getElementById('modalHealthClose')?.addEventListener('click', ()=>{
+    document.getElementById('modalHealth')?.classList.remove('open');
+  });
+  document.getElementById('healthRefreshBtn')?.addEventListener('click', A.runHealthCheck);
+  document.getElementById('healthCopyBtn')?.addEventListener('click', async ()=>{
+    const el = document.getElementById('healthResults');
+    if(!el) return;
+    const text = el.innerText || el.textContent;
+    try{
+      await navigator.clipboard.writeText(text);
+      toast('✅ کپی شد!','success');
+    }catch(e){toast('خطا','error')}
+  });
+  document.getElementById('modalHealth')?.addEventListener('click',function(e){
+    if(e.target===this) this.classList.remove('open');
+  });
   document.getElementById('cloudSetupBtn2')?.addEventListener('click',openCloudModal);
   document.getElementById('cloudUpBtn')?.addEventListener('click',()=>cloudUpload(false));
   document.getElementById('cloudDownBtn')?.addEventListener('click',cloudDownload);
