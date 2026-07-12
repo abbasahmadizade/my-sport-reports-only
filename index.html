@@ -387,75 +387,6 @@ width:5px;height:5px;border-radius:50%;background:var(--green);
 .cal-day.empty{visibility:hidden}
 .cal-footer{margin-top:10px;display:flex;gap:6px}
 .cal-footer button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--accent2);font-family:var(--font-family);font-size:.8rem;cursor:pointer;font-weight:700}
-/* SLEEP HEATMAP */
-.heatmap-container{padding:12px 4px}
-.heatmap-title{font-weight:700;margin-bottom:12px;font-size:.95rem;text-align:center;color:var(--accent2)}
-.heatmap-scroll{
-  width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  padding-bottom:8px;
-}
-.heatmap-grid{
-  display:grid;
-  grid-template-columns:48px repeat(7,minmax(38px,1fr));
-  gap:3px;
-  min-width:320px;
-}
-.heatmap-label{
-  font-size:.65rem;color:var(--muted);text-align:center;
-  padding:4px 2px;font-weight:700;
-}
-.heatmap-row-label{
-  font-size:.68rem;color:var(--muted);
-  padding:6px 4px;text-align:right;font-weight:700;
-  white-space:nowrap;display:flex;align-items:center;
-}
-.heatmap-cell{
-  border-radius:6px;position:relative;
-  min-height:36px;min-width:36px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.63rem;font-weight:700;color:rgba(255,255,255,.9);
-  cursor:pointer;user-select:none;
-  -webkit-tap-highlight-color:transparent;
-}
-.heatmap-cell.empty{background:rgba(255,255,255,.03);color:transparent}
-.heatmap-cell.hm-0{background:rgba(239,68,68,.6)}
-.heatmap-cell.hm-1{background:rgba(245,158,11,.5)}
-.heatmap-cell.hm-2{background:rgba(139,92,246,.35)}
-.heatmap-cell.hm-3{background:rgba(139,92,246,.55)}
-.heatmap-cell.hm-4{background:rgba(139,92,246,.75)}
-.heatmap-cell.hm-5{background:rgba(16,185,129,.75)}
-.heatmap-cell.hm-none{background:rgba(255,255,255,.06);color:rgba(255,255,255,.3)}
-.heatmap-cell .hm-val{position:relative;z-index:1}
-.heatmap-toast{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-  background:#1a1533;border:1px solid var(--border);border-radius:10px;
-  padding:8px 16px;font-size:.78rem;color:var(--text);z-index:999;
-  box-shadow:0 4px 20px rgba(0,0,0,.5);
-  opacity:0;transition:opacity .2s;pointer-events:none;
-  text-align:center;max-width:90vw;
-}
-.heatmap-toast.show{opacity:1}
-.heatmap-legend{
-  display:flex;justify-content:center;align-items:center;gap:5px;
-  margin-top:12px;font-size:.68rem;color:var(--muted);flex-wrap:wrap;
-}
-.heatmap-legend-item{display:flex;align-items:center;gap:3px}
-.heatmap-legend-box{width:14px;height:14px;border-radius:3px}
-.heatmap-legend-box.lg-0{background:rgba(239,68,68,.6)}
-.heatmap-legend-box.lg-1{background:rgba(245,158,11,.5)}
-.heatmap-legend-box.lg-2{background:rgba(139,92,246,.35)}
-.heatmap-legend-box.lg-3{background:rgba(139,92,246,.55)}
-.heatmap-legend-box.lg-4{background:rgba(139,92,246,.75)}
-.heatmap-legend-box.lg-5{background:rgba(16,185,129,.75)}
-@media(max-width:480px){
-  .heatmap-grid{
-    grid-template-columns:40px repeat(7,minmax(32px,1fr));
-    gap:2px;min-width:290px;
-  }
-  .heatmap-cell{min-height:32px;min-width:32px;font-size:.58rem}
-  .heatmap-row-label{font-size:.6rem;padding:4px 2px}
-  .heatmap-label{font-size:.58rem}
-}
 
 /* CHART */
 .chart-tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:12px;padding-bottom:4px}
@@ -991,9 +922,6 @@ margin-top:10px;font-family:var(--font-family);
 <button type="button" class="chart-tab active" data-chart="sleep">😴 خواب</button>
 <button type="button" class="chart-tab" data-chart="energy">⚡ انرژی</button>
 <button type="button" class="chart-tab" data-chart="activity">🏃 فعالیت</button>
-<button type="button" class="chart-tab" data-chart="heatmap">🔥 هیت‌مپ</button>
-<button type="button" class="chart-tab" data-chart="bedtime">🌙 ساعت خواب</button>
-<button type="button" class="chart-tab" data-chart="weekly">📅 هفتگی</button>
 <button type="button" class="chart-tab" data-chart="radar">🕸️ رادار</button>
 <button type="button" class="chart-tab" data-chart="scatter">🔬 همبستگی</button>
 </div>
@@ -1002,9 +930,6 @@ margin-top:10px;font-family:var(--font-family);
 <div class="chart-panel" id="chartPanel-activity"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="activity">⛶</button><canvas id="chartActivity"></canvas></div></div>
 <div class="chart-panel" id="chartPanel-radar"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="radar">⛶</button><canvas id="chartRadar"></canvas></div></div>
 <div class="chart-panel" id="chartPanel-scatter"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="scatter">⛶</button><canvas id="chartScatter"></canvas></div></div>
-<div class="chart-panel" id="chartPanel-heatmap"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="heatmap" onclick="document.getElementById('chartPanel-heatmap').querySelector('.card').classList.toggle('chart-fs')">⛶</button><div id="heatmapContainer"></div></div></div>
-<div class="chart-panel" id="chartPanel-bedtime"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="bedtime">⛶</button><canvas id="chartBedtime"></canvas></div></div>
-<div class="chart-panel" id="chartPanel-weekly"><div class="card chart-card"><button type="button" class="chart-fullscreen-btn" data-fs="weekly">⛶</button><canvas id="chartWeekly"></canvas></div></div>
 </div>
 
 <div class="chart-fullscreen" id="chartFs">
@@ -1983,41 +1908,24 @@ const RatingSlider = {
       };
       
       let isDragging = false;
-let ignoreHeatmapTouch = false;
-
-slider.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  handleMove(e.clientX);
-});
-
-slider.addEventListener('touchstart', (e) => {
-  if(e.target.closest('.heatmap-scroll')){
-    ignoreHeatmapTouch = true;
-    isDragging = false;
-    return;
-  }
-  ignoreHeatmapTouch = false;
-  isDragging = true;
-  handleMove(e.touches[0].clientX);
-}, {passive:true});
-
-document.addEventListener('mousemove', (e) => {
-  if(isDragging) handleMove(e.clientX);
-});
-
-document.addEventListener('touchmove', (e) => {
-  if(ignoreHeatmapTouch) return;
-  if(isDragging) handleMove(e.touches[0].clientX);
-}, {passive:true});
-
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-});
-
-document.addEventListener('touchend', () => {
-  isDragging = false;
-  ignoreHeatmapTouch = false;
-});
+      slider.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        handleMove(e.clientX);
+      });
+      slider.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        handleMove(e.touches[0].clientX);
+      }, {passive:true});
+      document.addEventListener('mousemove', (e) => {
+        if(isDragging) handleMove(e.clientX);
+      });
+      document.addEventListener('touchmove', (e) => {
+        if(isDragging) handleMove(e.touches[0].clientX);
+      }, {passive:true});
+      document.addEventListener('mouseup', () => { isDragging = false; });
+      document.addEventListener('touchend', () => { isDragging = false; });
+    });
+  },
   
   cap(s){return s.charAt(0).toUpperCase()+s.slice(1)},
   
@@ -3024,108 +2932,6 @@ function renderChartsIfReady(){
   if(typeof Chart==='undefined'){setTimeout(renderChartsIfReady,300);return}
   renderAllCharts();
 }
-function renderSleepHeatmap(){
-  const container = document.getElementById('heatmapContainer');
-  if(!container) return;
-  const sorted = [...state().rows].sort((a,b)=>Jalali.cmp(a.jdate, b.jdate));
-  if(!sorted.length){
-    container.innerHTML = '<div class="empty-state"><span class="emoji">📭</span><p>داده‌ای نیست</p></div>';
-    return;
-  }
-  const dateMap = {};
-  sorted.forEach(r => dateMap[r.jdate] = r);
-  const firstDay = sorted[0].jdate;
-  const today = Jalali.today();
-  let startCursor = firstDay;
-  const startWd = Jalali.weekday(startCursor);
-  for(let i = 0; i < startWd; i++) startCursor = Jalali.addDays(startCursor, -1);
-  let endCursor = today;
-  const endWd = Jalali.weekday(endCursor);
-  for(let i = endWd; i < 6; i++) endCursor = Jalali.addDays(endCursor, 1);
-  const weeks = [];
-  let cursor = startCursor;
-  let currentWeek = [];
-  while(Jalali.cmp(cursor, endCursor) <= 0){
-    const wd = Jalali.weekday(cursor);
-    currentWeek.push({jdate: cursor, row: dateMap[cursor] || null, wd: wd});
-    if(wd === 6){
-      weeks.push(currentWeek);
-      currentWeek = [];
-    }
-    cursor = Jalali.addDays(cursor, 1);
-  }
-  if(currentWeek.length) weeks.push(currentWeek);
-  const toastId = 'heatmap-toast-' + Date.now();
-  let html = '<div class="heatmap-container">';
-  html += '<div class="heatmap-title">🔥 نقشه حرارتی خواب</div>';
-  html += '<div class="heatmap-scroll">';
-  html += '<div class="heatmap-grid">';
-  html += '<div class="heatmap-label"></div>';
-  const dayLetters = ['ش','ی','د','س','چ','پ','ج'];
-  dayLetters.forEach(d => { html += '<div class="heatmap-label">' + d + '</div>'; });
-  weeks.forEach(week => {
-    const firstCell = week.find(x => x);
-    const label = firstCell ? firstCell.jdate.slice(5) : '';
-    html += '<div class="heatmap-row-label">' + label + '</div>';
-    for(let wd = 0; wd <= 6; wd++){
-      const cell = week.find(c => c.wd === wd);
-      if(!cell){
-        html += '<div class="heatmap-cell empty"></div>';
-        continue;
-      }
-      if(!cell.row){
-        const isBeforeFirst = Jalali.cmp(cell.jdate, firstDay) < 0;
-        const isAfterToday = Jalali.cmp(cell.jdate, today) > 0;
-        if(isBeforeFirst || isAfterToday){
-          html += '<div class="heatmap-cell empty"></div>';
-        } else {
-          html += '<div class="heatmap-cell hm-none" data-info="' + cell.jdate + ' — ثبت نشده" onclick="hmToast(this)">-</div>';
-        }
-        continue;
-      }
-      const si = sleepInfo(cell.row.sleepBlocks);
-      const h = si.totalH;
-      let level;
-      if(h <= 0){ level = 'none'; }
-      else if(h < 4){ level = '0'; }
-      else if(h < 5.5){ level = '1'; }
-      else if(h < 6.5){ level = '2'; }
-      else if(h < 7.5){ level = '3'; }
-      else if(h < 9){ level = '4'; }
-      else { level = '5'; }
-      const p = Jalali.parseKey(cell.jdate);
-      const wdName = Jalali.weekdayName(cell.jdate);
-      const info = wdName + ' ' + p.jd + ' ' + Jalali.monthName(p.jm) + ' — ' + si.totalDisplay;
-      const displayVal = h > 0 ? h.toFixed(1) : '-';
-      html += '<div class="heatmap-cell hm-' + level + '" data-info="' + info + '" onclick="hmToast(this)"><span class="hm-val">' + displayVal + '</span></div>';
-    }
-  });
-  html += '</div></div>';
-  html += '<div class="heatmap-legend">';
-  html += '<span class="heatmap-legend-item"><span class="heatmap-legend-box lg-0"></span>&lt;4h</span>';
-  html += '<span class="heatmap-legend-item"><span class="heatmap-legend-box lg-1"></span>4-5.5</span>';
-  html += '<span class="heatmap-legend-item"><span class="heatmap-legend-box lg-2"></span>5.5-6.5</span>';
-  html += '<span class="heatmap-legend-item"><span class="heatmap-legend-box lg-3"></span>6.5-7.5</span>';
-  html += '<span class="heatmap-legend-item"><span class="heatmap-legend-box lg-4"></span>7.5-9</span>';
-  html += '<span class="heatmap-legend-item"><span class="heatmap-legend-box lg-5"></span>9+</span>';
-  html += '</div>';
-  html += '<div class="heatmap-toast" id="' + toastId + '"></div>';
-  html += '</div>';
-  container.innerHTML = html;
-  container.dataset.toastId = toastId;
-}
-function hmToast(el){
-  const info = el.getAttribute('data-info');
-  if(!info) return;
-  const container = el.closest('.heatmap-container');
-  const toast = container ? container.querySelector('.heatmap-toast') : null;
-  if(!toast) return;
-  toast.textContent = info;
-  toast.classList.add('show');
-  clearTimeout(window._hmToastTimer);
-  window._hmToastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
 function renderAllCharts(){
   const sorted=[...state().rows].sort((a,b)=>Jalali.cmp(a.jdate,b.jdate));
   const labels=sorted.map(r=>r.jdate.slice(5));
@@ -3182,200 +2988,19 @@ function renderAllCharts(){
   }
 
   destroyChart('scatter');
-const c5=document.getElementById('chartScatter');
-if(c5){
-  const points=[];
-  for(let i=0;i<sorted.length-1;i++){
-    points.push({x:sleepInfo(sorted[i].sleepBlocks).totalH,y:sorted[i+1].energy||0});
+  const c5=document.getElementById('chartScatter');
+  if(c5){
+    const points=[];
+    for(let i=0;i<sorted.length-1;i++){
+      points.push({x:sleepInfo(sorted[i].sleepBlocks).totalH,y:sorted[i+1].energy||0});
+    }
+    chartInstances.scatter=new Chart(c5,{type:'scatter',data:{datasets:[{
+      label:'خواب امشب → انرژی فردا',data:points,backgroundColor:'rgba(139,92,246,.65)',pointRadius:7,pointHoverRadius:10,borderColor:accent,borderWidth:1.5
+    }]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:1000},
+      scales:{x:{title:{display:true,text:'خواب (ساعت)',color:'#aaa',font},ticks:{color:'#aaa',font},grid:{color:'rgba(255,255,255,.06)'}},
+        y:{title:{display:true,text:'انرژی فردا',color:'#aaa',font},ticks:{color:'#aaa',font},grid:{color:'rgba(255,255,255,.06)'},min:0,max:10}},
+      plugins:{legend:{labels:{color:'#ddd',font}}}}});
   }
-  chartInstances.scatter=new Chart(c5,{type:'scatter',data:{datasets:[{
-    label:'خواب امشب → انرژی فردا',data:points,backgroundColor:'rgba(139,92,246,.65)',pointRadius:7,pointHoverRadius:10,borderColor:accent,borderWidth:1.5
-  }]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:1000},
-    scales:{x:{title:{display:true,text:'خواب (ساعت)',color:'#aaa',font},ticks:{color:'#aaa',font},grid:{color:'rgba(255,255,255,.06)'}},
-      y:{title:{display:true,text:'انرژی فردا',color:'#aaa',font},ticks:{color:'#aaa',font},grid:{color:'rgba(255,255,255,.06)'},min:0,max:10}},
-    plugins:{legend:{labels:{color:'#ddd',font}}}}});
-}
-
-  // ─── اینجا کدهای جدید را paste کن ───
-  renderSleepHeatmap();
-
-  destroyChart('bedtime');
-  const cBed = document.getElementById('chartBedtime');
-  if(cBed){
-    const bedLabels = [];
-    const bedData = [];
-    const wakeData = [];
-
-    sorted.forEach(r => {
-      const si = sleepInfo(r.sleepBlocks);
-      bedLabels.push(r.jdate.slice(5));
-
-      if(si.bedtime !== '--:--'){
-        let btMin = timeToMin(si.bedtime);
-        if(btMin < 720) btMin += 1440;
-        bedData.push(btMin / 60);
-      } else {
-        bedData.push(null);
-      }
-
-      if(si.wakeTime !== '--:--'){
-        wakeData.push(timeToMin(si.wakeTime) / 60);
-      } else {
-        wakeData.push(null);
-      }
-    });
-
-    chartInstances.bedtime = new Chart(cBed, {
-      type: 'line',
-      data: {
-        labels: bedLabels,
-        datasets: [
-          {
-            label: '🛏️ ساعت خواب',
-            data: bedData,
-            borderColor: '#8b5cf6',
-            backgroundColor: 'rgba(139,92,246,.15)',
-            fill: false,
-            tension: .3,
-            pointRadius: 4,
-            pointBackgroundColor: '#8b5cf6',
-            borderWidth: 2.5,
-            spanGaps: true
-          },
-          {
-            label: '⏰ ساعت بیداری',
-            data: wakeData,
-            borderColor: '#f59e0b',
-            backgroundColor: 'rgba(245,158,11,.15)',
-            fill: false,
-            tension: .3,
-            pointRadius: 4,
-            pointBackgroundColor: '#f59e0b',
-            borderWidth: 2.5,
-            spanGaps: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          x: {
-            ticks: {
-              color: '#aaa',
-              font: font,
-              maxRotation: 45,
-              autoSkip: true,
-              maxTicksLimit: window.innerWidth < 500 ? 7 : 15
-            },
-            grid: { color: 'rgba(255,255,255,.05)' }
-          },
-          y: {
-            min: 0,
-            max: 32,
-            ticks: {
-              color: '#aaa',
-              font: font,
-              stepSize: 2,
-              callback: function(v){
-                return String(Math.floor(v) % 24).padStart(2,'0') + ':00';
-              }
-            },
-            grid: { color: 'rgba(255,255,255,.06)' }
-          }
-        },
-        plugins: {
-          legend: {
-            labels: {
-              color: '#ccc',
-              font: font,
-              usePointStyle: true,
-              padding: 12
-            }
-          },
-          tooltip: {
-            titleFont: font,
-            bodyFont: font,
-            callbacks: {
-              label: function(ctx){
-                const v = ctx.parsed.y;
-                if(v === null || v === undefined) return '';
-                const h = Math.floor(v) % 24;
-                const m = Math.round((v - Math.floor(v)) * 60);
-                return ctx.dataset.label + ': '
-                  + String(h).padStart(2,'0') + ':'
-                  + String(m).padStart(2,'0');
-              }
-            }
-          }
-        }
-      }
-    });
-  }
-
-  destroyChart('weekly');
-  const cWk = document.getElementById('chartWeekly');
-  if(cWk){
-    const weeks = weeklyBreakdown();
-    const isMobile = window.innerWidth < 500;
-
-    chartInstances.weekly = new Chart(cWk, {
-      type: 'bar',
-      data: {
-        labels: weeks.map(w => w.label),
-        datasets: isMobile
-          ? [
-              { label:'😴 خواب', data: weeks.map(w=>w.avgSleep), backgroundColor:'rgba(139,92,246,.7)', borderRadius:6 },
-              { label:'⚡ انرژی', data: weeks.map(w=>w.avgEnergy), backgroundColor:'rgba(16,185,129,.7)', borderRadius:6 },
-              { label:'🙂 حال', data: weeks.map(w=>w.avgMood), backgroundColor:'rgba(236,72,153,.7)', borderRadius:6 }
-            ]
-          : [
-              { label:'😴 خواب (h)', data: weeks.map(w=>w.avgSleep), backgroundColor:'rgba(139,92,246,.7)', borderRadius:6 },
-              { label:'⚡ انرژی', data: weeks.map(w=>w.avgEnergy), backgroundColor:'rgba(16,185,129,.7)', borderRadius:6 },
-              { label:'🙂 حال', data: weeks.map(w=>w.avgMood), backgroundColor:'rgba(236,72,153,.7)', borderRadius:6 },
-              { label:'🏃 دویدن (÷۵)', data: weeks.map(w=>w.totalRun/5), backgroundColor:'rgba(245,158,11,.6)', borderRadius:6 },
-              { label:'✅ فعال', data: weeks.map(w=>w.completedCount), backgroundColor:'rgba(14,165,233,.6)', borderRadius:6 }
-            ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        scales: {
-          x: {
-            ticks: {
-              color: '#aaa',
-              font: font,
-              maxRotation: 45,
-              autoSkip: true,
-              maxTicksLimit: isMobile ? 6 : 12
-            },
-            grid: { color: 'rgba(255,255,255,.05)' }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: { color: '#aaa', font: font },
-            grid: { color: 'rgba(255,255,255,.06)' },
-            title: { display: !isMobile, text: 'مقدار', color: '#aaa', font: font }
-          }
-        },
-        plugins: {
-          legend: {
-            position: isMobile ? 'bottom' : 'top',
-            labels: {
-              color: '#ccc',
-              font: font,
-              usePointStyle: true,
-              padding: isMobile ? 6 : 12
-            }
-          },
-          tooltip: { titleFont: font, bodyFont: font }
-        }
-      }
-    });
-  }
-
 }
 
 function openChartFullscreen(key){
@@ -3485,35 +3110,16 @@ A.runHealthCheck = function(){
   }
   results.push('');
   
-  // Sync Optimization — تشخیص واقعی
+  // Sync Optimization
   results.push('<b style="color:#a78bfa">⚡ بهینه‌سازی Sync</b>');
   try{
-    // متد ۱: بخون از source
-    const scriptTags = document.querySelectorAll('script');
-    let sourceCheck = false;
-    let has15min = false;
-    let hasHash = false;
-    let has10sec = false;
-    
-    for(let s of scriptTags){
-      const c = s.textContent || '';
-      if(c.includes('function startAutoSync') || c.includes('function scheduleCloudSync')){
-        sourceCheck = true;
-        if(c.includes('15*60*1000') || c.includes('15 * 60 * 1000')) has15min = true;
-        if(c.includes('__lastSyncedHash') || c.includes('lastStateHash') || c.includes('currentHash')) hasHash = true;
-        if(c.match(/setTimeout[\s\S]{0,80}10000/)) has10sec = true;
-      }
-    }
-    
-    if(sourceCheck){
-      results.push(`${has15min ? ok : bad} Auto interval 15min: ${has15min ? 'yes' : 'still 5min'}`);
-      results.push(`${hasHash ? ok : bad} Hash check optimization: ${hasHash ? 'yes' : 'no'}`);
-      results.push(`${has10sec ? ok : bad} Debounce 10sec: ${has10sec ? 'yes' : 'still 3sec'}`);
-    } else {
-      results.push(`${warn} تابع sync در source پیدا نشد`);
-    }
+    const funcStr = A.testSyncFunc();
+    const has15m = funcStr && funcStr.includes('15*60*1000');
+    const hasHash = funcStr && funcStr.includes('lastStateHash');
+    results.push(`${has15m ? ok : bad} Auto 15min: ${has15m ? 'yes' : 'still 5min'}`);
+    results.push(`${hasHash ? ok : bad} Hash Check: ${hasHash ? 'yes' : 'no'}`);
   }catch(e){
-    results.push(`${warn} خطا: ${e.message}`);
+    results.push(`${warn} Cannot verify sync functions`);
   }
   results.push('');
   
@@ -4466,37 +4072,14 @@ function setupFontSystem(){
   const savedScale = safeStorage.getItem(A.LS_FONT_SCALE);
   if(savedScale) applyFontScale(parseFloat(savedScale));
 
-document.getElementById('settingsBtn')?.addEventListener('click',function(e){
+  document.getElementById('settingsBtn')?.addEventListener('click',e=>{
     e.stopPropagation();
-    e.preventDefault();
-    const menu = document.getElementById('settingsMenu');
-    if(!menu) return;
-    menu.classList.toggle('open');
-    // Update تاریخ امروز
+    document.getElementById('settingsMenu')?.classList.toggle('open');
     const el = document.getElementById('settingsToday');
     if(el){
       const t = Jalali.today();
       const p = Jalali.parseKey(t);
       el.textContent = Jalali.weekdayName(t)+' '+p.jd+' '+Jalali.monthName(p.jm)+' '+p.jy;
-    }
-    // پوزیشن روی موبایل
-    if(window.innerWidth < 760){
-      const btn = e.currentTarget.getBoundingClientRect();
-      menu.style.top = (btn.bottom + 4) + 'px';
-      menu.style.left = '8px';
-      menu.style.right = '8px';
-      menu.style.maxWidth = 'calc(100vw - 16px)';
-    }
-  });
-  
-  // برای بستن با تاچ روی موبایل
-  document.addEventListener('touchend', function(e){
-    const menu = document.getElementById('settingsMenu');
-    const btn = document.getElementById('settingsBtn');
-    if(menu && menu.classList.contains('open')){
-      if(!menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)){
-        setTimeout(()=>menu.classList.remove('open'), 100);
-      }
     }
   });
 
