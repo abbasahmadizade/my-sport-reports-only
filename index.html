@@ -446,6 +446,45 @@ font-family:var(--font-family);text-align:center;
 .toast.error{background:var(--red)}
 .toast.success{background:var(--green)}
 
+/* MORE MENU (mobile) */
+.more-sheet{
+position:fixed;bottom:0;left:0;right:0;z-index:150;
+background:var(--bg2);border-top:1px solid var(--border);
+border-radius:20px 20px 0 0;
+padding:16px 12px calc(env(safe-area-inset-bottom,0) + 20px);
+transform:translateY(100%);transition:transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+box-shadow:0 -10px 40px rgba(0,0,0,.5);
+}
+.more-sheet.open{transform:translateY(0)}
+.more-sheet-backdrop{
+position:fixed;inset:0;z-index:149;background:rgba(0,0,0,.5);
+opacity:0;pointer-events:none;transition:opacity .3s;
+backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.more-sheet-backdrop.open{opacity:1;pointer-events:auto}
+.more-sheet-handle{
+width:40px;height:4px;background:rgba(255,255,255,.2);
+border-radius:2px;margin:0 auto 16px;
+}
+.more-sheet-title{
+text-align:center;font-size:.85rem;color:var(--muted);
+font-weight:700;margin-bottom:14px;
+}
+.more-grid{
+display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+}
+.more-item{
+display:flex;flex-direction:column;align-items:center;justify-content:center;
+gap:6px;padding:16px 8px;
+background:rgba(var(--accent-rgb),.08);
+border:1px solid rgba(var(--accent-rgb),.2);
+border-radius:14px;cursor:pointer;transition:.2s;
+font-family:var(--font-family);color:var(--text);
+}
+.more-item:active{transform:scale(.94);background:rgba(var(--accent-rgb),.2)}
+.more-item .more-icon{font-size:1.8rem;line-height:1}
+.more-item .more-label{font-size:.78rem;font-weight:700}
+
 /* SETTINGS DROPDOWN */
 .dropdown-menu{
 position:fixed;z-index:150;
@@ -978,8 +1017,41 @@ margin-top:10px;font-family:var(--font-family);
 <button type="button" data-tab="log"><span class="nav-icon">📋</span>ثبت</button>
 <button type="button" data-tab="charts"><span class="nav-icon">📊</span>نمودار</button>
 <button type="button" data-tab="ai"><span class="nav-icon">🧠</span>تحلیل</button>
-<button type="button" data-tab="export"><span class="nav-icon">📤</span>خروجی</button>
+<button type="button" id="moreMenuBtn"><span class="nav-icon">⋯</span>بیشتر</button>
 </nav>
+
+<!-- Mobile More Menu -->
+<div class="more-sheet-backdrop" id="moreSheetBackdrop"></div>
+<div class="more-sheet" id="moreSheet">
+<div class="more-sheet-handle"></div>
+<div class="more-sheet-title">دسترسی سریع</div>
+<div class="more-grid">
+<button type="button" class="more-item" data-tab="futsal">
+<span class="more-icon">⚽</span>
+<span class="more-label">فوتسال</span>
+</button>
+<button type="button" class="more-item" data-tab="calc">
+<span class="more-icon">🧮</span>
+<span class="more-label">محاسبه‌گر</span>
+</button>
+<button type="button" class="more-item" data-tab="export">
+<span class="more-icon">📤</span>
+<span class="more-label">خروجی</span>
+</button>
+<button type="button" class="more-item" onclick="document.getElementById('quickLog').click()">
+<span class="more-icon">➕</span>
+<span class="more-label">ثبت امروز</span>
+</button>
+<button type="button" class="more-item" onclick="document.getElementById('addFutsalBtn').click()">
+<span class="more-icon">⚽</span>
+<span class="more-label">+ فوتسال</span>
+</button>
+<button type="button" class="more-item" onclick="document.getElementById('settingsBtn').click()">
+<span class="more-icon">⚙️</span>
+<span class="more-label">تنظیمات</span>
+</button>
+</div>
+</div>
 
 <!-- MODAL: Day -->
 <div class="modal-overlay" id="modalDay">
@@ -3771,6 +3843,33 @@ function setupCalcs(){
 // ۹. Events
 // ============================================================
 function bindEvents(){
+  // More menu (mobile)
+  const moreSheet = document.getElementById('moreSheet');
+  const moreSheetBackdrop = document.getElementById('moreSheetBackdrop');
+  const moreMenuBtn = document.getElementById('moreMenuBtn');
+
+  function openMoreSheet(){
+    moreSheet?.classList.add('open');
+    moreSheetBackdrop?.classList.add('open');
+  }
+  function closeMoreSheet(){
+    moreSheet?.classList.remove('open');
+    moreSheetBackdrop?.classList.remove('open');
+  }
+
+  moreMenuBtn?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    openMoreSheet();
+  });
+  moreSheetBackdrop?.addEventListener('click', closeMoreSheet);
+
+  moreSheet?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.more-item');
+    if(item){
+      setTimeout(closeMoreSheet, 200);
+    }
+  });
   // Navigation
   document.addEventListener('click',e=>{
     const tab=e.target.closest('[data-tab]');
