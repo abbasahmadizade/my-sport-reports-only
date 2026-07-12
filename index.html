@@ -438,6 +438,37 @@ color:#c4b5fd;direction:ltr;text-align:left;white-space:pre-wrap;word-break:brea
 width:42px;height:42px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:.2s;
 }
 .theme-btn.active{border-color:rgba(255,255,255,.85);box-shadow:0 0 14px rgba(255,255,255,.25)}
+/* BACKUP REMINDER BANNER */
+.backup-reminder{
+grid-column:1/-1;
+background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.05));
+border:1px solid rgba(245,158,11,.35);
+border-radius:14px;padding:14px 16px;margin-bottom:8px;
+display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+animation:slideDown .4s ease;
+box-shadow:0 4px 20px rgba(245,158,11,.15);
+}
+@keyframes slideDown{
+from{opacity:0;transform:translateY(-10px)}
+to{opacity:1;transform:translateY(0)}
+}
+.backup-reminder-icon{
+font-size:1.8rem;flex-shrink:0;
+filter:drop-shadow(0 2px 8px rgba(245,158,11,.4));
+}
+.backup-reminder-content{flex:1;min-width:150px}
+.backup-reminder-title{
+font-weight:800;color:#fbbf24;font-size:.95rem;margin-bottom:2px;
+}
+.backup-reminder-desc{
+font-size:.78rem;color:#a69dc6;
+}
+.backup-reminder-actions{display:flex;gap:6px;flex-wrap:wrap}
+.backup-reminder-actions .btn{min-height:38px;font-size:.8rem;padding:9px 14px}
+@media(max-width:480px){
+.backup-reminder{flex-direction:column;align-items:stretch;text-align:center}
+.backup-reminder-actions{justify-content:center}
+}
 
 /* TOAST */
 .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:6px;pointer-events:none;max-width:calc(100vw - 32px)}
@@ -2491,6 +2522,7 @@ A.goto = goto;
 // ============================================================
 function renderDashboard(){
   const stats=computeStats(state().rows);
+    checkBackupReminder();
   const grid=document.getElementById('kpiGrid');
   if(grid){
     grid.innerHTML=`
@@ -2512,6 +2544,51 @@ function renderDashboard(){
   document.getElementById('goalSleep').value=state().goals?.sleepGoalHours||7;
   document.getElementById('goalActivity').value=state().goals?.activityGoalMin||20;
   renderGoalProgress();
+}
+// ============================================================
+// BACKUP REMINDER (یادآور هفتگی)
+// ============================================================
+const LS_LAST_BACKUP = 'sport_last_backup_v1';
+const BACKUP_INTERVAL_DAYS = 7;
+
+function checkBackupReminder(){
+  const lastBackup = safeStorage.getItem(LS_LAST_BACKUP);
+  const now = Date.now();
+  const daysSince = lastBackup 
+    ? Math.floor((now - parseInt(lastBackup)) / (24*60*60*1000)) 
+    : 999;
+  
+  // اگه تازه بکاپ گرفته یا کمتر از 7 روزه، خارج شو
+  if(daysSince < BACKUP_INTERVAL_DAYS) return;
+  
+  // اگه بنر قبلاً هست، دوباره نساز
+  if(document.getElementById('backupReminderBanner')) return;
+  
+  const grid = document.getElementById('kpiGrid');
+  if(!grid || !grid.parentElement) return;
+  
+  const banner = document.createElement('div');
+  banner.id = 'backupReminderBanner';
+  banner.className = 'backup-reminder';
+  
+  const msg = daysSince === 999 
+    ? 'هنوز backup محلی نگرفتی' 
+    : daysSince + ' روزه backup محلی نگرفتی';
+  
+  banner.innerHTML = `
+    <span class="backup-reminder-icon">💾</span>
+    <div class="backup-reminder-content">
+      <div class="backup-reminder-title">وقت backup محلی!</div>
+      <div class="backup-reminder-desc">${msg} — یه فایل امن دم دستت داشته باش</div>
+    </div>
+    <div class="backup-reminder-actions">
+      <button type="button" class="btn btn-primary btn-sm" onclick="window._app.doBackupNow()">📤 بگیر</button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="window._app.skipBackupReminder()">۲ روز بعد</button>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="window._app.dismissBackupReminder()">✕</button>
+    </div>
+  `;
+  
+  grid.parentElement.insertBefore(banner, grid);
 }
 
 function renderStreakMap(){
@@ -2937,6 +3014,43 @@ function closeChartFullscreen(){
 }
 
 A.renderDashboard = renderDashboard;
+A.doBackupNow = function(){
+  try{
+    const data = JSON.stringify(state(), null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = Jalali.today();
+    a.href = url;
+    a.download = 'sport-backup-' + dateStr + '.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+    safeStorage.setItem(LS_LAST_BACKUP, String(Date.now()));
+    document.getElementById('backupReminderBanner')?.remove();
+    toast('✅ بکاپ دانلود شد! تو Google Drive یا جای امن نگه دار','success', 4000);
+  }catch(e){
+    console.error('backup error:', e);
+    toast('خطا در دانلود','error');
+  }
+};
+
+A.skipBackupReminder = function(){
+  // 5 روز عقب بندازش (که 2 روز دیگه یاد بیاره)
+  safeStorage.setItem(LS_LAST_BACKUP, String(Date.now() - (5 * 24*60*60*1000)));
+  document.getElementById('backupReminderBanner')?.remove();
+  toast('👌 ۲ روز دیگه یادآوری میشه','default', 2000);
+};
+
+A.dismissBackupReminder = function(){
+  // فقط این هفته رو skip کن (7 روز عقب)
+  safeStorage.setItem(LS_LAST_BACKUP, String(Date.now()));
+  document.getElementById('backupReminderBanner')?.remove();
+  toast('باشه، هفته دیگه یادآوری میشه','default', 2000);
+};
 A.renderLog = renderLog;
 A.renderFutsal = renderFutsal;
 A.renderAIView = renderAIView;
@@ -3625,7 +3739,11 @@ function updateCloudStatus(){
   const lastTxt = timeSince === null ? 'هرگز' : timeSince === 0 ? 'الان' : timeSince < 60 ? `${timeSince}د پیش` : `${Math.floor(timeSince/60)}س پیش`;
   if(badge){badge.className='cloud-badge ok';badge.textContent='☁️ ✓'}
   if(dotEl) dotEl.className='status-dot ok';
-  if(textEl) textEl.textContent='آخرین sync: '+lastTxt;
+    let extraInfo = '';
+  if(cloudConfig.remainingRequests !== undefined){
+    extraInfo = ` • ${cloudConfig.remainingRequests} باقی`;
+  }
+  if(textEl) textEl.textContent='آخرین sync: '+lastTxt+extraInfo;
 }
 
 async function cloudUpload(silent){
@@ -3664,6 +3782,12 @@ async function cloudUpload(silent){
       body: JSON.stringify(state())
     });
     if(!res.ok) {
+        // نمایش تعداد request باقی‌مونده
+    const remaining = res.headers.get('X-RateLimit-Remaining');
+    if(remaining !== null){
+      cloudConfig.remainingRequests = parseInt(remaining);
+      saveCloudConfig();
+    }
       const errText = await res.text();
       throw new Error('HTTP '+res.status+': '+errText.substring(0,100));
     }
@@ -3723,10 +3847,26 @@ async function cloudDownload(){
 function scheduleCloudSync(){
   if(cloudSyncPending) return;
   cloudSyncPending = true;
+  // 10 ثانیه تأخیر (بجای 3) — که تغییرات متعدد یکجا sync شن
   setTimeout(()=>{
     cloudSyncPending = false;
     if(cloudConfig.binId && cloudConfig.apiKey) cloudUpload(true);
-  }, 3000);
+  }, 10000);
+}
+
+function startAutoSync(){
+  if(cloudSyncTimer) clearInterval(cloudSyncTimer);
+  if(cloudConfig.autoSync && cloudConfig.binId && cloudConfig.apiKey){
+    // فقط اگه تغییری باشه sync میشه، هر 15 دقیقه چک میشه
+    let lastStateHash = JSON.stringify(state()).length;
+    cloudSyncTimer = setInterval(()=>{
+      const currentHash = JSON.stringify(state()).length;
+      if(currentHash !== lastStateHash){
+        cloudUpload(true);
+        lastStateHash = currentHash;
+      }
+    }, 15*60*1000); // 15 دقیقه
+  }
 }
 
 function startAutoSync(){
