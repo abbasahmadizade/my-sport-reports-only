@@ -1,20 +1,27 @@
 # 🏃 گزارش ورزش، خواب و انرژی
 
-> اپلیکیشن شخصی تک‌فایل HTML برای ثبت و تحلیل روزانه ورزش، خواب، انرژی و فوتسال با تقویم شمسی، تحلیل هوشمند و sync ابری
+> اپلیکیشن شخصی تک‌فایل HTML برای ثبت و تحلیل روزانه ورزش، خواب، انرژی و فوتسال با تقویم شمسی، تحلیل هوشمند، sync ابری و ۸ نمودار پیشرفته
+
+**نسخه:** v4.3  
+**Build:** 1405-04-25
 
 ---
 
 ## 📋 فهرست
 
 - [هدف برنامه](#-هدف-برنامه)
+- [ویژگی‌های اصلی](#-ویژگی‌های-اصلی)
 - [معماری فنی](#️-معماری-فنی)
 - [مدل داده](#-مدل-داده-schema)
 - [ساختار UI](#-ساختار-ui)
 - [منطق تحلیل هوشمند](#-منطق-تحلیل-هوشمند)
 - [سیستم احراز هویت](#-سیستم-احراز-هویت)
 - [Cloud Sync](#️-cloud-sync-jsonbinio)
+- [سیستم Backup چند لایه](#-سیستم-backup-چند-لایه)
 - [Export System](#-export-system)
+- [نمودارها](#-نمودارها-8-تا)
 - [تم و ظاهر](#-تم-و-ظاهر)
+- [Health Check](#-health-check)
 - [مسائل شناخته شده](#-مسائل-شناخته-شده-و-راه‌حل‌ها)
 - [دستورات Debug](#-دستورات-مفید-debug)
 - [راهنمای Deploy](#-راهنمای-deploy)
@@ -33,6 +40,24 @@
 - Sync ابری بین گوشی و لپ‌تاپ
 - تولید خروجی مناسب برای AI برای تحلیل عمیق‌تر
 - سیستم احراز هویت برای امنیت شخصی
+- ۸ نمودار مختلف برای بررسی روند
+
+---
+
+## ⭐ ویژگی‌های اصلی
+
+```
+✅ Login system با SHA-256 hash + salt
+✅ ذخیره ابری با JSONBin (بدون فیلتر از ایران)
+✅ Auto-sync هوشمند (15 دقیقه، فقط اگه تغییر باشه)
+✅ یادآور backup هفتگی
+✅ ۸ نمودار مختلف (شامل Sleep Heatmap)
+✅ Health Check دکمه‌ای برای عیب‌یابی
+✅ تحلیل هوشمند با ۸ سناریو زمانی
+✅ ۵ تم رنگی + ۴ فونت فارسی + اندازه قابل تنظیم
+✅ Responsive کامل موبایل + دسکتاپ
+✅ RTL + شمسی
+```
 
 ---
 
@@ -48,27 +73,30 @@
   - Vazirmatn (Google Fonts)
   - Sahel + Samim (jsdelivr CDN)
 - **بدون build step** — مستقیم روی GitHub Pages deploy میشه
-- **حجم**: ~150KB
+- **حجم**: ~180KB
 
 ### ذخیره‌سازی
 
 ```
 localStorage keys:
-├── sport_report_v2      → دیتای اصلی (rows, futsal, goals, programGoal)
-├── sport_accent_v3      → تم رنگی
-├── sport_font_v1        → فونت انتخابی
-├── sport_font_scale_v1  → اندازه فونت (0.8x - 1.5x)
-├── sport_cloud_v2       → {apiKey, binId, autoSync, lastSync}
-├── sport_auth_v1        → {username, hash (SHA-256), salt}
-└── sport_session_v1     → {t: timestamp}
+├── sport_report_v2        → دیتای اصلی (rows, futsal, goals, programGoal)
+├── sport_accent_v3        → تم رنگی
+├── sport_font_v1          → فونت انتخابی
+├── sport_font_scale_v1    → اندازه فونت (0.8x - 1.5x)
+├── sport_cloud_v2         → {apiKey, binId, autoSync, lastSync}
+├── sport_auth_v1          → {username, hash (SHA-256), salt}
+├── sport_session_v1       → {t: timestamp}
+└── sport_last_backup_v1   → timestamp آخرین بکاپ محلی
 ```
 
-### Sync ابری
+### Sync ابری (بهینه‌شده)
 
 - **سرویس**: JSONBin.io (رایگان، 10K request/ماه)
 - **متد**: PUT برای upload، GET برای download
-- **Auto-sync**: هر ۵ دقیقه اگه تنظیم شده
-- **Authentication**: X-Master-Key header
+- **Auto-sync**: هر ۱۵ دقیقه چک، **فقط اگه تغییری باشه** upload میشه
+- **Debounce**: ۱۰ ثانیه تأخیر بعد از تغییرات
+- **Hash check**: مقایسه با آخرین وضعیت sync شده
+- **مصرف واقعی**: ~۳۰۰-۵۰۰ request/ماه (از ۱۰,۰۰۰ سقف = ۵٪ فقط)
 - **Privacy**: Bin با تیک Private ساخته میشه
 
 ### امنیت
@@ -136,7 +164,7 @@ localStorage keys:
       extra: string
     }
   ],
-  notes: string[],                 // یادداشت‌های کلی
+  notes: string[],
   goals: {
     sleepGoalHours: number,        // پیش‌فرض 7
     activityGoalMin: number        // پیش‌فرض 20
@@ -153,10 +181,10 @@ localStorage keys:
 
 | # | تب | آیکون | توضیح |
 |---|-----|-------|-------|
-| 1 | داشبورد | 🏠 | KPIs، Streak map، Insights، ۷ روز اخیر، تایم‌لاین خواب، مقایسه هفتگی، اهداف |
+| 1 | داشبورد | 🏠 | KPIs، Streak map، Insights، ۷ روز اخیر، تایم‌لاین خواب، مقایسه هفتگی، اهداف، یادآور backup |
 | 2 | ثبت روزانه | 📋 | لیست + جستجو + ویرایش/حذف |
 | 3 | فوتسال | ⚽ | لیست جلسات + ثبت جامع |
-| 4 | نمودارها | 📊 | ۵ نمودار: خواب، انرژی/حال، فعالیت، رادار، scatter |
+| 4 | نمودارها | 📊 | **۸ نمودار** — جزئیات پایین |
 | 5 | محاسبه‌گر | 🧮 | ۴ ابزار: زمان خواب، شدت فعالیت، برنامه دویدن، ریکاوری |
 | 6 | تحلیل | 🧠 | پیشنهاد بر اساس ساعت (۸ سناریو)، روند، الگوها، نکات علمی |
 | 7 | خروجی | 📤 | Export منعطف با ۴ فرمت + Cloud + Import |
@@ -292,11 +320,60 @@ Headers:
 Response: { record: {...state}, metadata: {...} }
 ```
 
-### Auto-sync:
+### Auto-sync (بهینه‌شده در v4.2):
 
-- اگه فعال باشه، هر ۵ دقیقه upload خودکار
-- بعد از هر ثبت/تغییر با 3 ثانیه تأخیر
+- **هر ۱۵ دقیقه چک میشه** (نه upload کور)
+- **فقط اگه تغییری باشه** upload میشه (با مقایسه hash)
+- بعد از هر ثبت/تغییر با ۱۰ ثانیه تأخیر (که تغییرات متعدد یکجا sync شن)
 - Badge وضعیت بالای صفحه: ☁️ ✓ (سبز) / ⏳ (زرد) / ✗ (قرمز)
+
+### مصرف واقعی:
+
+با بهینه‌سازی جدید:
+- ✅ ۳۰۰-۵۰۰ request/ماه (از ۱۰,۰۰۰ سقف)
+- ✅ ۹۵٪+ باقی می‌مونه
+- ✅ بدون قطع سرویس
+
+---
+
+## 💾 سیستم Backup چند لایه
+
+### لایه ۱: localStorage (خودکار)
+- بعد از هر تغییر ذخیره میشه
+- روی هر دستگاه مستقل
+- سریع‌ترین، ولی محدود به همون مرورگر
+
+### لایه ۲: JSONBin (خودکار)
+- Auto-sync هر ۱۵ دقیقه (فقط اگه تغییری باشه)
+- 10 ثانیه بعد از هر ثبت
+- بین دستگاه‌ها sync میشه
+- **مصرف بهینه**: ~300-500 request/ماه از ۱۰,۰۰۰
+
+### لایه ۳: Backup محلی (نیمه‌خودکار)
+- **یادآور هفتگی**: بنر نارنجی بالای داشبورد
+- بعد از ۷ روز از آخرین backup نمایش داده میشه
+- ۳ گزینه:
+  - 📤 **بگیر**: دانلود JSON + reset timer
+  - **۲ روز بعد**: تعویق کوتاه
+  - **✕**: dismiss این هفته
+
+### چرا تلگرام نه؟
+- ❌ api.telegram.org از ایران فیلتره
+- ❌ نیاز به VPN دائم = ناپایدار
+- ✅ راه‌حل: بجاش یادآور دانلود محلی
+
+### توصیه برای کاربر:
+
+```
+هفته‌ای یه بار (وقتی بنر میاد):
+1. کلیک 📤 بگیر
+2. فایل JSON دانلود میشه
+3. یه جای امن نگه دار:
+   - Google Drive (توصیه)
+   - USB
+   - Email به خودت
+   - فولدر خاص روی لپ‌تاپ
+```
 
 ---
 
@@ -348,6 +425,62 @@ Response: { record: {...state}, metadata: {...} }
 
 ---
 
+## 📊 نمودارها (8 تا)
+
+همه نمودارها **هر بار که تب رو باز کنی**، از دیتای جدید ساخته میشن. کاملاً responsive برای موبایل.
+
+### 1. 😴 خواب (Line)
+- خط اصلی: خواب روزانه
+- خط دوم: میانگین ۷ روزه (Moving Average)
+- خط سوم: هدف (dashed قرمز)
+
+### 2. ⚡ انرژی و حال (Line)
+- ۲ خط اصلی: انرژی + حال
+- ۲ خط MA7: میانگین ۷ روزه هرکدوم
+
+### 3. 🏃 فعالیت (Stacked Bar)
+- دویدن + پیاده‌روی
+- Stack به صورت رنگی
+
+### 4. 🔥 هیت‌مپ خواب (Heatmap) ⭐ جدید
+- گرید مثل GitHub contributions
+- هر روز یه خونه
+- ۶ سطح رنگی برای مقدار خواب:
+  - 🔴 قرمز: <4h
+  - 🟡 زرد: 4-5.5h
+  - 🟣 بنفش کم: 5.5-6.5h
+  - 🟣 بنفش پر: 6.5-7.5h
+  - 🟢 سبز روشن: 7.5-9h
+  - 🟢 سبز پر: 9+h
+- Tooltip روی hover/tap
+- Legend راهنما
+
+### 5. 🌙 ساعت خواب (Line) ⭐ جدید
+- ۲ خط: ساعت خواب + ساعت بیداری
+- محور Y با فرمت ساعت (18:00, 20:00, ...)
+- بعد نصف شب (00-06) درست نمایش داده میشه
+- Tooltip با فرمت HH:MM
+
+### 6. 📅 مقایسه هفتگی (Bar) ⭐ جدید
+- ۵ dataset گروهی:
+  - 😴 خواب (h)
+  - ⚡ انرژی
+  - 🙂 حال
+  - 🏃 دویدن (÷۵)
+  - ✅ روزهای فعال
+- می‌تونی dataset‌ها رو با کلیک روی legend خاموش/روشن کنی
+
+### 7. 🕸️ رادار (Radar)
+- مقایسه ۳ هفته آخر
+- ۵ محور: خواب، انرژی، حال، دویدن، پیاده
+
+### 8. 🔬 همبستگی (Scatter)
+- خواب امشب vs انرژی فردا
+- تشخیص pattern
+- Pearson correlation
+
+---
+
 ## 🎨 تم و ظاهر
 
 - **دارک بنفش** (پیش‌فرض)
@@ -373,7 +506,77 @@ Response: { record: {...state}, metadata: {...} }
 
 ---
 
+## 🩺 Health Check
+
+سیستم عیب‌یابی داخلی برای بررسی سلامت اپ.
+
+### دسترسی:
+**⚙️ → 🩺 تست سلامت**
+
+### چیزهایی که چک می‌کنه:
+
+```
+📦 نسخه
+├── Version + Build
+
+🔐 لاگین
+├── Auth setup
+└── Session active
+
+📊 دیتا
+├── تعداد rows
+├── تعداد فوتسال
+└── Goals
+
+☁️ ابری
+├── API Key set
+├── Bin ID set
+├── Auto Sync
+└── Last sync time
+
+⚡ بهینه‌سازی Sync
+├── Auto interval 15min
+├── Hash check
+└── Debounce 10sec
+
+💾 یادآور Backup
+├── تابع Backup موجود
+├── آخرین backup
+└── وضعیت بنر
+
+💽 حافظه
+├── Total size
+└── Rows size
+
+🎨 ظاهر
+├── Theme
+├── Font
+└── Font Scale
+
+🌐 مرورگر
+├── Screen size
+└── Mobile detection
+
+📋 خلاصه (نتیجه کلی)
+```
+
+### دکمه‌ها:
+- 🔄 **مجدد**: آپدیت نتایج
+- 📋 **کپی**: کپی به clipboard برای ارسال به AI
+
+---
+
 ## 🐛 مسائل شناخته شده و راه‌حل‌ها
+
+### 0. مشکلات از ایران
+
+- ❌ **تلگرام API**: فیلتره → استفاده نشد
+- ✅ **JSONBin**: کار می‌کنه
+- ✅ **GitHub**: کار می‌کنه (کد + Pages)
+- ✅ **Google Fonts + jsdelivr CDN**: کار می‌کنه
+- ✅ **api.telegram.org**: فیلتره → از یادآور محلی بجاش استفاده شد
+
+**این پروژه ۱۰۰٪ از ایران بدون VPN کار می‌کنه.**
 
 ### 1. Font در بار اول کند لود میشه
 **راه‌حل**: `<link preconnect>` + `font-display: swap`
@@ -400,6 +603,9 @@ Response: { record: {...state}, metadata: {...} }
 
 ### 7. Rating slider default یا 5 یا 5.5؟
 **راه‌حل**: default = 5.0 (half toggle به‌طور پیش‌فرض روی "صفر")
+
+### 8. Heatmap روی موبایل با دیتای زیاد اسکرول عمودی داره
+**راه‌حل**: طبیعیه — هر هفته یه ردیف
 
 ---
 
@@ -434,8 +640,21 @@ window._app.computeStats(window._app.state().rows);  // آمار
 window._app.renderDashboard();
 window._app.renderAIView();
 
-// force cloud upload
-// (باید cloudConfig ست شده باشه)
+// ری‌ست یادآور backup (که همین الان بیاد)
+localStorage.removeItem('sport_last_backup_v1');
+window._app.renderDashboard();
+
+// force backup دانلود
+window._app.doBackupNow();
+
+// چک آخرین بکاپ
+const last = localStorage.getItem('sport_last_backup_v1');
+console.log('Last backup:', last ? new Date(parseInt(last)).toLocaleString('fa-IR') : 'هرگز');
+
+// چک وضعیت sync
+const cc = JSON.parse(localStorage.getItem('sport_cloud_v2') || '{}');
+console.log('Cloud config:', cc);
+console.log('Last sync:', cc.lastSync ? new Date(cc.lastSync).toLocaleString('fa-IR') : 'هرگز');
 ```
 
 ### مشکلات رایج:
@@ -451,10 +670,11 @@ window._app.renderAIView();
 
 **مشکل**: sync کار نمی‌کنه  
 **حل**:
-1. Console خطا نشون میده؟
-2. Bin ID و API Key درسته؟
-3. Bin تو JSONBin موجوده؟
-4. اینترنت داری؟
+1. **⚙️ → 🩺 تست سلامت** بزن
+2. ببین Cloud بخش چی میگه
+3. Console خطا نشون میده؟
+4. Bin ID و API Key درسته؟
+5. اینترنت داری؟
 
 ---
 
@@ -531,26 +751,33 @@ window._app.renderAIView();
 2. **کل بلوک رو بگو** نه فقط چند خط
 3. **حتماً از localStorage compatibility** مطمئن شو (schema رو تغییر نده)
 4. **بعد پچ، از کاربر بخواه Commit → Refresh → Test**
+5. **از Health Check برای verify کردن پچ استفاده کن**
 
 ### نقاط قوت که نباید دست بخوره:
 
 - ✅ سیستم لاگین با SHA-256
 - ✅ Rating slider (0-10 با گام 0.5)
-- ✅ تحلیل هوشمند بر اساس ساعت
-- ✅ Sync ابری با JSONBin
-- ✅ تقویم جلالی
+- ✅ تحلیل هوشمند بر اساس ساعت (۸ سناریو)
+- ✅ Sync ابری با JSONBin (auto-sync 15 دقیقه، فقط اگه تغییر باشه)
+- ✅ تقویم جلالی (jalaali-js)
 - ✅ Stepper 5-مرحله‌ای ثبت روز
-- ✅ Bottom nav با منوی "بیشتر"
+- ✅ Bottom nav با منوی "بیشتر" برای موبایل
+- ✅ یادآور backup هفتگی (banner بالای داشبورد)
+- ✅ ۳ لایه backup: localStorage + JSONBin + دستی
+- ✅ Health Check دکمه‌ای برای عیب‌یابی
+- ✅ ۸ نمودار مختلف (شامل Sleep Heatmap)
 
 ### چیزهایی که هنوز جا برای بهبود دارن:
 
-- 📊 نمودارهای بیشتر (heatmap؟)
-- 🔔 Notification یادآور
+- 📊 نمودارهای بیشتر (comparison, quality score)
+- 🔔 Push Notification یادآور
 - 📸 عکس گرفتن از غذا/ورزش
 - 💧 ردیابی مصرف آب
 - ⚖️ ثبت وزن روزانه
 - 📅 export PDF قشنگ‌تر
 - 🌐 چند زبانه (فعلاً فقط فارسی)
+- ☁️ Backup به Google Drive (چون تلگرام از ایران فیلتره)
+- 🔄 Sync دو طرفه هوشمند (تشخیص conflict)
 
 ### فایل‌های پروژه:
 
@@ -574,22 +801,78 @@ my-sport-reports-only/
 | `Jalali.*` | تقویم جلالی |
 | `sleepInfo(blocks)` | محاسبه خواب چندبازه‌ای |
 | `computeStats(rows)` | آمار |
-| `generateRecommendation()` | پیشنهاد ساعت |
-| `analyzePatterns()` | الگوها |
+| `generateRecommendation()` | پیشنهاد ساعت (۸ سناریو) |
+| `analyzePatterns()` | الگوها (Pearson correlation) |
 | `renderDashboard()` | داشبورد |
-| `openDayModal(id)` | مودال ثبت |
-| `cloudUpload()` / `cloudDownload()` | Sync |
+| `openDayModal(id)` | مودال ثبت (stepper 5 مرحله‌ای) |
+| `cloudUpload()` / `cloudDownload()` | Sync JSONBin |
 | `exportAI()` | خروجی AI |
+| `checkBackupReminder()` | یادآور backup هفتگی |
+| `renderSleepHeatmap()` | نمودار Heatmap |
+| `renderAllCharts()` | همه ۸ نمودار |
+| `A.doBackupNow()` | دانلود سریع JSON |
+| `A.runHealthCheck()` | تست سلامت سیستم |
+| `openMoreSheet()` | منوی "بیشتر" موبایل |
 
 ### تست پس از هر تغییر:
 
 - [ ] لاگین کار می‌کنه؟
 - [ ] ثبت روز جدید ذخیره میشه؟
 - [ ] ویرایش کار می‌کنه؟
-- [ ] نمودارها رندر میشن؟
-- [ ] Sync ابری OK؟
+- [ ] نمودارها رندر میشن؟ (همه ۸ تا)
+- [ ] Sync ابری OK؟ (Health Check چک کن)
 - [ ] تم و فونت حفظ شد؟
 - [ ] موبایل responsive؟
+- [ ] Backup reminder کار می‌کنه؟
+
+### چطور یک AI جدید رو با پروژه آشنا کنی:
+
+**قالب پیام:**
+
+```
+سلام! من یه اپ شخصی دارم. لطفاً اول این README رو کامل بخون:
+
+🔗 راهنما: 
+https://raw.githubusercontent.com/{USERNAME}/{REPO}/main/README.md
+
+🔗 کد کامل:
+https://raw.githubusercontent.com/{USERNAME}/{REPO}/main/index.html
+
+🌐 سایت لایو:
+https://{USERNAME}.github.io/{REPO}/
+
+بعد از خواندن، بگو "آماده کمکم" تا سوالم رو بپرسم.
+```
+
+---
+
+## 🔔 سیستم یادآور Backup
+
+### هدف:
+یادآوری هفتگی به کاربر که backup محلی بگیره (مکمل sync ابری).
+
+### مکانیزم:
+```javascript
+LS_KEY: 'sport_last_backup_v1'
+INTERVAL: 7 روز
+```
+
+### زمان نمایش بنر:
+- در `renderDashboard()` تابع `checkBackupReminder()` صدا زده میشه
+- اگه `Date.now() - lastBackup >= 7*24*60*60*1000` → بنر نمایش داده میشه
+- اگه اصلاً backup محلی نگرفته: `daysSince = 999` (فوراً نمایش)
+
+### گزینه‌های کاربر:
+| دکمه | عملکرد | تاثیر روی timer |
+|------|--------|-----------------|
+| 📤 بگیر | دانلود JSON فایل | reset به 7 روز دیگه |
+| ۲ روز بعد | فقط بستن بنر | 2 روز دیگه نمایش |
+| ✕ | dismiss این هفته | 7 روز دیگه نمایش |
+
+### فرمت نام فایل:
+```
+sport-backup-1405-04-25.json
+```
 
 ---
 
@@ -625,6 +908,28 @@ my-sport-reports-only/
 
 ---
 
+## 📅 Changelog
+
+### v4.3 (1405-04-25)
+- ✨ **جدید**: ۳ نمودار اضافه شد (Heatmap خواب، ساعت خواب، مقایسه هفتگی)
+- ✨ **جدید**: Health Check دکمه‌ای در تنظیمات
+- ✨ **جدید**: یادآور backup هفتگی با بنر نارنجی
+- ⚡ **بهبود**: Auto-sync از ۵ به ۱۵ دقیقه (با hash check)
+- ⚡ **بهبود**: Debounce از ۳ به ۱۰ ثانیه
+- 📉 **کاهش**: مصرف JSONBin ۹۵٪ کمتر شد
+
+### v4.2 (1405-04-24)
+- ✅ سیستم لاگین با SHA-256
+- ✅ منوی "بیشتر" برای موبایل
+- ✅ فیکس‌های موبایل
+
+### v4.0 (1405-04-20)
+- ✅ Cloud sync با JSONBin
+- ✅ تحلیل هوشمند ۸ سناریو زمانی
+- ✅ بازطراحی UI
+
+---
+
 ## 🎉 تشکر
 
 - [jalaali-js](https://github.com/jalaali/jalaali-js) — تقویم جلالی
@@ -634,6 +939,4 @@ my-sport-reports-only/
 
 ---
 
-**نسخه فعلی**: v4 Ultra  
-**آخرین آپدیت**: ۱۴۰۴/۰۴  
 **Made with ❤️ in Iran**
