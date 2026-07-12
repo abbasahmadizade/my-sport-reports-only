@@ -1183,15 +1183,21 @@ margin-top:10px;font-family:var(--font-family);
 </div>
 <div class="modal-body">
 <p class="text-sm text-muted mb-3">
-با <b>npoint.io</b> (بدون ثبت‌نام!) دیتات رو تو ابر ذخیره کن. 
-یه Bin ID یکبار بساز و توی همه دستگاه‌هات همون رو بذار.
+با <b>JSONBin.io</b> دیتات رو تو ابر ذخیره کن و بین گوشی/لپ‌تاپ sync کن.<br>
+<a href="https://jsonbin.io" target="_blank" style="color:var(--accent2)">🔗 راهنمای ساخت اکانت</a>
 </p>
 <div class="form-group">
-<label>📦 Bin ID</label>
-<input type="text" class="form-input" id="cloudBinId" placeholder="مثلاً: abcd1234ef567890">
+<label>🔑 API Key (Master Key)</label>
+<input type="password" class="form-input" id="cloudApiKey" placeholder="$2a$10$...">
 <p class="text-sm text-muted mt-1">
-📌 اگه خالی باشه، اولین بار خودکار ساخته میشه.<br>
-💡 برای انتقال به دستگاه دیگه، همین Bin ID رو اونجا وارد کن.
+از <a href="https://jsonbin.io/app/keys" target="_blank" style="color:var(--accent2)">jsonbin.io/app/keys</a> بگیر
+</p>
+</div>
+<div class="form-group">
+<label>📦 Bin ID</label>
+<input type="text" class="form-input" id="cloudBinId" placeholder="68a1f...">
+<p class="text-sm text-muted mt-1">
+یه Bin رو <a href="https://jsonbin.io/quick-store" target="_blank" style="color:var(--accent2)">jsonbin.io</a> بساز با محتوای <code>{}</code>
 </p>
 </div>
 <label class="checkbox-item"><input type="checkbox" id="cloudAutoSync" checked> 🔄 sync خودکار هر ۵ دقیقه</label>
@@ -3443,9 +3449,9 @@ function resetData(){
 }
 
 // ============================================================
-// ۵. Cloud — npoint.io
+// ۵. Cloud — JSONBin.io
 // ============================================================
-let cloudConfig = {binId:'', autoSync:true, lastSync:0};
+let cloudConfig = {apiKey:'', binId:'', autoSync:true, lastSync:0};
 let cloudSyncTimer = null;
 let cloudSyncPending = false;
 
@@ -3466,7 +3472,7 @@ function updateCloudStatus(){
   const dotEl = document.getElementById('cloudStatusDot');
   const textEl = document.getElementById('cloudStatusText');
   
-  if(!cloudConfig.binId){
+  if(!cloudConfig.apiKey || !cloudConfig.binId){
     if(badge){badge.className='cloud-badge';badge.textContent='☁️ آفلاین'}
     if(dotEl) dotEl.className='status-dot';
     if(textEl) textEl.textContent='تنظیم نشده';
@@ -3479,12 +3485,25 @@ function updateCloudStatus(){
   if(textEl) textEl.textContent='آخرین sync: '+lastTxt;
 }
 
-// npoint API
 async function cloudUpload(silent){
-  if(!cloudConfig.binId){
-    // اولین بار: ساخت bin جدید
-    if(!silent && !confirm('هنوز Bin ID نداری. یه Bin جدید ساخته بشه؟')) return;
-    return await createNewBin(silent);
+  if(!cloudConfig.apiKey || !cloudConfig.binId){
+    if(!silent) {
+      alert(`❌ تنظیمات ابری کامل نیست!
+
+🎯 مراحل:
+1️⃣ برو به: https://jsonbin.io
+2️⃣ ثبت‌نام رایگان کن (با گوگل یا ایمیل)
+3️⃣ بعد لاگین:
+   - کلیک "Create Bin"
+   - تو editor بنویس: {}
+   - Save Bin
+4️⃣ Bin ID رو از URL کپی کن (اون کد 24 کاراکتری)
+5️⃣ برو "API Keys" (منوی چپ)
+   - Master Key رو کپی کن (اون که با $2a$ شروع میشه)
+6️⃣ اینجا تو تنظیمات هردو رو paste کن`);
+      window.open('https://jsonbin.io', '_blank');
+    }
+    return;
   }
   
   const badge = document.getElementById('cloudBadge');
@@ -3493,83 +3512,54 @@ async function cloudUpload(silent){
   if(dotEl) dotEl.className='status-dot syncing';
   
   try{
-    const res = await fetch(`https://api.npoint.io/${cloudConfig.binId}`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': cloudConfig.apiKey
+      },
       body: JSON.stringify(state())
     });
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res.ok) {
+      const errText = await res.text();
+      throw new Error('HTTP '+res.status+': '+errText.substring(0,100));
+    }
     cloudConfig.lastSync = Date.now();
     saveCloudConfig();
     if(!silent) toast('☁️ ذخیره شد!','success');
   }catch(e){
     console.error('cloud upload:',e);
-    if(!silent) toast('خطا در ذخیره ابری ❌','error');
+    if(!silent) toast('خطا: '+e.message,'error',4000);
     if(badge){badge.className='cloud-badge err';badge.textContent='☁️ ✗'}
     if(dotEl) dotEl.className='status-dot err';
   }
 }
 
-async function createNewBin(silent){
-  const badge = document.getElementById('cloudBadge');
-  if(badge){badge.className='cloud-badge syncing';badge.textContent='☁️ ⏳'}
-  
-  try{
-    // npoint.io: POST به api.npoint.io/ برای ساخت bin جدید
-    const res = await fetch('https://api.npoint.io/', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(state())
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    // response includes location or json body
-    const contentType = res.headers.get('content-type') || '';
-    let binId = '';
-    if(contentType.includes('application/json')){
-      const data = await res.json();
-      binId = data.id || data.bin_id || '';
-    }
-    if(!binId){
-      // Try location header
-      const loc = res.headers.get('location') || res.url;
-      const match = loc.match(/\/([a-f0-9]{16})/);
-      if(match) binId = match[1];
-    }
-    if(!binId){
-      throw new Error('نتونستم Bin ID رو بگیرم');
-    }
-    cloudConfig.binId = binId;
-    cloudConfig.lastSync = Date.now();
-    saveCloudConfig();
-    if(!silent){
-      toast('☁️ Bin ساخته شد: '+binId,'success',4000);
-      alert(`✅ Bin ID جدید: ${binId}\n\nاین رو یادداشت کن! برای دستگاه‌های دیگه لازمه.`);
-    }
-    return true;
-  }catch(e){
-    console.error('create bin:',e);
-    if(!silent) toast('خطا در ساخت Bin ❌','error');
-    return false;
-  }
-}
-
 async function cloudDownload(){
-  if(!cloudConfig.binId){
-    toast('اول Bin ID رو تنظیم کن','error');return;
+  if(!cloudConfig.apiKey || !cloudConfig.binId){
+    toast('اول تنظیمات رو کامل کن (Bin ID + API Key)','error',4000);
+    return;
   }
-  if(!confirm('⚠️ دیتای فعلی با نسخه ابری جایگزین بشه؟\n(اول یه backup محلی می‌گیریم)')) return;
+  if(!confirm('⚠️ دیتای فعلی با نسخه ابری جایگزین بشه؟\n(یه backup محلی خودکار گرفته میشه)')) return;
   
   // Auto backup before
-  downloadFile(JSON.stringify(state()),'backup-before-cloud-'+Date.now()+'.json','application/json');
+  try{
+    downloadFile(JSON.stringify(state()),'backup-before-cloud-'+Date.now()+'.json','application/json');
+  }catch(e){}
   
   const badge = document.getElementById('cloudBadge');
   if(badge){badge.className='cloud-badge syncing';badge.textContent='☁️ ⏳'}
   
   try{
-    const res = await fetch(`https://api.npoint.io/${cloudConfig.binId}`);
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}/latest`, {
+      headers: {
+        'X-Master-Key': cloudConfig.apiKey
+      }
+    });
     if(!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    if(!data || !data.rows) throw new Error('دیتای نامعتبر');
+    const result = await res.json();
+    const data = result.record;
+    if(!data || !data.rows) throw new Error('دیتای Bin نامعتبره. اول یه بار ذخیره کن.');
     A.setState(data);
     const s = state();
     if(!s.goals) s.goals={sleepGoalHours:7,activityGoalMin:20};
@@ -3582,7 +3572,7 @@ async function cloudDownload(){
     toast('☁️⬇️ '+s.rows.length+' روز بارگذاری شد','success');
   }catch(e){
     console.error('cloud download:',e);
-    toast('خطا: '+e.message,'error');
+    toast('خطا: '+e.message,'error',4000);
     if(badge){badge.className='cloud-badge err';badge.textContent='☁️ ✗'}
   }
 }
@@ -3592,43 +3582,49 @@ function scheduleCloudSync(){
   cloudSyncPending = true;
   setTimeout(()=>{
     cloudSyncPending = false;
-    if(cloudConfig.binId) cloudUpload(true);
+    if(cloudConfig.binId && cloudConfig.apiKey) cloudUpload(true);
   }, 3000);
 }
 
 function startAutoSync(){
   if(cloudSyncTimer) clearInterval(cloudSyncTimer);
-  if(cloudConfig.autoSync && cloudConfig.binId){
+  if(cloudConfig.autoSync && cloudConfig.binId && cloudConfig.apiKey){
     cloudSyncTimer = setInterval(()=>{cloudUpload(true)}, 5*60*1000);
   }
 }
 
 function openCloudModal(){
+  document.getElementById('cloudApiKey').value = cloudConfig.apiKey || '';
   document.getElementById('cloudBinId').value = cloudConfig.binId || '';
   document.getElementById('cloudAutoSync').checked = cloudConfig.autoSync !== false;
   const info = document.getElementById('cloudCurrentInfo');
   if(info){
-    if(cloudConfig.binId){
+    if(cloudConfig.binId && cloudConfig.apiKey){
       const t = cloudConfig.lastSync ? new Date(cloudConfig.lastSync).toLocaleString('fa-IR') : 'هرگز';
-      info.innerHTML = `<b>Bin فعلی:</b> <code>${cloudConfig.binId}</code><br><b>آخرین sync:</b> ${t}<br><a href="https://www.npoint.io/docs/${cloudConfig.binId}" target="_blank" style="color:var(--accent2)">🔗 مشاهده در npoint</a>`;
+      info.innerHTML = `<b style="color:var(--green)">✅ متصل</b><br><b>Bin:</b> <code style="font-size:.7rem">${cloudConfig.binId.substring(0,20)}...</code><br><b>آخرین sync:</b> ${t}`;
     } else {
-      info.innerHTML = 'هنوز Bin ID تنظیم نشده. با دکمه "ذخیره ابری" برای اولین بار خودکار ساخته میشه.';
+      info.innerHTML = '<b style="color:var(--yellow)">⚠️ تنظیم نشده</b><br>راهنما:<br>1. برو <a href="https://jsonbin.io" target="_blank" style="color:var(--accent2)">jsonbin.io</a><br>2. ثبت‌نام + بساز Bin با {}<br>3. API Key و Bin ID رو paste کن';
     }
   }
   document.getElementById('modalCloud').classList.add('open');
 }
 function closeCloudModal(){document.getElementById('modalCloud').classList.remove('open')}
 function saveCloudSettings(){
+  cloudConfig.apiKey = document.getElementById('cloudApiKey').value.trim();
   cloudConfig.binId = document.getElementById('cloudBinId').value.trim();
   cloudConfig.autoSync = document.getElementById('cloudAutoSync').checked;
   saveCloudConfig();
   startAutoSync();
   closeCloudModal();
-  toast('☁️ تنظیمات ذخیره شد','success');
+  if(cloudConfig.apiKey && cloudConfig.binId){
+    toast('☁️ ذخیره شد! حالا ⬆️ ذخیره آنلاین بزن','success',3000);
+  } else {
+    toast('تنظیمات ناقصه','error');
+  }
 }
 function clearCloudSettings(){
   if(!confirm('تنظیمات ابری پاک بشه؟')) return;
-  cloudConfig = {binId:'', autoSync:true, lastSync:0};
+  cloudConfig = {apiKey:'', binId:'', autoSync:true, lastSync:0};
   saveCloudConfig();
   if(cloudSyncTimer){clearInterval(cloudSyncTimer);cloudSyncTimer=null}
   closeCloudModal();
