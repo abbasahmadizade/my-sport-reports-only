@@ -4314,26 +4314,55 @@ function bindEvents(){
 
   // Cloud
   document.getElementById('cloudSetupBtn')?.addEventListener('click',openCloudModal);
-    // Health Check
-  document.getElementById('healthCheckBtn')?.addEventListener('click', ()=>{
-    A.runHealthCheck();
-    document.getElementById('modalHealth')?.classList.add('open');
-  });
-  document.getElementById('modalHealthClose')?.addEventListener('click', ()=>{
-    document.getElementById('modalHealth')?.classList.remove('open');
-  });
-  document.getElementById('healthRefreshBtn')?.addEventListener('click', A.runHealthCheck);
-  document.getElementById('healthCopyBtn')?.addEventListener('click', async ()=>{
+  // Health Check — بهبود یافته
+  function openHealthModal(){
+    if(window._app && typeof window._app.runHealthCheck === 'function'){
+      window._app.runHealthCheck();
+    }
+    const modal = document.getElementById('modalHealth');
+    if(modal) modal.classList.add('open');
+  }
+  function closeHealthModal(){
+    const modal = document.getElementById('modalHealth');
+    if(modal) modal.classList.remove('open');
+  }
+  function refreshHealth(){
+    if(window._app && typeof window._app.runHealthCheck === 'function'){
+      window._app.runHealthCheck();
+      toast('🔄 آپدیت شد','success',1500);
+    }
+  }
+  async function copyHealth(){
     const el = document.getElementById('healthResults');
-    if(!el) return;
-    const text = el.innerText || el.textContent;
+    if(!el){toast('خطا','error');return}
+    // پاک کردن HTML tags برای کپی تمیز
+    const text = el.innerText || el.textContent || '';
     try{
       await navigator.clipboard.writeText(text);
       toast('✅ کپی شد!','success');
-    }catch(e){toast('خطا','error')}
-  });
-  document.getElementById('modalHealth')?.addEventListener('click',function(e){
-    if(e.target===this) this.classList.remove('open');
+    }catch(e){
+      // Fallback
+      try{
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        toast('✅ کپی شد!','success');
+      }catch(e2){
+        toast('خطا در کپی','error');
+      }
+    }
+  }
+  
+  document.getElementById('healthCheckBtn')?.addEventListener('click', openHealthModal);
+  document.getElementById('modalHealthClose')?.addEventListener('click', closeHealthModal);
+  document.getElementById('healthRefreshBtn')?.addEventListener('click', refreshHealth);
+  document.getElementById('healthCopyBtn')?.addEventListener('click', copyHealth);
+  document.getElementById('modalHealth')?.addEventListener('click', function(e){
+    if(e.target === this) closeHealthModal();
   });
   document.getElementById('cloudSetupBtn2')?.addEventListener('click',openCloudModal);
   document.getElementById('cloudUpBtn')?.addEventListener('click',()=>cloudUpload(false));
