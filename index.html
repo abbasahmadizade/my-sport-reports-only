@@ -3404,7 +3404,7 @@ function renderAllCharts(){
           }
         });
         
-  }catch(e){
+  }try{
     console.warn('weekly chart error:', e);
   }
       chartInstances.bedtime = new Chart(cB, {
@@ -4325,8 +4325,8 @@ function resetData(){
   save();renderAll();toast('🗑️ ریست شد');
 }
 
-// ============================================================
-// ۵. Cloud — GitHub Gist (پایدارتر از JSONBin)
+/// ============================================================
+// ۵. Cloud — GitHub Gist
 // ============================================================
 let cloudConfig = {token:'', gistId:'', autoSync:true, lastSync:0};
 let cloudSyncTimer = null;
@@ -4336,16 +4336,22 @@ let __lastSyncedHash = null;
 function loadCloudConfig(){
   try{
     const raw = safeStorage.getItem(A.LS_CLOUD);
-    if(raw) cloudConfig = {...cloudConfig, ...JSON.parse(raw)};
-    // Migration از JSONBin (اگه قبلاً apiKey داشت، نگهش دار برای بازیابی)
-    if(cloudConfig.apiKey && !cloudConfig.token){
-      console.log('⚠️ Migration: باید Token جدید GitHub بذاری');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      cloudConfig = Object.assign(cloudConfig, parsed);
     }
-  }catch(e){}
+  }catch(e){
+    console.warn('loadCloudConfig error:', e);
+  }
   updateCloudStatus();
 }
+
 function saveCloudConfig(){
-  safeStorage.setItem(A.LS_CLOUD, JSON.stringify(cloudConfig));
+  try{
+    safeStorage.setItem(A.LS_CLOUD, JSON.stringify(cloudConfig));
+  }catch(e){
+    console.warn('saveCloudConfig error:', e);
+  }
   updateCloudStatus();
 }
 
@@ -4354,32 +4360,27 @@ function updateCloudStatus(){
   const dotEl = document.getElementById('cloudStatusDot');
   const textEl = document.getElementById('cloudStatusText');
   if(!cloudConfig.token || !cloudConfig.gistId){
-    if(badge){badge.className='cloud-badge';badge.textContent='☁️ آفلاین'}
-    if(dotEl) dotEl.className='status-dot';
-    if(textEl) textEl.textContent='تنظیم نشده';
+    if(badge){ badge.className = 'cloud-badge'; badge.textContent = '☁️ آفلاین'; }
+    if(dotEl) dotEl.className = 'status-dot';
+    if(textEl) textEl.textContent = 'تنظیم نشده';
     return;
   }
-  const timeSince = cloudConfig.lastSync ? Math.floor((Date.now()-cloudConfig.lastSync)/60000) : null;
-  const lastTxt = timeSince === null ? 'هرگز' : timeSince === 0 ? 'الان' : timeSince < 60 ? `${timeSince}د پیش` : `${Math.floor(timeSince/60)}س پیش`;
-  if(badge){badge.className='cloud-badge ok';badge.textContent='☁️ ✓'}
-  if(dotEl) dotEl.className='status-dot ok';
-  if(textEl) textEl.textContent='آخرین sync: '+lastTxt;
+  const timeSince = cloudConfig.lastSync ? Math.floor((Date.now() - cloudConfig.lastSync) / 60000) : null;
+  let lastTxt = 'هرگز';
+  if(timeSince !== null){
+    if(timeSince === 0) lastTxt = 'الان';
+    else if(timeSince < 60) lastTxt = timeSince + 'د پیش';
+    else lastTxt = Math.floor(timeSince/60) + 'س پیش';
+  }
+  if(badge){ badge.className = 'cloud-badge ok'; badge.textContent = '☁️ ✓'; }
+  if(dotEl) dotEl.className = 'status-dot ok';
+  if(textEl) textEl.textContent = 'آخرین sync: ' + lastTxt;
 }
 
 async function cloudUpload(silent){
   if(!cloudConfig.token || !cloudConfig.gistId){
     if(!silent){
-      alert(`❌ تنظیمات ابری کامل نیست!
-
-🎯 مراحل:
-1️⃣ برو به: https://github.com/settings/tokens
-2️⃣ Generate new token (classic)
-3️⃣ فقط scope "gist" رو تیک بزن
-4️⃣ Token رو کپی کن
-5️⃣ برو به: https://gist.github.com/
-6️⃣ Secret Gist بساز با محتوای {"init":true}
-7️⃣ Gist ID از URL کپی کن
-8️⃣ اینجا paste کن`);
+      alert('❌ تنظیمات ابری کامل نیست!\n\n🎯 مراحل:\n1. برو github.com/settings/tokens/new\n2. scope "gist" رو تیک بزن\n3. Token رو کپی کن\n4. برو gist.github.com\n5. Secret Gist بساز با {"init":true}\n6. Gist ID از URL کپی کن\n7. اینجا paste کن');
       window.open('https://github.com/settings/tokens/new', '_blank');
     }
     return;
@@ -4387,15 +4388,15 @@ async function cloudUpload(silent){
   
   const badge = document.getElementById('cloudBadge');
   const dotEl = document.getElementById('cloudStatusDot');
-  if(badge){badge.className='cloud-badge syncing';badge.textContent='☁️ ⏳'}
-  if(dotEl) dotEl.className='status-dot syncing';
+  if(badge){ badge.className = 'cloud-badge syncing'; badge.textContent = '☁️ ⏳'; }
+  if(dotEl) dotEl.className = 'status-dot syncing';
   
   try{
-    const res = await fetch(`https://api.github.com/gists/${cloudConfig.gistId}`, {
+    const res = await fetch('https://api.github.com/gists/' + cloudConfig.gistId, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `token ${cloudConfig.token}`,
+        'Authorization': 'token ' + cloudConfig.token,
         'Accept': 'application/vnd.github.v3+json'
       },
       body: JSON.stringify({
@@ -4406,69 +4407,79 @@ async function cloudUpload(silent){
         }
       })
     });
+    
     if(!res.ok){
       const errText = await res.text();
-      throw new Error('HTTP '+res.status+': '+errText.substring(0,150));
+      throw new Error('HTTP ' + res.status + ': ' + errText.substring(0, 150));
     }
+    
     cloudConfig.lastSync = Date.now();
     saveCloudConfig();
-    if(!silent) toast('☁️ ذخیره شد!','success');
+    if(!silent) toast('☁️ ذخیره شد!', 'success');
   }catch(e){
-    console.error('cloud upload:',e);
-    if(!silent) toast('خطا: '+e.message,'error',4000);
-    if(badge){badge.className='cloud-badge err';badge.textContent='☁️ ✗'}
-    if(dotEl) dotEl.className='status-dot err';
+    console.error('cloud upload:', e);
+    if(!silent) toast('خطا: ' + e.message, 'error', 4000);
+    if(badge){ badge.className = 'cloud-badge err'; badge.textContent = '☁️ ✗'; }
+    if(dotEl) dotEl.className = 'status-dot err';
   }
 }
 
 async function cloudDownload(){
   if(!cloudConfig.token || !cloudConfig.gistId){
-    toast('اول تنظیمات رو کامل کن','error',4000);
+    toast('اول تنظیمات رو کامل کن', 'error', 4000);
     return;
   }
+  
   if(!confirm('⚠️ دیتای فعلی با نسخه ابری جایگزین بشه؟\n(backup محلی خودکار گرفته میشه)')) return;
   
   try{
-    downloadFile(JSON.stringify(state()),'backup-before-cloud-'+Date.now()+'.json','application/json');
-  }catch(e){}
+    downloadFile(JSON.stringify(state()), 'backup-before-cloud-' + Date.now() + '.json', 'application/json');
+  }catch(e){
+    console.warn('backup before download failed:', e);
+  }
   
   const badge = document.getElementById('cloudBadge');
-  if(badge){badge.className='cloud-badge syncing';badge.textContent='☁️ ⏳'}
+  if(badge){ badge.className = 'cloud-badge syncing'; badge.textContent = '☁️ ⏳'; }
   
   try{
-    const res = await fetch(`https://api.github.com/gists/${cloudConfig.gistId}`, {
+    const res = await fetch('https://api.github.com/gists/' + cloudConfig.gistId, {
       headers: {
-        'Authorization': `token ${cloudConfig.token}`,
+        'Authorization': 'token ' + cloudConfig.token,
         'Accept': 'application/vnd.github.v3+json'
       }
     });
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    
     const gist = await res.json();
-    const file = gist.files['sport-data.json'];
+    const file = gist.files && gist.files['sport-data.json'];
     if(!file) throw new Error('فایل sport-data.json تو Gist نیست');
+    
     const data = JSON.parse(file.content);
     if(!data || !data.rows) throw new Error('دیتای Gist نامعتبره');
+    
     A.setState(data);
     const s = state();
-    if(!s.goals) s.goals={sleepGoalHours:7,activityGoalMin:20};
-    if(!s.futsal) s.futsal=[];
-    if(!s.programGoal) s.programGoal=DEFAULT_DATA.programGoal;
+    if(!s.goals) s.goals = {sleepGoalHours: 7, activityGoalMin: 20};
+    if(!s.futsal) s.futsal = [];
+    if(!s.programGoal) s.programGoal = DEFAULT_DATA.programGoal;
+    
     save();
     cloudConfig.lastSync = Date.now();
     saveCloudConfig();
     renderAll();
-    toast('☁️⬇️ '+s.rows.length+' روز بارگذاری شد','success');
+    toast('☁️⬇️ ' + s.rows.length + ' روز بارگذاری شد', 'success');
   }catch(e){
-    console.error('cloud download:',e);
-    toast('خطا: '+e.message,'error',4000);
-    if(badge){badge.className='cloud-badge err';badge.textContent='☁️ ✗'}
+    console.error('cloud download:', e);
+    toast('خطا: ' + e.message, 'error', 4000);
+    if(badge){ badge.className = 'cloud-badge err'; badge.textContent = '☁️ ✗'; }
   }
 }
 
 function scheduleCloudSync(){
   if(cloudSyncPending) return;
   cloudSyncPending = true;
-  setTimeout(()=>{
+  setTimeout(function(){
     cloudSyncPending = false;
     if(cloudConfig.gistId && cloudConfig.token) cloudUpload(true);
   }, 10000);
@@ -4477,19 +4488,18 @@ function scheduleCloudSync(){
 function startAutoSync(){
   if(cloudSyncTimer) clearInterval(cloudSyncTimer);
   if(cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token){
-    __lastSyncedHash = JSON.stringify(state()).length + '_' + (state().rows||[]).length;
-    cloudSyncTimer = setInterval(()=>{
-      const currentHash = JSON.stringify(state()).length + '_' + (state().rows||[]).length;
+    __lastSyncedHash = JSON.stringify(state()).length + '_' + (state().rows || []).length;
+    cloudSyncTimer = setInterval(function(){
+      const currentHash = JSON.stringify(state()).length + '_' + (state().rows || []).length;
       if(currentHash !== __lastSyncedHash){
         cloudUpload(true);
         __lastSyncedHash = currentHash;
       }
-    }, 15*60*1000);
+    }, 15 * 60 * 1000);
   }
 }
 
 function openCloudModal(){
-  // Legacy support: اگه apiKey داشت (JSONBin قدیمی)، نمایش نده
   document.getElementById('cloudApiKey').value = cloudConfig.token || '';
   document.getElementById('cloudBinId').value = cloudConfig.gistId || '';
   document.getElementById('cloudAutoSync').checked = cloudConfig.autoSync !== false;
@@ -4497,35 +4507,39 @@ function openCloudModal(){
   if(info){
     if(cloudConfig.gistId && cloudConfig.token){
       const t = cloudConfig.lastSync ? new Date(cloudConfig.lastSync).toLocaleString('fa-IR') : 'هرگز';
-      info.innerHTML = `<b style="color:var(--green)">✅ متصل (Gist)</b><br><b>Gist:</b> <code style="font-size:.7rem">${cloudConfig.gistId.substring(0,20)}...</code><br><b>آخرین sync:</b> ${t}<br><a href="https://gist.github.com/${cloudConfig.gistId}" target="_blank" style="color:var(--accent2)">🔗 مشاهده در GitHub</a>`;
+      info.innerHTML = '<b style="color:var(--green)">✅ متصل (Gist)</b><br><b>Gist:</b> <code style="font-size:.7rem">' + cloudConfig.gistId.substring(0, 20) + '...</code><br><b>آخرین sync:</b> ' + t + '<br><a href="https://gist.github.com/' + cloudConfig.gistId + '" target="_blank" style="color:var(--accent2)">🔗 مشاهده در GitHub</a>';
     } else {
       info.innerHTML = '<b style="color:var(--yellow)">⚠️ تنظیم نشده</b>';
     }
   }
   document.getElementById('modalCloud').classList.add('open');
 }
-function closeCloudModal(){document.getElementById('modalCloud').classList.remove('open')}
+
+function closeCloudModal(){
+  document.getElementById('modalCloud').classList.remove('open');
+}
+
 function saveCloudSettings(){
   cloudConfig.token = document.getElementById('cloudApiKey').value.trim();
   cloudConfig.gistId = document.getElementById('cloudBinId').value.trim();
   cloudConfig.autoSync = document.getElementById('cloudAutoSync').checked;
-  // پاک کردن تنظیمات JSONBin قدیمی
   delete cloudConfig.apiKey;
   delete cloudConfig.binId;
   saveCloudConfig();
   startAutoSync();
   closeCloudModal();
   if(cloudConfig.token && cloudConfig.gistId){
-    toast('☁️ ذخیره شد! حالا ⬆️ ذخیره آنلاین بزن','success',3000);
+    toast('☁️ ذخیره شد! حالا ⬆️ ذخیره آنلاین بزن', 'success', 3000);
   } else {
-    toast('تنظیمات ناقصه','error');
+    toast('تنظیمات ناقصه', 'error');
   }
 }
+
 function clearCloudSettings(){
   if(!confirm('تنظیمات ابری پاک بشه؟')) return;
   cloudConfig = {token:'', gistId:'', autoSync:true, lastSync:0};
   saveCloudConfig();
-  if(cloudSyncTimer){clearInterval(cloudSyncTimer);cloudSyncTimer=null}
+  if(cloudSyncTimer){ clearInterval(cloudSyncTimer); cloudSyncTimer = null; }
   closeCloudModal();
   toast('تنظیمات پاک شد');
 }
