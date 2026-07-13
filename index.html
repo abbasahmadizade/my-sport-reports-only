@@ -795,6 +795,44 @@ margin-top:10px;font-family:var(--font-family);
 @media(min-width:1000px){
   .export-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 }
+
+/* ===== SETTINGS MOBILE FIX ===== */
+.settings-backdrop{
+  display:none;position:fixed;inset:0;z-index:998;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+.settings-backdrop.open{display:block}
+#settingsMenu{z-index:1000!important}
+@media(max-width:759px){
+  #settingsMenu.open{
+    position:fixed !important;
+    top:auto !important;
+    bottom:0 !important;
+    left:0 !important;
+    right:0 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:100% !important;
+    border-radius:20px 20px 0 0 !important;
+    padding:16px 12px calc(env(safe-area-inset-bottom,0) + 20px) !important;
+    max-height:75vh !important;
+    box-shadow:0 -8px 40px rgba(0,0,0,.6) !important;
+    animation:sheetUp .3s ease !important;
+  }
+  #settingsMenu.open button{
+    padding:14px 16px !important;
+    font-size:.95rem !important;
+    min-height:48px !important;
+  }
+  #settingsMenu.open .menu-label{
+    padding:10px 16px 4px !important;
+    font-size:.75rem !important;
+  }
+  @keyframes sheetUp{
+    from{transform:translateY(100%);opacity:.5}
+    to{transform:translateY(0);opacity:1}
+  }
+}
 </style>
 </head>
 <body>
@@ -1414,24 +1452,26 @@ margin-top:10px;font-family:var(--font-family);
 </div>
 <div class="modal-body">
 <p class="text-sm text-muted mb-3">
-با <b>JSONBin.io</b> دیتات رو تو ابر ذخیره کن و بین گوشی/لپ‌تاپ sync کن.<br>
-<a href="https://jsonbin.io" target="_blank" style="color:var(--accent2)">🔗 راهنمای ساخت اکانت</a>
+با <b>GitHub Gist</b> دیتات رو تو ابر ذخیره کن و بین گوشی/لپ‌تاپ sync کن.<br>
+<a href="https://github.com/settings/tokens/new" target="_blank" style="color:var(--accent2)">🔗 ساخت Token</a>
+&nbsp;•&nbsp;
+<a href="https://gist.github.com/" target="_blank" style="color:var(--accent2)">🔗 ساخت Gist</a>
 </p>
 <div class="form-group">
-<label>🔑 API Key (Master Key)</label>
-<input type="password" class="form-input" id="cloudApiKey" placeholder="$2a$10$...">
+<label>🔑 GitHub Personal Access Token</label>
+<input type="password" class="form-input" id="cloudApiKey" placeholder="ghp_...">
 <p class="text-sm text-muted mt-1">
-از <a href="https://jsonbin.io/app/keys" target="_blank" style="color:var(--accent2)">jsonbin.io/app/keys</a> بگیر
+از <a href="https://github.com/settings/tokens/new" target="_blank" style="color:var(--accent2)">github.com/settings/tokens</a> بگیر (فقط scope "gist" کافیه)
 </p>
 </div>
 <div class="form-group">
-<label>📦 Bin ID</label>
-<input type="text" class="form-input" id="cloudBinId" placeholder="68a1f...">
+<label>📦 Gist ID</label>
+<input type="text" class="form-input" id="cloudBinId" placeholder="abc123def456...">
 <p class="text-sm text-muted mt-1">
-یه Bin رو <a href="https://jsonbin.io/quick-store" target="_blank" style="color:var(--accent2)">jsonbin.io</a> بساز با محتوای <code>{}</code>
+یه Secret Gist بساز با محتوای <code>{"init":true}</code>، بعد ID رو از URL کپی کن
 </p>
 </div>
-<label class="checkbox-item"><input type="checkbox" id="cloudAutoSync" checked> 🔄 sync خودکار هر ۵ دقیقه</label>
+<label class="checkbox-item"><input type="checkbox" id="cloudAutoSync" checked> 🔄 sync خودکار هر ۱۵ دقیقه</label>
 <hr>
 <div id="cloudCurrentInfo" class="text-sm text-muted"></div>
 </div>
@@ -3184,9 +3224,9 @@ function renderAllCharts(){
   destroyChart('activity');
   const c3=document.getElementById('chartActivity');
   if(c3) chartInstances.activity=new Chart(c3,{type:'bar',data:{labels,datasets:[
-    {label:'🏃 دویدن',data:runData,backgroundColor:'rgba(139,92,246,.75)',borderRadius:6},
-    {label:'🚶 پیاده',data:walkData,backgroundColor:'rgba(14,165,233,.55)',borderRadius:6}
-  ]},options:{...opts,scales:{x:{...opts.scales.x,stacked:true},y:{...opts.scales.y,stacked:true}}}});
+    {label:'🏃 دویدن',data:runData,backgroundColor:'rgba(139,92,246,.75)',borderRadius:6,barPercentage:0.85,categoryPercentage:0.9},
+    {label:'🚶 پیاده',data:walkData,backgroundColor:'rgba(14,165,233,.55)',borderRadius:6,barPercentage:0.85,categoryPercentage:0.9}
+  ]},options:{...opts,scales:{x:{...opts.scales.x,stacked:true,offset:true},y:{...opts.scales.y,stacked:true,beginAtZero:true}}}});
 
   destroyChart('radar');
   const c4=document.getElementById('chartRadar');
@@ -3260,72 +3300,97 @@ function renderAllCharts(){
         // خالی، skip
       } else {
         // محدودیت: حداکثر ۱۲ هفته اخیر
-        const MAX_WEEKS = 12;
+                // موبایل: کمتر هفته
+        const MAX_WEEKS = window.innerWidth < 760 ? 6 : 12;
         const weeksToShow = weeks.length > MAX_WEEKS 
           ? weeks.slice(-MAX_WEEKS) 
           : weeks;
         
+                const isMobile = window.innerWidth < 760;
         chartInstances.weekly = new Chart(cW, {
           type: 'bar',
           data: {
             labels: weeksToShow.map(w => w.label),
             datasets: [
               {
-                label: '😴 خواب (ساعت)',
+                label: '😴 خواب',
                 data: weeksToShow.map(w => w.avgSleep || 0),
                 backgroundColor: 'rgba(139,92,246,.75)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.85,
+                categoryPercentage: 0.85
               },
               {
                 label: '⚡ انرژی',
                 data: weeksToShow.map(w => w.avgEnergy || 0),
                 backgroundColor: 'rgba(16,185,129,.75)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.85,
+                categoryPercentage: 0.85
               },
               {
                 label: '🙂 حال',
                 data: weeksToShow.map(w => w.avgMood || 0),
                 backgroundColor: 'rgba(236,72,153,.75)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.85,
+                categoryPercentage: 0.85
               },
               {
-                label: '🏃 دویدن (÷۵)',
+                label: '🏃 دویدن÷۵',
                 data: weeksToShow.map(w => (w.totalRun || 0) / 5),
                 backgroundColor: 'rgba(245,158,11,.65)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.85,
+                categoryPercentage: 0.85
               },
               {
-                label: '✅ روزهای فعال',
+                label: '✅ فعال',
                 data: weeksToShow.map(w => w.completedCount || 0),
                 backgroundColor: 'rgba(14,165,233,.65)',
-                borderRadius: 6
+                borderRadius: 4,
+                barPercentage: 0.85,
+                categoryPercentage: 0.85
               }
             ]
           },
           options: {
-            ...opts,
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {duration: 900, easing: 'easeOutQuart'},
             scales: {
-              x: {...opts.scales.x},
-              y: {
-                ...opts.scales.y,
-                beginAtZero: true,
-                title: {
-                  display: true,
-                  text: 'مقدار',
+              x: {
+  offset: true,
+  ticks: {
                   color: '#aaa',
-                  font: font
-                }
+                  font: {...font, size: isMobile ? 9 : 11},
+                  maxRotation: isMobile ? 45 : 0,
+                  minRotation: isMobile ? 45 : 0
+                },
+                grid: {color: 'rgba(255,255,255,.05)'}
+              },
+              y: {
+                ticks: {color: '#aaa', font: font},
+                grid: {color: 'rgba(255,255,255,.06)'},
+                beginAtZero: true
               }
             },
             plugins: {
-              ...opts.plugins,
+              legend: {
+                labels: {
+                  color: '#ddd',
+                  font: {...font, size: isMobile ? 10 : 12},
+                  padding: isMobile ? 8 : 12,
+                  boxWidth: isMobile ? 12 : 16
+                },
+                position: 'top'
+              },
               tooltip: {
                 titleFont: font,
                 bodyFont: font,
                 callbacks: {
                   label: function(ctx){
                     let value = ctx.parsed.y;
-                    // برای دویدن (÷۵)، عدد واقعی رو نشون بده
                     if(ctx.dataset.label.includes('دویدن')){
                       value = (value * 5).toFixed(0) + ' دقیقه';
                     } else {
@@ -3338,8 +3403,7 @@ function renderAllCharts(){
             }
           }
         });
-      }
-    }
+        
   }catch(e){
     console.warn('weekly chart error:', e);
   }
@@ -4262,16 +4326,21 @@ function resetData(){
 }
 
 // ============================================================
-// ۵. Cloud — JSONBin.io
+// ۵. Cloud — GitHub Gist (پایدارتر از JSONBin)
 // ============================================================
-let cloudConfig = {apiKey:'', binId:'', autoSync:true, lastSync:0};
+let cloudConfig = {token:'', gistId:'', autoSync:true, lastSync:0};
 let cloudSyncTimer = null;
 let cloudSyncPending = false;
+let __lastSyncedHash = null;
 
 function loadCloudConfig(){
   try{
     const raw = safeStorage.getItem(A.LS_CLOUD);
     if(raw) cloudConfig = {...cloudConfig, ...JSON.parse(raw)};
+    // Migration از JSONBin (اگه قبلاً apiKey داشت، نگهش دار برای بازیابی)
+    if(cloudConfig.apiKey && !cloudConfig.token){
+      console.log('⚠️ Migration: باید Token جدید GitHub بذاری');
+    }
   }catch(e){}
   updateCloudStatus();
 }
@@ -4284,8 +4353,7 @@ function updateCloudStatus(){
   const badge = document.getElementById('cloudBadge');
   const dotEl = document.getElementById('cloudStatusDot');
   const textEl = document.getElementById('cloudStatusText');
-  
-  if(!cloudConfig.apiKey || !cloudConfig.binId){
+  if(!cloudConfig.token || !cloudConfig.gistId){
     if(badge){badge.className='cloud-badge';badge.textContent='☁️ آفلاین'}
     if(dotEl) dotEl.className='status-dot';
     if(textEl) textEl.textContent='تنظیم نشده';
@@ -4295,30 +4363,24 @@ function updateCloudStatus(){
   const lastTxt = timeSince === null ? 'هرگز' : timeSince === 0 ? 'الان' : timeSince < 60 ? `${timeSince}د پیش` : `${Math.floor(timeSince/60)}س پیش`;
   if(badge){badge.className='cloud-badge ok';badge.textContent='☁️ ✓'}
   if(dotEl) dotEl.className='status-dot ok';
-    let extraInfo = '';
-  if(cloudConfig.remainingRequests !== undefined){
-    extraInfo = ` • ${cloudConfig.remainingRequests} باقی`;
-  }
-  if(textEl) textEl.textContent='آخرین sync: '+lastTxt+extraInfo;
+  if(textEl) textEl.textContent='آخرین sync: '+lastTxt;
 }
 
 async function cloudUpload(silent){
-  if(!cloudConfig.apiKey || !cloudConfig.binId){
-    if(!silent) {
+  if(!cloudConfig.token || !cloudConfig.gistId){
+    if(!silent){
       alert(`❌ تنظیمات ابری کامل نیست!
 
 🎯 مراحل:
-1️⃣ برو به: https://jsonbin.io
-2️⃣ ثبت‌نام رایگان کن (با گوگل یا ایمیل)
-3️⃣ بعد لاگین:
-   - کلیک "Create Bin"
-   - تو editor بنویس: {}
-   - Save Bin
-4️⃣ Bin ID رو از URL کپی کن (اون کد 24 کاراکتری)
-5️⃣ برو "API Keys" (منوی چپ)
-   - Master Key رو کپی کن (اون که با $2a$ شروع میشه)
-6️⃣ اینجا تو تنظیمات هردو رو paste کن`);
-      window.open('https://jsonbin.io', '_blank');
+1️⃣ برو به: https://github.com/settings/tokens
+2️⃣ Generate new token (classic)
+3️⃣ فقط scope "gist" رو تیک بزن
+4️⃣ Token رو کپی کن
+5️⃣ برو به: https://gist.github.com/
+6️⃣ Secret Gist بساز با محتوای {"init":true}
+7️⃣ Gist ID از URL کپی کن
+8️⃣ اینجا paste کن`);
+      window.open('https://github.com/settings/tokens/new', '_blank');
     }
     return;
   }
@@ -4329,23 +4391,24 @@ async function cloudUpload(silent){
   if(dotEl) dotEl.className='status-dot syncing';
   
   try{
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}`, {
-      method: 'PUT',
+    const res = await fetch(`https://api.github.com/gists/${cloudConfig.gistId}`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'X-Master-Key': cloudConfig.apiKey
+        'Authorization': `token ${cloudConfig.token}`,
+        'Accept': 'application/vnd.github.v3+json'
       },
-      body: JSON.stringify(state())
+      body: JSON.stringify({
+        files: {
+          'sport-data.json': {
+            content: JSON.stringify(state(), null, 2)
+          }
+        }
+      })
     });
-    if(!res.ok) {
-        // نمایش تعداد request باقی‌مونده
-    const remaining = res.headers.get('X-RateLimit-Remaining');
-    if(remaining !== null){
-      cloudConfig.remainingRequests = parseInt(remaining);
-      saveCloudConfig();
-    }
+    if(!res.ok){
       const errText = await res.text();
-      throw new Error('HTTP '+res.status+': '+errText.substring(0,100));
+      throw new Error('HTTP '+res.status+': '+errText.substring(0,150));
     }
     cloudConfig.lastSync = Date.now();
     saveCloudConfig();
@@ -4359,13 +4422,12 @@ async function cloudUpload(silent){
 }
 
 async function cloudDownload(){
-  if(!cloudConfig.apiKey || !cloudConfig.binId){
-    toast('اول تنظیمات رو کامل کن (Bin ID + API Key)','error',4000);
+  if(!cloudConfig.token || !cloudConfig.gistId){
+    toast('اول تنظیمات رو کامل کن','error',4000);
     return;
   }
-  if(!confirm('⚠️ دیتای فعلی با نسخه ابری جایگزین بشه؟\n(یه backup محلی خودکار گرفته میشه)')) return;
+  if(!confirm('⚠️ دیتای فعلی با نسخه ابری جایگزین بشه؟\n(backup محلی خودکار گرفته میشه)')) return;
   
-  // Auto backup before
   try{
     downloadFile(JSON.stringify(state()),'backup-before-cloud-'+Date.now()+'.json','application/json');
   }catch(e){}
@@ -4374,15 +4436,18 @@ async function cloudDownload(){
   if(badge){badge.className='cloud-badge syncing';badge.textContent='☁️ ⏳'}
   
   try{
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${cloudConfig.binId}/latest`, {
+    const res = await fetch(`https://api.github.com/gists/${cloudConfig.gistId}`, {
       headers: {
-        'X-Master-Key': cloudConfig.apiKey
+        'Authorization': `token ${cloudConfig.token}`,
+        'Accept': 'application/vnd.github.v3+json'
       }
     });
     if(!res.ok) throw new Error('HTTP '+res.status);
-    const result = await res.json();
-    const data = result.record;
-    if(!data || !data.rows) throw new Error('دیتای Bin نامعتبره. اول یه بار ذخیره کن.');
+    const gist = await res.json();
+    const file = gist.files['sport-data.json'];
+    if(!file) throw new Error('فایل sport-data.json تو Gist نیست');
+    const data = JSON.parse(file.content);
+    if(!data || !data.rows) throw new Error('دیتای Gist نامعتبره');
     A.setState(data);
     const s = state();
     if(!s.goals) s.goals={sleepGoalHours:7,activityGoalMin:20};
@@ -4405,14 +4470,13 @@ function scheduleCloudSync(){
   cloudSyncPending = true;
   setTimeout(()=>{
     cloudSyncPending = false;
-    if(cloudConfig.binId && cloudConfig.apiKey) cloudUpload(true);
+    if(cloudConfig.gistId && cloudConfig.token) cloudUpload(true);
   }, 10000);
 }
 
-let __lastSyncedHash = null;
 function startAutoSync(){
   if(cloudSyncTimer) clearInterval(cloudSyncTimer);
-  if(cloudConfig.autoSync && cloudConfig.binId && cloudConfig.apiKey){
+  if(cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token){
     __lastSyncedHash = JSON.stringify(state()).length + '_' + (state().rows||[]).length;
     cloudSyncTimer = setInterval(()=>{
       const currentHash = JSON.stringify(state()).length + '_' + (state().rows||[]).length;
@@ -4425,29 +4489,33 @@ function startAutoSync(){
 }
 
 function openCloudModal(){
-  document.getElementById('cloudApiKey').value = cloudConfig.apiKey || '';
-  document.getElementById('cloudBinId').value = cloudConfig.binId || '';
+  // Legacy support: اگه apiKey داشت (JSONBin قدیمی)، نمایش نده
+  document.getElementById('cloudApiKey').value = cloudConfig.token || '';
+  document.getElementById('cloudBinId').value = cloudConfig.gistId || '';
   document.getElementById('cloudAutoSync').checked = cloudConfig.autoSync !== false;
   const info = document.getElementById('cloudCurrentInfo');
   if(info){
-    if(cloudConfig.binId && cloudConfig.apiKey){
+    if(cloudConfig.gistId && cloudConfig.token){
       const t = cloudConfig.lastSync ? new Date(cloudConfig.lastSync).toLocaleString('fa-IR') : 'هرگز';
-      info.innerHTML = `<b style="color:var(--green)">✅ متصل</b><br><b>Bin:</b> <code style="font-size:.7rem">${cloudConfig.binId.substring(0,20)}...</code><br><b>آخرین sync:</b> ${t}`;
+      info.innerHTML = `<b style="color:var(--green)">✅ متصل (Gist)</b><br><b>Gist:</b> <code style="font-size:.7rem">${cloudConfig.gistId.substring(0,20)}...</code><br><b>آخرین sync:</b> ${t}<br><a href="https://gist.github.com/${cloudConfig.gistId}" target="_blank" style="color:var(--accent2)">🔗 مشاهده در GitHub</a>`;
     } else {
-      info.innerHTML = '<b style="color:var(--yellow)">⚠️ تنظیم نشده</b><br>راهنما:<br>1. برو <a href="https://jsonbin.io" target="_blank" style="color:var(--accent2)">jsonbin.io</a><br>2. ثبت‌نام + بساز Bin با {}<br>3. API Key و Bin ID رو paste کن';
+      info.innerHTML = '<b style="color:var(--yellow)">⚠️ تنظیم نشده</b>';
     }
   }
   document.getElementById('modalCloud').classList.add('open');
 }
 function closeCloudModal(){document.getElementById('modalCloud').classList.remove('open')}
 function saveCloudSettings(){
-  cloudConfig.apiKey = document.getElementById('cloudApiKey').value.trim();
-  cloudConfig.binId = document.getElementById('cloudBinId').value.trim();
+  cloudConfig.token = document.getElementById('cloudApiKey').value.trim();
+  cloudConfig.gistId = document.getElementById('cloudBinId').value.trim();
   cloudConfig.autoSync = document.getElementById('cloudAutoSync').checked;
+  // پاک کردن تنظیمات JSONBin قدیمی
+  delete cloudConfig.apiKey;
+  delete cloudConfig.binId;
   saveCloudConfig();
   startAutoSync();
   closeCloudModal();
-  if(cloudConfig.apiKey && cloudConfig.binId){
+  if(cloudConfig.token && cloudConfig.gistId){
     toast('☁️ ذخیره شد! حالا ⬆️ ذخیره آنلاین بزن','success',3000);
   } else {
     toast('تنظیمات ناقصه','error');
@@ -4455,7 +4523,7 @@ function saveCloudSettings(){
 }
 function clearCloudSettings(){
   if(!confirm('تنظیمات ابری پاک بشه؟')) return;
-  cloudConfig = {apiKey:'', binId:'', autoSync:true, lastSync:0};
+  cloudConfig = {token:'', gistId:'', autoSync:true, lastSync:0};
   saveCloudConfig();
   if(cloudSyncTimer){clearInterval(cloudSyncTimer);cloudSyncTimer=null}
   closeCloudModal();
@@ -4962,6 +5030,75 @@ function init(){
     alert('خطا در راه‌اندازی: '+e.message);
   }
 }
+
+// ===== SETTINGS MOBILE FIX v4 =====
+setTimeout(function(){
+  const btn = document.getElementById('settingsBtn');
+  const menu = document.getElementById('settingsMenu');
+  const backdrop = document.getElementById('settingsBackdrop');
+  
+  if(!btn || !menu){
+    console.warn('Settings elements not found');
+    return;
+  }
+  
+  // Clone دکمه برای پاک کردن listener های قبلی
+  const newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+  
+  function openM(){
+    const el = document.getElementById('settingsToday');
+    if(el && typeof Jalali !== 'undefined'){
+      try{
+        const t = Jalali.today();
+        const p = Jalali.parseKey(t);
+        el.textContent = Jalali.weekdayName(t)+' '+p.jd+' '+Jalali.monthName(p.jm)+' '+p.jy;
+      }catch(e){}
+    }
+    menu.classList.add('open');
+    if(window.innerWidth < 760 && backdrop){
+      backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+  
+  function closeM(){
+    menu.classList.remove('open');
+    if(backdrop) backdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  
+  newBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    e.preventDefault();
+    if(menu.classList.contains('open')) closeM();
+    else openM();
+  });
+  
+  if(backdrop) backdrop.addEventListener('click', closeM);
+  
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && menu.classList.contains('open')) closeM();
+  });
+  
+  document.addEventListener('click', function(e){
+    if(!menu.classList.contains('open')) return;
+    if(window.innerWidth < 760) return;
+    if(menu.contains(e.target)) return;
+    if(newBtn.contains(e.target)) return;
+    closeM();
+  });
+  
+  menu.addEventListener('click', function(e){
+    const c = e.target.closest('button');
+    if(!c) return;
+    if(c.hasAttribute('data-font')) return;
+    if(c.id === 'fontUp' || c.id === 'fontDown' || c.id === 'fontReset') return;
+    setTimeout(closeM, 200);
+  });
+  
+  console.log('✅ Settings v4 ready');
+}, 1000);
 
 window.onerror=function(msg,src,line,col,err){
   console.error('ERR:',msg,line,col,err);
