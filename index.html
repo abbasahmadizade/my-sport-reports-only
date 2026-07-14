@@ -2073,6 +2073,15 @@
       <button type="button" id="cloudUpBtn">⬆️ ذخیره آنلاین</button>
       <button type="button" id="cloudDownBtn">⬇️ بارگذاری</button>
       <hr />
+      <div class="menu-label">📱 صفحات دیگه</div>
+      <button type="button" data-tab="futsal">⚽ فوتسال</button>
+      <button type="button" data-tab="calc">🧮 محاسبه‌گر</button>
+      <button type="button" data-tab="charts">📊 نمودارها</button>
+      <button type="button" data-tab="log">📋 ثبت روزانه</button>
+      <hr />
+      <div class="menu-label">🤖 هوش مصنوعی</div>
+      <button type="button" id="aiHelperBtn">✨ راهنما برای AI</button>
+      <hr />
       <div class="menu-label">🔧 عیب‌یابی</div>
       <button type="button" id="healthCheckBtn">🩺 تست سلامت</button>
       <hr />
@@ -3577,6 +3586,112 @@
           >
             🗑️ پاک
           </button>
+        </div>
+      </div>
+    </div>
+    <!-- === MODAL: AI HELPER === -->
+    <div class="modal-overlay" id="modalAI">
+      <div class="modal" style="max-width: 600px">
+        <div class="modal-header">
+          <h2>🤖 راهنمای هوش مصنوعی</h2>
+          <button type="button" class="modal-close" id="modalAIClose">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="text-sm text-muted mb-3">
+            یه متن آماده که به هر AI (ChatGPT/Claude/Gemini) بدی، سریع می‌فهمه
+            پروژه‌ت چیه.
+          </p>
+
+          <div class="form-group">
+            <label>🎯 نوع درخواست</label>
+            <select class="form-input" id="aiRequestType">
+              <option value="bug">🐛 گزارش باگ / خطا</option>
+              <option value="feature">➕ اضافه کردن قابلیت جدید</option>
+              <option value="design">🎨 تغییر ظاهر / رنگ / فونت</option>
+              <option value="question">❓ سوال کلی / راهنمایی</option>
+              <option value="optimize">⚡ بهینه‌سازی کد</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>💬 توضیح مشکل / درخواستت (اختیاری)</label>
+            <textarea
+              class="form-input"
+              id="aiUserMessage"
+              rows="3"
+              placeholder="مثلاً: تو تب فوتسال، دکمه ذخیره کار نمی‌کنه..."
+            ></textarea>
+          </div>
+
+          <label class="checkbox-item"
+            ><input type="checkbox" id="aiIncStats" checked /> 📊 آمار فعلی رو
+            هم بذار</label
+          >
+          <label class="checkbox-item"
+            ><input type="checkbox" id="aiIncRepoLink" /> 🔗 لینک repo هم بذار
+            (اگه GitHub داری)</label
+          >
+
+          <div id="aiRepoInputGroup" style="display: none">
+            <div class="form-group mt-2">
+              <label>🔗 لینک GitHub (فقط یوزرنیم/repo)</label>
+              <input
+                type="text"
+                class="form-input"
+                id="aiRepoUrl"
+                placeholder="مثلاً: abbasahmadizade/my-sport-reports-only"
+              />
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn btn-primary" id="aiGenerateBtn">
+              ⚡ تولید متن
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm" id="aiCopyBtn">
+              📋 کپی
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm" id="aiShareBtn">
+              📤 اشتراک
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              id="aiDownloadBtn"
+            >
+              💾 دانلود
+            </button>
+          </div>
+
+          <div class="export-stats mt-2" id="aiStats"></div>
+
+          <pre
+            class="export-preview mt-3"
+            id="aiPreview"
+            style="display: none; direction: rtl; text-align: right"
+          ></pre>
+
+          <div
+            class="mt-3"
+            style="
+              padding: 12px;
+              background: rgba(var(--accent-rgb), 0.08);
+              border-radius: 10px;
+              font-size: 0.78rem;
+              color: var(--accent2);
+              line-height: 1.7;
+            "
+          >
+            <b>💡 راهنما:</b><br />
+            1. نوع درخواست رو انتخاب کن<br />
+            2. اگه توضیح خاصی داری، بنویس<br />
+            3. کلیک "⚡ تولید متن"<br />
+            4. کلیک "📋 کپی"<br />
+            5. برو تو ChatGPT/Claude/Gemini، paste کن<br />
+            6. AI کاملاً می‌فهمه و کمکت می‌کنه!
+          </div>
         </div>
       </div>
     </div>
@@ -7903,7 +8018,318 @@
           if (banner) banner.remove();
           toast('باشه، هفته دیگه', 'default', 2000);
         };
+        // ===== AI HELPER =====
+        function generateAIMessage() {
+          const type = document.getElementById('aiRequestType').value;
+          const userMsg = document.getElementById('aiUserMessage').value.trim();
+          const incStats = document.getElementById('aiIncStats').checked;
+          const incRepo = document.getElementById('aiIncRepoLink').checked;
+          const repoUrl = document.getElementById('aiRepoUrl').value.trim();
 
+          const typeLabels = {
+            bug: '🐛 گزارش باگ',
+            feature: '➕ اضافه کردن قابلیت جدید',
+            design: '🎨 تغییر ظاهر',
+            question: '❓ سوال / راهنمایی',
+            optimize: '⚡ بهینه‌سازی',
+          };
+
+          const typeInstructions = {
+            bug: 'یه باگ دارم که باید فیکس بشه. دقیقاً بگو کجای کد رو تغییر بدم.',
+            feature:
+              'یه قابلیت جدید می‌خوام اضافه کنم. لطفاً پچ کوچیک بده که با Ctrl+F پیدا کنم و paste کنم.',
+            design: 'می‌خوام یه تغییر ظاهری بدم. فقط بخش CSS مربوطه رو بگو.',
+            question: 'یه سوال دارم درباره کد یا نحوه استفاده.',
+            optimize: 'می‌خوام بخشی از کد بهینه‌تر شه. راهنمایی کن.',
+          };
+
+          let msg = '';
+
+          // === HEADER ===
+          msg += '# 🏃 پروژه گزارش ورزشی — درخواست کمک از AI\n\n';
+          msg += '## 📋 نوع درخواست\n';
+          msg += typeLabels[type] + '\n\n';
+
+          if (userMsg) {
+            msg += '## 💬 توضیح من\n';
+            msg += userMsg + '\n\n';
+          }
+
+          // === PROJECT INFO ===
+          msg += '## 📦 اطلاعات پروژه\n';
+          msg += '- **نام:** گزارش ورزش، خواب و انرژی\n';
+          msg += '- **ساختار:** تک فایل HTML (~5000 خط)\n';
+          msg += '- **زبان:** فارسی (RTL)\n';
+          msg += '- **تقویم:** جلالی (jalaali-js از CDN)\n';
+          msg += '- **نمودار:** Chart.js 4.4.7 از CDN\n';
+          msg += '- **فونت:** Vazirmatn (اصلی) + Sahel + Samim\n';
+          msg += '- **Cloud Sync:** GitHub Gist API\n';
+          msg += '- **Login:** SHA-256 hash + salt (localStorage)\n';
+          msg += '- **نسخه:** v5.0\n';
+          msg += '- **پلتفرم:** موبایل (اولویت) + دسکتاپ\n\n';
+
+          // === STATS ===
+          if (incStats) {
+            const s = state();
+            const stats = computeStats(s.rows);
+            msg += '## 📊 آمار فعلی\n';
+            msg += '- تعداد روزهای ثبت‌شده: ' + s.rows.length + '\n';
+            msg += '- تعداد جلسات فوتسال: ' + s.futsal.length + '\n';
+            if (s.rows.length) {
+              const sorted = s.rows.slice().sort(function (a, b) {
+                return Jalali.cmp(b.jdate, a.jdate);
+              });
+              msg += '- آخرین ثبت: ' + sorted[0].jdate + '\n';
+              msg += '- میانگین خواب: ' + stats.avgSleepDisplay + '\n';
+              msg += '- میانگین انرژی: ' + stats.avgEnergy + '/10\n';
+              msg += '- استریک فعلی: ' + stats.streak + ' روز\n';
+            }
+            msg += '- هدف خواب: ' + (s.goals.sleepGoalHours || 7) + ' ساعت\n';
+            msg +=
+              '- هدف فعالیت: ' + (s.goals.activityGoalMin || 20) + ' دقیقه\n\n';
+          }
+
+          // === STRUCTURE ===
+          msg += '## 🏗️ ساختار اپ\n\n';
+          msg += '### تب‌های اصلی (۷ تا):\n';
+          msg +=
+            '1. 🏠 داشبورد - KPI، Streak Map، Insights، ۷ روز اخیر، Sleep Timeline، مقایسه هفتگی، اهداف\n';
+          msg += '2. 📋 ثبت روزانه - لیست + جستجو + ویرایش\n';
+          msg += '3. ⚽ فوتسال - ثبت جامع جلسات\n';
+          msg += '4. 📊 نمودارها - ۸ نمودار (Line/Bar/Radar/Scatter/Heatmap)\n';
+          msg += '5. 🧮 محاسبه‌گرها - ۴ ابزار\n';
+          msg += '6. 🧠 تحلیل - Readiness Score + ۸ سناریو زمانی\n';
+          msg += '7. 📤 خروجی - AI/MD/JSON/CSV + Cloud\n\n';
+
+          msg += '### توابع مهم (که ممکنه لازم داشته باشی):\n';
+          msg += '```\n';
+          msg += '// State Management\n';
+          msg += 'window._app.state()          // دیتای فعلی\n';
+          msg += 'window._app.save()           // ذخیره تو localStorage\n';
+          msg += 'window._app.setState(data)   // آپدیت state\n\n';
+          msg += '// Jalali Calendar\n';
+          msg += 'Jalali.today()               // تاریخ امروز (شمسی)\n';
+          msg += 'Jalali.parseKey(str)         // پارس تاریخ\n';
+          msg += 'Jalali.addDays(date, n)      // اضافه/کم کردن روز\n';
+          msg += 'Jalali.weekdayName(date)     // نام روز هفته\n\n';
+          msg += '// Rendering\n';
+          msg += 'A.renderDashboard()          // رندر داشبورد\n';
+          msg += 'A.renderLog()                // رندر لیست\n';
+          msg += 'A.renderAIView()             // رندر تحلیل\n';
+          msg += 'A.renderChartsIfReady()      // رندر نمودارها\n\n';
+          msg += '// Modals\n';
+          msg += 'A.editDay(id)                // مودال ویرایش روز\n';
+          msg += 'A.deleteDay(id)              // حذف روز\n';
+          msg += 'A.editFutsal(id)             // مودال ویرایش فوتسال\n\n';
+          msg += '// Helpers\n';
+          msg += 'sleepInfo(blocks)            // اطلاعات خواب\n';
+          msg += 'computeStats(rows)           // آمار کلی\n';
+          msg += 'toast(msg, type)             // نمایش پیام\n';
+          msg += '```\n\n';
+
+          // === SCHEMA ===
+          msg += '### Schema دیتا (localStorage):\n';
+          msg += '```json\n';
+          msg += '{\n';
+          msg += '  "rows": [{\n';
+          msg += '    "id": 1234567,\n';
+          msg += '    "jdate": "1405-04-25",    // تاریخ شمسی\n';
+          msg += '    "completed": true,\n';
+          msg += '    "energy": 7,              // 0-10 (با گام 0.5)\n';
+          msg += '    "mood": 8,\n';
+          msg += '    "runMin": 5,\n';
+          msg += '    "walkMin": 25,\n';
+          msg += '    "longestRun": 2,\n';
+          msg += '    "activity": "شرح فعالیت",\n';
+          msg += '    "note": "یادداشت",\n';
+          msg += '    "futsalRef": false,\n';
+          msg += '    "sleepBlocks": [\n';
+          msg +=
+            '      {"label": "خواب شب", "start": "00:30", "end": "07:00"},\n';
+          msg += '      {"label": "چرت", "start": "13:00", "end": "13:30"}\n';
+          msg += '    ],\n';
+          msg += '    "officialWake": "07:00"\n';
+          msg += '  }],\n';
+          msg += '  "futsal": [...],\n';
+          msg += '  "goals": {"sleepGoalHours": 7, "activityGoalMin": 20},\n';
+          msg += '  "programGoal": "هدف کلی"\n';
+          msg += '}\n';
+          msg += '```\n\n';
+
+          // === RULES ===
+          msg += '## ⚠️ قوانین طلایی برای تغییر کد\n\n';
+          msg += '**لطفاً حتماً رعایت کن:**\n\n';
+          msg += '1. ✅ **پچ کوچیک بده**، نه فایل کامل (فایل ۵۰۰۰ خطه!)\n';
+          msg += '2. ✅ **دقیق بگو کجا تغییر کنه** — از Ctrl+F استفاده کنم\n';
+          msg +=
+            '3. ✅ فرمت: "با Ctrl+F این خط رو پیدا کن: XXX، بعدش این رو اضافه کن"\n';
+          msg +=
+            '4. ✅ **schema دیتا رو تغییر نده** (localStorage keys ثابت بمونن)\n';
+          msg += '5. ✅ **backward compatibility** رعایت کن\n';
+          msg += '6. ✅ فارسی + RTL رعایت شه\n';
+          msg += '7. ✅ **موبایل اولویت** — طراحی responsive\n';
+          msg += '8. ✅ اول بگو "تست کن"، بعد "commit"\n';
+          msg += '9. ✅ اگه چند پچ لازمه، شماره‌گذاری کن\n';
+          msg += '10. ✅ syntax check قبل از دادن پچ (کاما، پرانتز، ...)\n\n';
+
+          msg += '**❌ این کارها رو نکن:**\n';
+          msg += '- فایل کامل نده\n';
+          msg += '- کد رو یهو زیاد تغییر نده\n';
+          msg += '- کتابخانه‌های جدید نصب نکن (فقط CDN)\n';
+          msg += '- localStorage key ها رو عوض نکن\n';
+          msg += '- زبان انگلیسی برای UI نذار\n\n';
+
+          // === REPO LINK ===
+          if (incRepo && repoUrl) {
+            const cleanUrl = repoUrl
+              .replace(/^https?:\/\/github\.com\//, '')
+              .replace(/\/$/, '');
+            msg += '## 🔗 کد کامل\n';
+            msg +=
+              'https://raw.githubusercontent.com/' +
+              cleanUrl +
+              '/main/index.html\n\n';
+            msg += 'می‌تونی از این لینک، کد کامل رو fetch کنی.\n\n';
+          }
+
+          // === INSTRUCTIONS BY TYPE ===
+          msg += '## 🎯 چطور کمک کنی\n\n';
+          msg += typeInstructions[type] + '\n\n';
+
+          if (type === 'bug') {
+            msg += '**فرمت پاسخ خوب:**\n';
+            msg += '```\n';
+            msg += '📍 با Ctrl+F پیدا کن: "function XXX"\n';
+            msg += '📍 خط X رو (که این‌جوریه: [کد قبلی]) با این عوض کن:\n';
+            msg += '[کد جدید]\n';
+            msg += '📍 Commit → Refresh → تست\n';
+            msg += '```\n\n';
+          } else if (type === 'feature') {
+            msg += '**فرمت پاسخ خوب:**\n';
+            msg += '```\n';
+            msg +=
+              'پچ ۱ (HTML): با Ctrl+F پیدا کن XXX، بعدش این رو اضافه کن...\n';
+            msg += 'پچ ۲ (CSS): با Ctrl+F پیدا کن YYY، اضافه کن...\n';
+            msg += 'پچ ۳ (JS): با Ctrl+F پیدا کن ZZZ، اضافه کن...\n';
+            msg += 'تست: Commit → Refresh → این کار رو انجام بده\n';
+            msg += '```\n\n';
+          }
+
+          msg += '---\n';
+          msg += 'ممنون که کمکم می‌کنی! 🙏\n';
+
+          return msg;
+        }
+
+        function openAIModal() {
+          const modal = document.getElementById('modalAI');
+          if (!modal) return;
+          // Load saved repo URL
+          const savedRepo = safeStorage.getItem('sport_repo_url');
+          if (savedRepo) {
+            document.getElementById('aiRepoUrl').value = savedRepo;
+            document.getElementById('aiIncRepoLink').checked = true;
+            document.getElementById('aiRepoInputGroup').style.display = 'block';
+          }
+          modal.classList.add('open');
+        }
+
+        function closeAIModal() {
+          const modal = document.getElementById('modalAI');
+          if (modal) modal.classList.remove('open');
+        }
+
+        function setupAIHelper() {
+          const btn = document.getElementById('aiHelperBtn');
+          if (btn) btn.addEventListener('click', openAIModal);
+
+          const closeBtn = document.getElementById('modalAIClose');
+          if (closeBtn) closeBtn.addEventListener('click', closeAIModal);
+
+          const modal = document.getElementById('modalAI');
+          if (modal)
+            modal.addEventListener('click', function (e) {
+              if (e.target === this) closeAIModal();
+            });
+
+          const repoCheckbox = document.getElementById('aiIncRepoLink');
+          if (repoCheckbox)
+            repoCheckbox.addEventListener('change', function () {
+              document.getElementById('aiRepoInputGroup').style.display = this
+                .checked
+                ? 'block'
+                : 'none';
+            });
+
+          const repoInput = document.getElementById('aiRepoUrl');
+          if (repoInput)
+            repoInput.addEventListener('blur', function () {
+              if (this.value.trim())
+                safeStorage.setItem('sport_repo_url', this.value.trim());
+            });
+
+          const genBtn = document.getElementById('aiGenerateBtn');
+          if (genBtn)
+            genBtn.addEventListener('click', function () {
+              const msg = generateAIMessage();
+              const pv = document.getElementById('aiPreview');
+              if (pv) {
+                pv.textContent = msg;
+                pv.style.display = 'block';
+              }
+              const st = document.getElementById('aiStats');
+              if (st)
+                st.textContent =
+                  msg.length.toLocaleString() +
+                  ' کاراکتر • ~' +
+                  Math.ceil(msg.length / 3.5).toLocaleString() +
+                  ' توکن';
+              toast('✅ متن آماده شد', 'success', 1500);
+            });
+
+          const copyBtn = document.getElementById('aiCopyBtn');
+          if (copyBtn)
+            copyBtn.addEventListener('click', async function () {
+              const msg = generateAIMessage();
+              if (await copyText(msg)) {
+                toast(
+                  '📋 کپی شد! (' + msg.length + ' کاراکتر)',
+                  'success',
+                  3000,
+                );
+              } else {
+                toast('خطا در کپی', 'error');
+              }
+            });
+
+          const shareBtn = document.getElementById('aiShareBtn');
+          if (shareBtn)
+            shareBtn.addEventListener('click', async function () {
+              const msg = generateAIMessage();
+              if (navigator.share) {
+                try {
+                  await navigator.share({ title: 'راهنمای AI', text: msg });
+                } catch (e) {
+                  if (e.name !== 'AbortError') await copyText(msg);
+                }
+              } else {
+                await copyText(msg);
+                toast('📋 کپی شد', 'success');
+              }
+            });
+
+          const dlBtn = document.getElementById('aiDownloadBtn');
+          if (dlBtn)
+            dlBtn.addEventListener('click', function () {
+              const msg = generateAIMessage();
+              downloadFile(
+                msg,
+                'ai-helper-' + Jalali.today() + '.md',
+                'text/markdown;charset=utf-8',
+              );
+              toast('💾 دانلود شد', 'success');
+            });
+        }
         // ===== HEALTH CHECK =====
         A.runHealthCheck = function () {
           const results = [];
@@ -8663,6 +9089,7 @@
             setupSettingsMenu();
             A.setupNumSteppers();
             setupCalcs();
+            setupAIHelper();
             loadCloudConfig();
             bindEvents();
             renderAll();
