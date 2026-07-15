@@ -2083,6 +2083,7 @@
       <button type="button" id="aiHelperBtn">✨ راهنما برای AI</button>
       <hr />
       <div class="menu-label">🔧 عیب‌یابی</div>
+      <button type="button" id="clearCacheBtn">🧹 پاک کردن کش</button>
       <button type="button" id="healthCheckBtn">🩺 تست سلامت</button>
       <hr />
       <div class="menu-label">🔐 حساب</div>
@@ -3674,10 +3675,18 @@
           <hr />
 
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="btn btn-primary" id="aiGenerateBtn">
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="aiHelperGenerateBtn"
+            >
               ⚡ تولید متن
             </button>
-            <button type="button" class="btn btn-ghost btn-sm" id="aiCopyBtn">
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              id="aiHelperCopyBtn"
+            >
               📋 کپی
             </button>
             <button type="button" class="btn btn-ghost btn-sm" id="aiShareBtn">
@@ -8003,13 +8012,12 @@
           const badge = document.getElementById('cloudBadge');
           const dotEl = document.getElementById('cloudStatusDot');
 
-          // === Retry Logic ===
-          const MAX_RETRIES = 3;
-          const RETRY_DELAY = 2000; // 2 ثانیه
+          // === Retry با Backoff ===
+          const MAX_RETRIES = 4;
+          const RETRY_DELAYS = [1500, 3000, 5000, 8000]; // 1.5s, 3s, 5s, 8s
           let lastError = null;
 
           for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-            // نشون دادن وضعیت
             if (badge) {
               badge.className = 'cloud-badge syncing';
               badge.textContent =
@@ -8022,24 +8030,38 @@
             try {
               const startTime = Date.now();
 
-              const res = await fetch(
-                'https://api.github.com/gists/' + cloudConfig.gistId,
-                {
-                  method: 'PATCH',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: 'token ' + cloudConfig.token,
-                    Accept: 'application/vnd.github.v3+json',
-                  },
-                  body: JSON.stringify({
-                    files: {
-                      'sport-data.json': {
-                        content: JSON.stringify(state(), null, 2),
-                      },
-                    },
-                  }),
+              // === Cache Busting ===
+              // اضافه کردن timestamp به URL که هر بار unique باشه
+              const cacheBuster =
+                '_t=' +
+                Date.now() +
+                '_' +
+                Math.random().toString(36).substring(2, 8);
+              const url =
+                'https://api.github.com/gists/' +
+                cloudConfig.gistId +
+                '?' +
+                cacheBuster;
+
+              const res = await fetch(url, {
+                method: 'PATCH',
+                cache: 'no-store', // مهم! کش نکن
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: 'token ' + cloudConfig.token,
+                  Accept: 'application/vnd.github.v3+json',
+                  'Cache-Control': 'no-cache, no-store, must-revalidate',
+                  Pragma: 'no-cache',
+                  'X-Retry-Attempt': attempt.toString(),
                 },
-              );
+                body: JSON.stringify({
+                  files: {
+                    'sport-data.json': {
+                      content: JSON.stringify(state(), null, 2),
+                    },
+                  },
+                }),
+              });
 
               const elapsed = Date.now() - startTime;
 
@@ -8056,13 +8078,15 @@
                   );
                 }
                 if (res.status === 403) {
-                  throw new Error('🚫 Rate limit خوردی! صبر کن ۱ ساعت.');
+                  throw new Error(
+                    '🚫 Rate limit یا دسترسی رد شد! صبر کن ۱ ساعت.',
+                  );
                 }
                 // بقیه خطاها — retry می‌شن
-                throw new Error('HTTP ' + res.status);
+                throw new Error('HTTP_' + res.status);
               }
 
-              // موفقیت
+              // موفقیت!
               cloudConfig.lastSync = Date.now();
               saveCloudConfig();
 
@@ -8071,11 +8095,7 @@
                   toast('☁️ ذخیره شد! (' + elapsed + 'ms)', 'success');
                 } else {
                   toast(
-                    '☁️ ذخیره شد بعد از ' +
-                      attempt +
-                      ' تلاش! (' +
-                      elapsed +
-                      'ms)',
+                    '☁️ ذخیره شد بعد از ' + attempt + ' تلاش! ✨',
                     'success',
                     3000,
                   );
@@ -8086,34 +8106,39 @@
               lastError = e;
               const errMsg = e.message || String(e);
 
-              // خطاهای که نباید retry بشن
+              // خطاهای غیرشبکه‌ای — retry نکن
               if (
-                errMsg.includes('Token اشتباه') ||
-                errMsg.includes('Gist ID پیدا نشد') ||
-                errMsg.includes('Rate limit')
+                errMsg.indexOf('Token اشتباه') !== -1 ||
+                errMsg.indexOf('Gist ID پیدا نشد') !== -1 ||
+                errMsg.indexOf('Rate limit') !== -1
               ) {
-                break; // خروج از حلقه
+                break;
               }
 
               // اگه تلاش آخر نبود، صبر کن
               if (attempt < MAX_RETRIES) {
+                const delay = RETRY_DELAYS[attempt - 1] || 3000;
                 console.warn(
-                  'Cloud upload attempt ' + attempt + ' failed:',
+                  '☁️ Cloud attempt ' +
+                    attempt +
+                    '/' +
+                    MAX_RETRIES +
+                    ' failed:',
                   errMsg,
                 );
                 if (!silent) {
                   toast(
                     '⏳ تلاش ' +
                       attempt +
-                      '/' +
-                      MAX_RETRIES +
-                      ' ناموفق، دوباره...',
+                      ' ناموفق، ' +
+                      Math.round(delay / 1000) +
+                      ' ثانیه دیگه...',
                     'default',
-                    1500,
+                    delay - 200,
                   );
                 }
                 await new Promise(function (resolve) {
-                  setTimeout(resolve, RETRY_DELAY);
+                  setTimeout(resolve, delay);
                 });
               }
             }
@@ -8121,7 +8146,7 @@
 
           // همه تلاش‌ها ناموفق
           console.error(
-            'Cloud upload failed after ' + MAX_RETRIES + ' attempts:',
+            '☁️ Cloud upload failed after ' + MAX_RETRIES + ' attempts:',
             lastError,
           );
 
@@ -8131,14 +8156,14 @@
           let userMessage = '';
 
           if (
-            errMsg.includes('Failed to fetch') ||
-            errMsg.includes('NetworkError') ||
-            errMsg.includes('HTTP ')
+            errMsg.indexOf('Failed to fetch') !== -1 ||
+            errMsg.indexOf('NetworkError') !== -1 ||
+            errMsg.indexOf('HTTP_') !== -1
           ) {
             userMessage =
               '🌐 مشکل شبکه پس از ' +
               MAX_RETRIES +
-              ' تلاش!\n\nممکن دلایل:\n• اینترنت گوشی ضعیف\n• GitHub موقتاً پاسخ نمیده\n• DNS مشکل داره\n\n💡 چیکار کن:\n1. اینترنت رو چک کن\n2. ۵ دقیقه صبر کن\n3. دوباره امتحان کن';
+              ' تلاش!\n\n💡 راه‌حل‌های ممکن:\n\n1️⃣ اینترنت گوشی رو چک کن (Wi-Fi/4G)\n\n2️⃣ کش مرورگر رو پاک کن:\n   ⚙️ → 🧹 پاک کردن کش\n\n3️⃣ ۵ دقیقه صبر کن و دوباره امتحان کن\n\n4️⃣ اگه با VPN وصلی، خاموش/روشن کن\n\n5️⃣ از مرورگر دیگه امتحان کن (مثل Firefox)';
           } else {
             userMessage = errMsg;
           }
@@ -8176,44 +8201,88 @@
               'application/json',
             );
           } catch (e) {}
+
           const badge = document.getElementById('cloudBadge');
           if (badge) {
             badge.className = 'cloud-badge syncing';
             badge.textContent = '☁️ ⏳';
           }
-          try {
-            const res = await fetch(
-              'https://api.github.com/gists/' + cloudConfig.gistId,
-              {
+
+          const MAX_RETRIES = 3;
+          let lastError = null;
+
+          for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+              // Cache busting
+              const cacheBuster =
+                '_t=' +
+                Date.now() +
+                '_' +
+                Math.random().toString(36).substring(2, 8);
+              const url =
+                'https://api.github.com/gists/' +
+                cloudConfig.gistId +
+                '?' +
+                cacheBuster;
+
+              const res = await fetch(url, {
+                cache: 'no-store',
                 headers: {
                   Authorization: 'token ' + cloudConfig.token,
                   Accept: 'application/vnd.github.v3+json',
+                  'Cache-Control': 'no-cache, no-store, must-revalidate',
+                  Pragma: 'no-cache',
                 },
-              },
-            );
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const gist = await res.json();
-            const file = gist.files && gist.files['sport-data.json'];
-            if (!file) throw new Error('فایل sport-data.json تو Gist نیست');
-            const data = JSON.parse(file.content);
-            if (!data || !data.rows) throw new Error('دیتای نامعتبر');
-            A.setState(data);
-            const s = state();
-            if (!s.goals) s.goals = { sleepGoalHours: 7, activityGoalMin: 20 };
-            if (!s.futsal) s.futsal = [];
-            if (!s.programGoal) s.programGoal = DEFAULT_DATA.programGoal;
-            save();
-            cloudConfig.lastSync = Date.now();
-            saveCloudConfig();
-            renderAll();
-            toast('☁️⬇️ ' + s.rows.length + ' روز بارگذاری شد', 'success');
-          } catch (e) {
-            console.error('cloud download:', e);
-            toast('خطا: ' + e.message, 'error', 4000);
-            if (badge) {
-              badge.className = 'cloud-badge err';
-              badge.textContent = '☁️ ✗';
+              });
+
+              if (!res.ok) throw new Error('HTTP ' + res.status);
+              const gist = await res.json();
+              const file = gist.files && gist.files['sport-data.json'];
+              if (!file) throw new Error('فایل sport-data.json تو Gist نیست');
+              const data = JSON.parse(file.content);
+              if (!data || !data.rows) throw new Error('دیتای نامعتبر');
+
+              A.setState(data);
+              const s = state();
+              if (!s.goals)
+                s.goals = { sleepGoalHours: 7, activityGoalMin: 20 };
+              if (!s.futsal) s.futsal = [];
+              if (!s.programGoal) s.programGoal = DEFAULT_DATA.programGoal;
+              save();
+              cloudConfig.lastSync = Date.now();
+              saveCloudConfig();
+              renderAll();
+              toast('☁️⬇️ ' + s.rows.length + ' روز بارگذاری شد', 'success');
+              return;
+            } catch (e) {
+              lastError = e;
+              if (attempt < MAX_RETRIES) {
+                console.warn(
+                  'Download attempt ' + attempt + ' failed:',
+                  e.message,
+                );
+                toast(
+                  '⏳ تلاش ' + attempt + ' ناموفق، دوباره...',
+                  'default',
+                  1500,
+                );
+                await new Promise(function (resolve) {
+                  setTimeout(resolve, 2000 * attempt);
+                });
+              }
             }
+          }
+
+          console.error('cloud download failed:', lastError);
+          toast(
+            '❌ خطا در بارگذاری: ' +
+              (lastError ? lastError.message : 'نامعلوم'),
+            'error',
+            5000,
+          );
+          if (badge) {
+            badge.className = 'cloud-badge err';
+            badge.textContent = '☁️ ✗';
           }
         }
 
@@ -8614,27 +8683,31 @@
         }
 
         window.setupAIHelper = function () {
+          // === دکمه باز کردن مدال ===
           const btn = document.getElementById('aiHelperBtn');
           if (btn) btn.addEventListener('click', openAIModal);
 
+          // === دکمه بستن مدال ===
           const closeBtn = document.getElementById('modalAIClose');
           if (closeBtn) closeBtn.addEventListener('click', closeAIModal);
 
+          // === بستن با کلیک بیرون مدال ===
           const modal = document.getElementById('modalAI');
           if (modal)
             modal.addEventListener('click', function (e) {
               if (e.target === this) closeAIModal();
             });
 
+          // === Checkbox لینک repo ===
           const repoCheckbox = document.getElementById('aiIncRepoLink');
           if (repoCheckbox)
             repoCheckbox.addEventListener('change', function () {
-              document.getElementById('aiRepoInputGroup').style.display = this
-                .checked
-                ? 'block'
-                : 'none';
+              const inputGroup = document.getElementById('aiRepoInputGroup');
+              if (inputGroup)
+                inputGroup.style.display = this.checked ? 'block' : 'none';
             });
 
+          // === ذخیره خودکار URL repo ===
           const repoInput = document.getElementById('aiRepoUrl');
           if (repoInput)
             repoInput.addEventListener('blur', function () {
@@ -8642,7 +8715,8 @@
                 safeStorage.setItem('sport_repo_url', this.value.trim());
             });
 
-          const genBtn = document.getElementById('aiGenerateBtn');
+          // === دکمه تولید متن ===
+          const genBtn = document.getElementById('aiHelperGenerateBtn');
           if (genBtn)
             genBtn.addEventListener('click', function () {
               const msg = window.generateAIMessage
@@ -8656,7 +8730,6 @@
               if (pv) {
                 pv.textContent = msg;
                 pv.style.display = 'block';
-                // اسکرول به preview که کاربر ببینه
                 setTimeout(function () {
                   pv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }, 100);
@@ -8671,32 +8744,110 @@
               toast('✅ متن آماده شد! پایین رو ببین ↓', 'success', 2500);
             });
 
+          // === دکمه کپی ===
+          const copyBtn = document.getElementById('aiHelperCopyBtn');
+          if (copyBtn)
+            copyBtn.addEventListener('click', async function () {
+              const msg = window.generateAIMessage
+                ? window.generateAIMessage()
+                : '';
+              if (!msg) {
+                toast('❌ خطا در تولید متن', 'error');
+                return;
+              }
+              try {
+                await navigator.clipboard.writeText(msg);
+                toast(
+                  '✅ کپی شد! (' + msg.length.toLocaleString() + ' کاراکتر)',
+                  'success',
+                  3000,
+                );
+              } catch (e) {
+                // Fallback برای مرورگرهای قدیمی یا HTTP
+                try {
+                  const ta = document.createElement('textarea');
+                  ta.value = msg;
+                  ta.style.cssText =
+                    'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+                  document.body.appendChild(ta);
+                  ta.focus();
+                  ta.select();
+                  const ok = document.execCommand('copy');
+                  document.body.removeChild(ta);
+                  if (ok) {
+                    toast('✅ کپی شد!', 'success', 3000);
+                  } else {
+                    toast('❌ کپی نشد، دستی از preview کپی کن', 'error', 4000);
+                  }
+                } catch (e2) {
+                  toast('❌ کپی نشد: ' + e.message, 'error', 4000);
+                }
+              }
+            });
+
+          // === دکمه اشتراک ===
           const shareBtn = document.getElementById('aiShareBtn');
           if (shareBtn)
             shareBtn.addEventListener('click', async function () {
-              const msg = window.generateAIMessage();
+              const msg = window.generateAIMessage
+                ? window.generateAIMessage()
+                : '';
+              if (!msg) {
+                toast('❌ خطا در تولید متن', 'error');
+                return;
+              }
               if (navigator.share) {
                 try {
                   await navigator.share({ title: 'راهنمای AI', text: msg });
                 } catch (e) {
-                  if (e.name !== 'AbortError') await copyText(msg);
+                  if (e.name !== 'AbortError') {
+                    try {
+                      await navigator.clipboard.writeText(msg);
+                      toast('📋 کپی شد', 'success');
+                    } catch (e2) {
+                      toast('❌ خطا', 'error');
+                    }
+                  }
                 }
               } else {
-                await copyText(msg);
-                toast('📋 کپی شد', 'success');
+                try {
+                  await navigator.clipboard.writeText(msg);
+                  toast('📋 کپی شد (اشتراک پشتیبانی نمیشه)', 'success');
+                } catch (e) {
+                  toast('❌ خطا', 'error');
+                }
               }
             });
 
+          // === دکمه دانلود ===
           const dlBtn = document.getElementById('aiDownloadBtn');
           if (dlBtn)
             dlBtn.addEventListener('click', function () {
-              const msg = window.generateAIMessage();
-              downloadFile(
-                msg,
-                'ai-helper-' + Jalali.today() + '.md',
-                'text/markdown;charset=utf-8',
-              );
-              toast('💾 دانلود شد', 'success');
+              const msg = window.generateAIMessage
+                ? window.generateAIMessage()
+                : '';
+              if (!msg) {
+                toast('❌ خطا در تولید متن', 'error');
+                return;
+              }
+              try {
+                const blob = new Blob([msg], {
+                  type: 'text/markdown;charset=utf-8',
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ai-helper-' + Jalali.today() + '.md';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function () {
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }, 100);
+                toast('💾 دانلود شد', 'success');
+              } catch (e) {
+                toast('❌ خطا در دانلود: ' + e.message, 'error');
+              }
             });
         };
         window.testGitHubConnection = async function () {
@@ -9745,7 +9896,55 @@
           const aiGenerateBtn = document.getElementById('aiGenerateBtn');
           if (aiGenerateBtn)
             aiGenerateBtn.addEventListener('click', A.renderAIView);
+          // دکمه پاک کردن کش
+          const clearCacheBtn = document.getElementById('clearCacheBtn');
+          if (clearCacheBtn)
+            clearCacheBtn.addEventListener('click', async function () {
+              if (
+                !confirm(
+                  '🧹 پاک کردن کش مرورگر؟\n\nاین کارها انجام میشه:\n• Cache Storage پاک میشه\n• Service Worker پاک میشه\n• صفحه Reload کامل میشه\n\n⚠️ دیتای شما (localStorage) پاک نمیشه!\n\nادامه؟',
+                )
+              )
+                return;
 
+              toast('🧹 در حال پاک کردن...', 'default', 2000);
+
+              try {
+                // Clear Cache Storage
+                if ('caches' in window) {
+                  const cacheNames = await caches.keys();
+                  await Promise.all(
+                    cacheNames.map(function (name) {
+                      return caches.delete(name);
+                    }),
+                  );
+                }
+
+                // Unregister Service Workers
+                if ('serviceWorker' in navigator) {
+                  const registrations =
+                    await navigator.serviceWorker.getRegistrations();
+                  await Promise.all(
+                    registrations.map(function (r) {
+                      return r.unregister();
+                    }),
+                  );
+                }
+
+                toast('✅ کش پاک شد! Reload...', 'success', 1500);
+
+                // Force reload بدون cache
+                setTimeout(function () {
+                  window.location.reload(true);
+                }, 1500);
+              } catch (e) {
+                console.error('cache clear error:', e);
+                toast('⚠️ خطا: ' + e.message, 'error', 3000);
+                setTimeout(function () {
+                  window.location.reload(true);
+                }, 2000);
+              }
+            });
           // Health Check
           const healthCheckBtn = document.getElementById('healthCheckBtn');
           if (healthCheckBtn)
