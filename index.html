@@ -2144,6 +2144,33 @@
           </div>
         </div>
         <div class="card">
+          <div class="card-title">
+            <span class="emoji">💭</span> هدف کلی برنامه
+          </div>
+          <div
+            id="programGoalDisplay"
+            style="
+              padding: 14px;
+              background: rgba(var(--accent-rgb), 0.05);
+              border: 1px solid var(--border);
+              border-radius: 10px;
+              font-size: 0.88rem;
+              line-height: 1.8;
+              color: var(--text);
+              margin-bottom: 10px;
+              min-height: 60px;
+              white-space: pre-line;
+            "
+          ></div>
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm btn-block"
+            id="editGoalBtn"
+          >
+            ✏️ ویرایش هدف
+          </button>
+        </div>
+        <div class="card">
           <div class="card-title"><span class="emoji">🎯</span> اهداف</div>
           <div class="form-group">
             <label>هدف خواب (ساعت)</label>
@@ -3695,6 +3722,104 @@
         </div>
       </div>
     </div>
+    <!-- === MODAL: EDIT PROGRAM GOAL === -->
+    <div class="modal-overlay" id="modalGoal">
+      <div class="modal" style="max-width: 500px">
+        <div class="modal-header">
+          <h2>💭 ویرایش هدف برنامه</h2>
+          <button type="button" class="modal-close" id="modalGoalClose">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="text-sm text-muted mb-3">
+            هدف کلی برنامه‌ت رو بنویس. این متن تو تحلیل AI و ریپورت‌ها استفاده
+            میشه.
+          </p>
+          <div class="form-group">
+            <label>🎯 هدف من</label>
+            <textarea
+              class="form-input"
+              id="programGoalInput"
+              rows="6"
+              placeholder="مثلاً: تقویت اراده، روتین ورزشی، آمادگی برای امتحان..."
+            ></textarea>
+          </div>
+          <div class="text-sm text-muted mt-3">💡 نمونه‌های آماده:</div>
+          <div
+            style="
+              display: flex;
+              flex-direction: column;
+              gap: 6px;
+              margin-top: 8px;
+            "
+          >
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              style="
+                text-align: right;
+                justify-content: flex-start;
+                font-size: 0.78rem;
+                line-height: 1.4;
+              "
+              data-goal-preset="1"
+            >
+              🎯 تقویت اراده و روتین ورزشی
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              style="
+                text-align: right;
+                justify-content: flex-start;
+                font-size: 0.78rem;
+                line-height: 1.4;
+              "
+              data-goal-preset="2"
+            >
+              💪 آمادگی جسمانی برای فوتسال
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              style="
+                text-align: right;
+                justify-content: flex-start;
+                font-size: 0.78rem;
+                line-height: 1.4;
+              "
+              data-goal-preset="3"
+            >
+              🏃 دویدن پیوسته و کاهش وزن
+            </button>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm"
+              style="
+                text-align: right;
+                justify-content: flex-start;
+                font-size: 0.78rem;
+                line-height: 1.4;
+              "
+              data-goal-preset="4"
+            >
+              😴 بهبود کیفیت خواب
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="saveGoalBtn"
+            style="flex: 1"
+          >
+            💾 ذخیره
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- === MODAL: HEALTH CHECK === -->
     <div class="modal-overlay" id="modalHealth">
@@ -4139,7 +4264,7 @@
           notes: [],
           goals: { sleepGoalHours: 7, activityGoalMin: 20 },
           programGoal:
-            'هدف: بهتر شدن آمادگی جسمانی برای فوتسال. الان تازه شروع کردم به دویدن. می‌خوام کم‌کم زمان دویدن پیوسته‌ام رو زیاد کنم و شب‌ها زودتر بخوابم.',
+            'هدف: تقویت اراده و ساخت روتین ورزشی روزانه (دویدن + پیاده‌روی) و خواب منظم. این روتین قراره پایه‌ای باشه برای اراده قوی‌تر در آینده — مخصوصاً برای درس خوندن ارشد. تمرکز اصلی: ثبات (Consistency) بیشتر از شدت (Intensity).',
         };
 
         // ===== STATE =====
@@ -5338,6 +5463,7 @@
             }, 100);
           }
           checkBackupReminder();
+          renderProgramGoal();
           renderStreakMap();
           renderInsights();
           renderRecent7();
@@ -5351,7 +5477,87 @@
             ga.value = state().goals ? state().goals.activityGoalMin || 20 : 20;
           renderGoalProgress();
         }
+        // === PROGRAM GOAL EDITOR ===
+        const GOAL_PRESETS = {
+          1: 'هدف: تقویت اراده و ساخت روتین ورزشی روزانه (دویدن + پیاده‌روی) و خواب منظم. این روتین قراره پایه‌ای باشه برای اراده قوی‌تر در آینده — مخصوصاً برای درس خوندن ارشد. تمرکز اصلی: ثبات (Consistency) بیشتر از شدت (Intensity).',
+          2: 'هدف: بهتر شدن آمادگی جسمانی برای فوتسال. افزایش زمان دویدن پیوسته و خواب منظم قبل از جلسات.',
+          3: 'هدف: افزایش زمان دویدن پیوسته تا ۲۰ دقیقه و کاهش وزن به روش تدریجی و پایدار.',
+          4: 'هدف: بهبود کیفیت خواب — خوابیدن قبل از ۲۳:۳۰، ۸ ساعت خواب پیوسته، بیدار شدن راحت صبح.',
+        };
 
+        function renderProgramGoal() {
+          const el = document.getElementById('programGoalDisplay');
+          if (!el) return;
+          const goal =
+            state().programGoal ||
+            'هنوز هدف تنظیم نکردی. کلیک کن ✏️ برای اضافه کردن.';
+          el.textContent = goal;
+        }
+
+        function openGoalModal() {
+          const modal = document.getElementById('modalGoal');
+          if (!modal) return;
+          const input = document.getElementById('programGoalInput');
+          if (input) input.value = state().programGoal || '';
+          modal.classList.add('open');
+        }
+
+        function closeGoalModal() {
+          const modal = document.getElementById('modalGoal');
+          if (modal) modal.classList.remove('open');
+        }
+
+        function saveProgramGoal() {
+          const input = document.getElementById('programGoalInput');
+          if (!input) return;
+          const newGoal = input.value.trim();
+          if (!newGoal) {
+            toast('هدف خالی نمیشه', 'error');
+            return;
+          }
+          const s = state();
+          s.programGoal = newGoal;
+          save();
+          renderProgramGoal();
+          closeGoalModal();
+          toast('✅ هدف ذخیره شد', 'success');
+          if (
+            typeof cloudConfig !== 'undefined' &&
+            cloudConfig.autoSync &&
+            cloudConfig.gistId &&
+            cloudConfig.token
+          ) {
+            if (typeof scheduleCloudSync === 'function') scheduleCloudSync();
+          }
+        }
+
+        window.setupGoalEditor = function () {
+          const editBtn = document.getElementById('editGoalBtn');
+          if (editBtn) editBtn.addEventListener('click', openGoalModal);
+
+          const closeBtn = document.getElementById('modalGoalClose');
+          if (closeBtn) closeBtn.addEventListener('click', closeGoalModal);
+
+          const modal = document.getElementById('modalGoal');
+          if (modal)
+            modal.addEventListener('click', function (e) {
+              if (e.target === this) closeGoalModal();
+            });
+
+          const saveBtn = document.getElementById('saveGoalBtn');
+          if (saveBtn) saveBtn.addEventListener('click', saveProgramGoal);
+
+          document
+            .querySelectorAll('[data-goal-preset]')
+            .forEach(function (btn) {
+              btn.addEventListener('click', function () {
+                const preset = this.getAttribute('data-goal-preset');
+                const input = document.getElementById('programGoalInput');
+                if (input && GOAL_PRESETS[preset])
+                  input.value = GOAL_PRESETS[preset];
+              });
+            });
+        };
         function renderStreakMap() {
           const map = document.getElementById('streakMap');
           const label = document.getElementById('streakLabel');
@@ -8056,6 +8262,13 @@
           }
 
           // === PROJECT INFO ===
+          // === PROGRAM GOAL ===
+          const sState = state();
+          if (sState.programGoal) {
+            msg += '## 🎯 هدف من از این برنامه\n';
+            msg += sState.programGoal + '\n\n';
+          }
+
           msg += '## 📦 اطلاعات پروژه\n';
           msg += '- **نام:** گزارش ورزش، خواب و انرژی\n';
           msg += '- **ساختار:** تک فایل HTML (~5000 خط)\n';
@@ -8090,6 +8303,41 @@
           }
 
           // === STRUCTURE ===
+          // === AUTO-DETECT FEATURES (خودکار) ===
+          msg += '## 🔧 قابلیت‌های فعال (خودکار تشخیص داده شد)\n';
+          const features = [];
+          if (typeof Chart !== 'undefined')
+            features.push('✅ Chart.js (نمودارها)');
+          if (typeof jalaali !== 'undefined')
+            features.push('✅ Jalaali (تقویم شمسی)');
+          if (cloudConfig && cloudConfig.token)
+            features.push('✅ Cloud Sync (GitHub Gist)');
+          if (safeStorage.getItem('sport_auth_v1'))
+            features.push('✅ Login System (SHA-256)');
+          if (safeStorage.getItem('sport_last_backup_v1'))
+            features.push('✅ Backup Reminder');
+          const themeData = safeStorage.getItem('sport_accent_v3');
+          if (themeData) features.push('✅ Custom Theme');
+          features.forEach(function (f) {
+            msg += '- ' + f + '\n';
+          });
+          msg += '\n';
+
+          // === LIVE FUNCTIONS LIST ===
+          msg += '## 🎯 توابع موجود در window._app\n';
+          msg += '```\n';
+          const appFuncs = [];
+          for (const key in window._app) {
+            if (typeof window._app[key] === 'function') {
+              appFuncs.push('A.' + key + '()');
+            }
+          }
+          appFuncs.sort();
+          appFuncs.forEach(function (f) {
+            msg += f + '\n';
+          });
+          msg += '```\n\n';
+
           msg += '## 🏗️ ساختار اپ\n\n';
           msg += '### تب‌های اصلی (۷ تا):\n';
           msg +=
@@ -8338,44 +8586,112 @@
           const warn = '<span style="color:#f59e0b">⚠️</span>';
           const info = '<span style="color:#8b5cf6">ℹ️</span>';
 
+          // === VERSION ===
           results.push('<b style="color:#a78bfa;font-size:1rem">📦 نسخه</b>');
-          results.push(info + ' Version: v5.0 Final');
+          results.push(info + ' Version: v5.2');
+          results.push(
+            info + ' تاریخ چک: ' + new Date().toLocaleString('fa-IR'),
+          );
           results.push('');
 
+          // === LOGIN ===
           results.push('<b style="color:#a78bfa">🔐 لاگین</b>');
           const auth = safeStorage.getItem('sport_auth_v1');
           const sess = safeStorage.getItem('sport_session_v1');
           results.push(
             (auth ? ok : warn) + ' Auth: ' + (auth ? 'setup شده' : 'ست نشده'),
           );
-          results.push(
-            (sess ? ok : warn) + ' Session: ' + (sess ? 'فعال' : 'غیرفعال'),
-          );
+          if (sess) {
+            try {
+              const sessData = JSON.parse(sess);
+              const daysLeft = Math.max(
+                0,
+                7 -
+                  Math.floor((Date.now() - sessData.t) / (24 * 60 * 60 * 1000)),
+              );
+              results.push(ok + ' Session: فعال (' + daysLeft + ' روز باقی)');
+            } catch (e) {
+              results.push(warn + ' Session: نامعتبر');
+            }
+          } else {
+            results.push(warn + ' Session: غیرفعال');
+          }
           results.push('');
 
+          // === DATA ===
           results.push('<b style="color:#a78bfa">📊 دیتا</b>');
           const data = JSON.parse(
             safeStorage.getItem('sport_report_v2') || '{}',
           );
+          const rowsCount = data.rows ? data.rows.length : 0;
+          const futsalCount = data.futsal ? data.futsal.length : 0;
           results.push(
-            (data.rows && data.rows.length > 0 ? ok : warn) +
-              ' Rows: ' +
-              (data.rows ? data.rows.length : 0) +
-              ' روز',
+            (rowsCount > 0 ? ok : warn) + ' Rows: ' + rowsCount + ' روز',
           );
-          results.push(
-            info +
-              ' Futsal: ' +
-              (data.futsal ? data.futsal.length : 0) +
-              ' جلسه',
-          );
+          results.push(info + ' Futsal: ' + futsalCount + ' جلسه');
+
+          if (rowsCount > 0) {
+            const sorted = data.rows.slice().sort(function (a, b) {
+              return Jalali.cmp(b.jdate, a.jdate);
+            });
+            const lastRow = sorted[0];
+            const today = Jalali.today();
+            const daysSince = Jalali.diffDays(today, lastRow.jdate);
+            let statusIcon = ok;
+            let statusText = '';
+            if (daysSince === 0) statusText = 'امروز ✨';
+            else if (daysSince === 1) {
+              statusText = 'دیروز';
+              statusIcon = info;
+            } else if (daysSince <= 3) {
+              statusText = daysSince + ' روز پیش';
+              statusIcon = warn;
+            } else {
+              statusText = daysSince + ' روز پیش (فراموش کردی؟)';
+              statusIcon = bad;
+            }
+            results.push(
+              statusIcon + ' آخرین ثبت: ' + lastRow.jdate + ' — ' + statusText,
+            );
+
+            try {
+              const stats = computeStats(data.rows);
+              results.push(info + ' استریک: ' + stats.streak + ' روز');
+              results.push(
+                info +
+                  ' نرخ فعالیت: ' +
+                  Math.round((stats.completedCount / stats.totalDays) * 100) +
+                  '%',
+              );
+              results.push(info + ' میانگین خواب: ' + stats.avgSleepDisplay);
+            } catch (e) {}
+          } else {
+            results.push(bad + ' هیچ ثبتی نداری');
+          }
           results.push('');
 
-          results.push('<b style="color:#a78bfa">☁️ ابری (Gist)</b>');
+          // === PROGRAM GOAL ===
+          results.push('<b style="color:#a78bfa">💭 هدف برنامه</b>');
+          if (data.programGoal) {
+            const goalPreview =
+              data.programGoal.length > 100
+                ? data.programGoal.substring(0, 100) + '...'
+                : data.programGoal;
+            results.push(ok + ' تنظیم شده');
+            results.push(info + ' متن: ' + goalPreview);
+          } else {
+            results.push(warn + ' هدف تنظیم نشده');
+          }
+          results.push('');
+
+          // === CLOUD ===
+          results.push('<b style="color:#a78bfa">☁️ ذخیره ابری (Gist)</b>');
           results.push(
             (cloudConfig.token ? ok : bad) +
               ' Token: ' +
-              (cloudConfig.token ? 'set' : 'missing'),
+              (cloudConfig.token
+                ? 'set (' + cloudConfig.token.length + ' char)'
+                : 'missing'),
           );
           results.push(
             (cloudConfig.gistId ? ok : bad) +
@@ -8387,21 +8703,30 @@
           results.push(
             (cloudConfig.autoSync ? ok : warn) +
               ' Auto Sync: ' +
-              (cloudConfig.autoSync ? 'on (15min)' : 'off'),
+              (cloudConfig.autoSync ? 'روشن' : 'خاموش'),
           );
           if (cloudConfig.lastSync) {
             const mins = Math.floor(
               (Date.now() - cloudConfig.lastSync) / 60000,
             );
-            results.push(
-              info +
-                ' Last Sync: ' +
-                (mins < 60 ? mins + 'm ago' : Math.floor(mins / 60) + 'h ago'),
-            );
+            let syncText = '',
+              syncIcon = ok;
+            if (mins < 1) syncText = 'همین الان';
+            else if (mins < 60) syncText = mins + ' دقیقه پیش';
+            else if (mins < 1440)
+              syncText = Math.floor(mins / 60) + ' ساعت پیش';
+            else {
+              syncText = Math.floor(mins / 1440) + ' روز پیش';
+              syncIcon = warn;
+            }
+            results.push(syncIcon + ' Last Sync: ' + syncText);
+          } else if (cloudConfig.token && cloudConfig.gistId) {
+            results.push(warn + ' هنوز sync نکردی');
           }
           results.push('');
 
-          results.push('<b style="color:#a78bfa">💾 یادآور Backup</b>');
+          // === BACKUP ===
+          results.push('<b style="color:#a78bfa">💾 Backup محلی</b>');
           const lastBk = safeStorage.getItem('sport_last_backup_v1');
           if (!lastBk) {
             results.push(warn + ' هرگز backup محلی نگرفتی');
@@ -8409,36 +8734,124 @@
             const days = Math.floor(
               (Date.now() - parseInt(lastBk)) / (24 * 60 * 60 * 1000),
             );
-            results.push(info + ' ' + days + ' روز از آخرین backup');
+            if (days < 7) {
+              results.push(
+                ok +
+                  ' ' +
+                  days +
+                  ' روز پیش (یادآور بعدی: ' +
+                  (7 - days) +
+                  ' روز)',
+              );
+            } else {
+              results.push(warn + ' ' + days + ' روز پیش (زمانشه!)');
+            }
           }
           results.push('');
 
+          // === STORAGE ===
+          results.push('<b style="color:#a78bfa">💽 حافظه محلی</b>');
+          let totalSize = 0,
+            itemCount = 0;
+          try {
+            for (let i = 0; i < localStorage.length; i++) {
+              const k = localStorage.key(i);
+              if (k && k.indexOf('sport_') === 0) {
+                totalSize += (localStorage.getItem(k) || '').length;
+                itemCount++;
+              }
+            }
+            results.push(
+              info + ' مجموع: ' + (totalSize / 1024).toFixed(2) + ' KB',
+            );
+            results.push(info + ' تعداد کلید: ' + itemCount);
+          } catch (e) {
+            results.push(warn + ' نمی‌تونم اندازه بگیرم');
+          }
+          results.push('');
+
+          // === APPEARANCE ===
           results.push('<b style="color:#a78bfa">🎨 ظاهر</b>');
+          const themeData = safeStorage.getItem('sport_accent_v3');
+          let themeName = 'بنفش (پیش‌فرض)';
+          if (themeData) {
+            try {
+              const t = JSON.parse(themeData);
+              const themeMap = {
+                '#8b5cf6': 'بنفش',
+                '#0ea5e9': 'آبی',
+                '#10b981': 'سبز',
+                '#f59e0b': 'طلایی',
+                '#ec4899': 'صورتی',
+              };
+              themeName = themeMap[t.accent] || 'سفارشی';
+            } catch (e) {}
+          }
+          results.push(info + ' تم: ' + themeName);
           results.push(
             info +
-              ' Font: ' +
+              ' فونت: ' +
               (safeStorage.getItem('sport_font_v1') || 'Vazirmatn'),
           );
           results.push(
-            info + ' Screen: ' + window.innerWidth + '×' + window.innerHeight,
-          );
-          results.push(
-            info + ' Mobile: ' + (window.innerWidth < 760 ? 'yes' : 'no'),
+            info +
+              ' اندازه: ' +
+              (safeStorage.getItem('sport_font_scale_v1') || '1.0') +
+              'x',
           );
           results.push('');
 
+          // === BROWSER ===
+          results.push('<b style="color:#a78bfa">🌐 مرورگر</b>');
+          results.push(
+            info + ' اندازه: ' + window.innerWidth + '×' + window.innerHeight,
+          );
+          results.push(
+            info +
+              ' نوع: ' +
+              (window.innerWidth < 760 ? 'موبایل 📱' : 'دسکتاپ 💻'),
+          );
+          results.push(
+            (navigator.onLine ? ok : warn) +
+              ' آنلاین: ' +
+              (navigator.onLine ? 'بله' : 'خیر'),
+          );
+          results.push('');
+
+          // === LIBRARIES ===
+          results.push('<b style="color:#a78bfa">📚 کتابخانه‌ها</b>');
+          results.push(
+            (typeof Chart !== 'undefined' ? ok : bad) +
+              ' Chart.js: ' +
+              (typeof Chart !== 'undefined' ? 'لود شده' : 'لود نشده'),
+          );
+          results.push(
+            (typeof jalaali !== 'undefined' ? ok : bad) +
+              ' Jalaali: ' +
+              (typeof jalaali !== 'undefined' ? 'لود شده' : 'لود نشده'),
+          );
+          results.push('');
+
+          // === SUMMARY ===
           const critical = [
             !!auth,
             !!(cloudConfig.token && cloudConfig.gistId),
-            data.rows && data.rows.length > 0,
+            rowsCount > 0,
+            typeof Chart !== 'undefined',
+            typeof jalaali !== 'undefined',
+            !!data.programGoal,
           ];
           const okCount = critical.filter(function (x) {
             return x;
           }).length;
-          results.push('<b style="color:#a78bfa">📋 خلاصه</b>');
-          if (okCount === 3) results.push(ok + ' <b>همه چیز عالیه!</b>');
-          else if (okCount === 2) results.push(warn + ' <b>یه مورد ناقصه</b>');
-          else results.push(bad + ' <b>چند مورد ناقصه</b>');
+          results.push('<b style="color:#a78bfa;font-size:1rem">📋 خلاصه</b>');
+          if (okCount === 6) results.push(ok + ' <b>همه چیز عالیه! 🎉</b>');
+          else if (okCount >= 5)
+            results.push(ok + ' <b>عالی — امتیاز ' + okCount + '/6</b>');
+          else if (okCount >= 3)
+            results.push(warn + ' <b>خوب — امتیاز ' + okCount + '/6</b>');
+          else
+            results.push(bad + ' <b>نیاز به تنظیمات — ' + okCount + '/6</b>');
 
           const el = document.getElementById('healthResults');
           if (el) el.innerHTML = results.join('<br>');
@@ -8877,19 +9290,28 @@
           const exPreset = document.getElementById('exPreset');
           if (exPreset)
             exPreset.addEventListener('change', function () {
-              document.getElementById('exCustomDates').style.display =
-                this.value === 'custom' ? 'grid' : 'none';
-              if (this.value === 'custom') {
+              const isCustom = this.value === 'custom';
+              const customDiv = document.getElementById('exCustomDates');
+              if (customDiv)
+                customDiv.style.display = isCustom ? 'grid' : 'none';
+
+              const fromEl = document.getElementById('exFrom');
+              const toEl = document.getElementById('exTo');
+
+              if (isCustom) {
                 const sorted = state()
                   .rows.slice()
                   .sort(function (a, b) {
                     return Jalali.cmp(a.jdate, b.jdate);
                   });
                 if (sorted.length) {
-                  document.getElementById('exFrom').value = sorted[0].jdate;
-                  document.getElementById('exTo').value =
-                    sorted[sorted.length - 1].jdate;
+                  if (fromEl) fromEl.value = sorted[0].jdate;
+                  if (toEl) toEl.value = sorted[sorted.length - 1].jdate;
                 }
+              } else {
+                // پاک کردن تاریخ‌ها وقتی به حالت غیر سفارشی میره
+                if (fromEl) fromEl.value = '';
+                if (toEl) toEl.value = '';
               }
             });
 
@@ -9089,6 +9511,8 @@
             setupSettingsMenu();
             A.setupNumSteppers();
             setupCalcs();
+            if (typeof window.setupGoalEditor === 'function')
+              window.setupGoalEditor();
             setupAIHelper();
             loadCloudConfig();
             bindEvents();
