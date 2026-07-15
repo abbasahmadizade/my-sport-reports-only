@@ -3203,7 +3203,7 @@
             id="stepPrev"
             style="flex: 1"
           >
-            ◄ قبلی
+            → قبلی
           </button>
           <button
             type="button"
@@ -3211,7 +3211,7 @@
             id="stepNext"
             style="flex: 2"
           >
-            بعدی ►
+            بعدی ←
           </button>
           <button
             type="button"
@@ -7986,50 +7986,176 @@
             }
             return;
           }
-          const badge = document.getElementById('cloudBadge');
-          const dotEl = document.getElementById('cloudStatusDot');
-          if (badge) {
-            badge.className = 'cloud-badge syncing';
-            badge.textContent = '☁️ ⏳';
-          }
-          if (dotEl) dotEl.className = 'status-dot syncing';
-          try {
-            const res = await fetch(
-              'https://api.github.com/gists/' + cloudConfig.gistId,
-              {
-                method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'token ' + cloudConfig.token,
-                  Accept: 'application/vnd.github.v3+json',
-                },
-                body: JSON.stringify({
-                  files: {
-                    'sport-data.json': {
-                      content: JSON.stringify(state(), null, 2),
-                    },
-                  },
-                }),
-              },
-            );
-            if (!res.ok) {
-              const errText = await res.text();
-              throw new Error(
-                'HTTP ' + res.status + ': ' + errText.substring(0, 150),
-              );
-            }
-            cloudConfig.lastSync = Date.now();
-            saveCloudConfig();
-            if (!silent) toast('☁️ ذخیره شد!', 'success');
-          } catch (e) {
-            console.error('cloud upload:', e);
-            if (!silent) toast('خطا: ' + e.message, 'error', 4000);
+
+          // چک اینترنت
+          if (!navigator.onLine) {
+            if (!silent) toast('❌ اینترنت قطع است!', 'error', 4000);
+            const badge = document.getElementById('cloudBadge');
+            const dotEl = document.getElementById('cloudStatusDot');
             if (badge) {
               badge.className = 'cloud-badge err';
               badge.textContent = '☁️ ✗';
             }
             if (dotEl) dotEl.className = 'status-dot err';
+            return;
           }
+
+          const badge = document.getElementById('cloudBadge');
+          const dotEl = document.getElementById('cloudStatusDot');
+
+          // === Retry Logic ===
+          const MAX_RETRIES = 3;
+          const RETRY_DELAY = 2000; // 2 ثانیه
+          let lastError = null;
+
+          for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            // نشون دادن وضعیت
+            if (badge) {
+              badge.className = 'cloud-badge syncing';
+              badge.textContent =
+                attempt === 1
+                  ? '☁️ ⏳'
+                  : '☁️ ⏳ ' + attempt + '/' + MAX_RETRIES;
+            }
+            if (dotEl) dotEl.className = 'status-dot syncing';
+
+            try {
+              const startTime = Date.now();
+
+              const res = await fetch(
+                'https://api.github.com/gists/' + cloudConfig.gistId,
+                {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'token ' + cloudConfig.token,
+                    Accept: 'application/vnd.github.v3+json',
+                  },
+                  body: JSON.stringify({
+                    files: {
+                      'sport-data.json': {
+                        content: JSON.stringify(state(), null, 2),
+                      },
+                    },
+                  }),
+                },
+              );
+
+              const elapsed = Date.now() - startTime;
+
+              if (!res.ok) {
+                // خطاهای غیرشبکه‌ای — retry نکن
+                if (res.status === 401) {
+                  throw new Error(
+                    '🔑 Token اشتباه یا expire شده!\n\nبرو github.com/settings/tokens و یه Token جدید بساز.',
+                  );
+                }
+                if (res.status === 404) {
+                  throw new Error(
+                    '📦 Gist ID پیدا نشد!\n\nچک کن gist.github.com که Gist وجود داره.',
+                  );
+                }
+                if (res.status === 403) {
+                  throw new Error('🚫 Rate limit خوردی! صبر کن ۱ ساعت.');
+                }
+                // بقیه خطاها — retry می‌شن
+                throw new Error('HTTP ' + res.status);
+              }
+
+              // موفقیت
+              cloudConfig.lastSync = Date.now();
+              saveCloudConfig();
+
+              if (!silent) {
+                if (attempt === 1) {
+                  toast('☁️ ذخیره شد! (' + elapsed + 'ms)', 'success');
+                } else {
+                  toast(
+                    '☁️ ذخیره شد بعد از ' +
+                      attempt +
+                      ' تلاش! (' +
+                      elapsed +
+                      'ms)',
+                    'success',
+                    3000,
+                  );
+                }
+              }
+              return; // موفق، خارج شو
+            } catch (e) {
+              lastError = e;
+              const errMsg = e.message || String(e);
+
+              // خطاهای که نباید retry بشن
+              if (
+                errMsg.includes('Token اشتباه') ||
+                errMsg.includes('Gist ID پیدا نشد') ||
+                errMsg.includes('Rate limit')
+              ) {
+                break; // خروج از حلقه
+              }
+
+              // اگه تلاش آخر نبود، صبر کن
+              if (attempt < MAX_RETRIES) {
+                console.warn(
+                  'Cloud upload attempt ' + attempt + ' failed:',
+                  errMsg,
+                );
+                if (!silent) {
+                  toast(
+                    '⏳ تلاش ' +
+                      attempt +
+                      '/' +
+                      MAX_RETRIES +
+                      ' ناموفق، دوباره...',
+                    'default',
+                    1500,
+                  );
+                }
+                await new Promise(function (resolve) {
+                  setTimeout(resolve, RETRY_DELAY);
+                });
+              }
+            }
+          }
+
+          // همه تلاش‌ها ناموفق
+          console.error(
+            'Cloud upload failed after ' + MAX_RETRIES + ' attempts:',
+            lastError,
+          );
+
+          const errMsg = lastError
+            ? lastError.message || String(lastError)
+            : 'خطای نامعلوم';
+          let userMessage = '';
+
+          if (
+            errMsg.includes('Failed to fetch') ||
+            errMsg.includes('NetworkError') ||
+            errMsg.includes('HTTP ')
+          ) {
+            userMessage =
+              '🌐 مشکل شبکه پس از ' +
+              MAX_RETRIES +
+              ' تلاش!\n\nممکن دلایل:\n• اینترنت گوشی ضعیف\n• GitHub موقتاً پاسخ نمیده\n• DNS مشکل داره\n\n💡 چیکار کن:\n1. اینترنت رو چک کن\n2. ۵ دقیقه صبر کن\n3. دوباره امتحان کن';
+          } else {
+            userMessage = errMsg;
+          }
+
+          if (!silent) {
+            if (userMessage.length > 60) {
+              alert('❌ خطا در ذخیره ابری:\n\n' + userMessage);
+            } else {
+              toast('❌ ' + userMessage, 'error', 5000);
+            }
+          }
+
+          if (badge) {
+            badge.className = 'cloud-badge err';
+            badge.textContent = '☁️ ✗';
+          }
+          if (dotEl) dotEl.className = 'status-dot err';
         }
 
         async function cloudDownload() {
@@ -8225,7 +8351,7 @@
           toast('باشه، هفته دیگه', 'default', 2000);
         };
         // ===== AI HELPER =====
-        function generateAIMessage() {
+        window.generateAIMessage = function () {
           const type = document.getElementById('aiRequestType').value;
           const userMsg = document.getElementById('aiUserMessage').value.trim();
           const incStats = document.getElementById('aiIncStats').checked;
@@ -8467,7 +8593,7 @@
           msg += 'ممنون که کمکم می‌کنی! 🙏\n';
 
           return msg;
-        }
+        };
 
         function openAIModal() {
           const modal = document.getElementById('modalAI');
@@ -8487,7 +8613,7 @@
           if (modal) modal.classList.remove('open');
         }
 
-        function setupAIHelper() {
+        window.setupAIHelper = function () {
           const btn = document.getElementById('aiHelperBtn');
           if (btn) btn.addEventListener('click', openAIModal);
 
@@ -8519,11 +8645,21 @@
           const genBtn = document.getElementById('aiGenerateBtn');
           if (genBtn)
             genBtn.addEventListener('click', function () {
-              const msg = generateAIMessage();
+              const msg = window.generateAIMessage
+                ? window.generateAIMessage()
+                : '';
+              if (!msg) {
+                toast('❌ خطا در تولید متن', 'error');
+                return;
+              }
               const pv = document.getElementById('aiPreview');
               if (pv) {
                 pv.textContent = msg;
                 pv.style.display = 'block';
+                // اسکرول به preview که کاربر ببینه
+                setTimeout(function () {
+                  pv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
               }
               const st = document.getElementById('aiStats');
               if (st)
@@ -8532,28 +8668,13 @@
                   ' کاراکتر • ~' +
                   Math.ceil(msg.length / 3.5).toLocaleString() +
                   ' توکن';
-              toast('✅ متن آماده شد', 'success', 1500);
-            });
-
-          const copyBtn = document.getElementById('aiCopyBtn');
-          if (copyBtn)
-            copyBtn.addEventListener('click', async function () {
-              const msg = generateAIMessage();
-              if (await copyText(msg)) {
-                toast(
-                  '📋 کپی شد! (' + msg.length + ' کاراکتر)',
-                  'success',
-                  3000,
-                );
-              } else {
-                toast('خطا در کپی', 'error');
-              }
+              toast('✅ متن آماده شد! پایین رو ببین ↓', 'success', 2500);
             });
 
           const shareBtn = document.getElementById('aiShareBtn');
           if (shareBtn)
             shareBtn.addEventListener('click', async function () {
-              const msg = generateAIMessage();
+              const msg = window.generateAIMessage();
               if (navigator.share) {
                 try {
                   await navigator.share({ title: 'راهنمای AI', text: msg });
@@ -8569,7 +8690,7 @@
           const dlBtn = document.getElementById('aiDownloadBtn');
           if (dlBtn)
             dlBtn.addEventListener('click', function () {
-              const msg = generateAIMessage();
+              const msg = window.generateAIMessage();
               downloadFile(
                 msg,
                 'ai-helper-' + Jalali.today() + '.md',
@@ -8577,7 +8698,159 @@
               );
               toast('💾 دانلود شد', 'success');
             });
-        }
+        };
+        window.testGitHubConnection = async function () {
+          const resultEl = document.getElementById('githubTestResult');
+          if (!resultEl) return;
+
+          resultEl.innerHTML = '⏳ در حال تست...';
+          resultEl.style.color = '#f59e0b';
+
+          const results = [];
+
+          // Test 1: Basic connection
+          try {
+            const t1Start = Date.now();
+            const res = await fetch('https://api.github.com', {
+              method: 'HEAD',
+              cache: 'no-cache',
+            });
+            const t1 = Date.now() - t1Start;
+            if (res.ok || res.status === 200) {
+              results.push('✅ اتصال به GitHub: ' + t1 + 'ms');
+            } else {
+              results.push('⚠️ GitHub پاسخ داد ولی ' + res.status);
+            }
+          } catch (e) {
+            results.push('❌ اتصال به GitHub: ناموفق');
+            results.push('   خطا: ' + (e.message || 'نامعلوم'));
+            resultEl.innerHTML =
+              results.join('<br>') +
+              '<br><br><b style="color:#ef4444">🚨 GitHub در دسترس نیست!</b><br>احتمالاً فیلتره یا اینترنت مشکل داره.<br>💡 راه حل: VPN یا اینترنت دیگه';
+            resultEl.style.color = '#ef4444';
+            return;
+          }
+
+          // Test 2: With auth
+          if (typeof cloudConfig !== 'undefined' && cloudConfig.token) {
+            try {
+              const t2Start = Date.now();
+              const res = await fetch('https://api.github.com/user', {
+                headers: { Authorization: 'token ' + cloudConfig.token },
+              });
+              const t2 = Date.now() - t2Start;
+              if (res.ok) {
+                const user = await res.json();
+                results.push(
+                  '✅ Token معتبر: ' + user.login + ' (' + t2 + 'ms)',
+                );
+              } else if (res.status === 401) {
+                results.push('❌ Token نامعتبر (401) — Token expire شده');
+              } else {
+                results.push('⚠️ Token: HTTP ' + res.status);
+              }
+            } catch (e) {
+              results.push('❌ تست Token: ' + (e.message || 'نامعلوم'));
+            }
+          } else {
+            results.push('⚠️ Token تنظیم نشده');
+          }
+
+          // Test 3: Gist access
+          if (
+            typeof cloudConfig !== 'undefined' &&
+            cloudConfig.token &&
+            cloudConfig.gistId
+          ) {
+            try {
+              const t3Start = Date.now();
+              const res = await fetch(
+                'https://api.github.com/gists/' + cloudConfig.gistId,
+                {
+                  headers: { Authorization: 'token ' + cloudConfig.token },
+                },
+              );
+              const t3 = Date.now() - t3Start;
+              if (res.ok) {
+                const gist = await res.json();
+                const fileCount = gist.files
+                  ? Object.keys(gist.files).length
+                  : 0;
+                results.push(
+                  '✅ Gist در دسترس: ' + fileCount + ' فایل (' + t3 + 'ms)',
+                );
+              } else if (res.status === 404) {
+                results.push('❌ Gist پیدا نشد (404)');
+              } else {
+                results.push('⚠️ Gist: HTTP ' + res.status);
+              }
+            } catch (e) {
+              results.push('❌ تست Gist: ' + (e.message || 'نامعلوم'));
+            }
+          } else {
+            results.push('⚠️ Gist ID تنظیم نشده');
+          }
+
+          // Test 4: Rate Limit
+          if (typeof cloudConfig !== 'undefined' && cloudConfig.token) {
+            try {
+              const res = await fetch('https://api.github.com/rate_limit', {
+                headers: { Authorization: 'token ' + cloudConfig.token },
+              });
+              if (res.ok) {
+                const data = await res.json();
+                const core = data.resources && data.resources.core;
+                if (core) {
+                  const usedPct = Math.round(
+                    ((core.limit - core.remaining) / core.limit) * 100,
+                  );
+                  const resetDate = new Date(core.reset * 1000);
+                  const resetTime = resetDate.toLocaleTimeString('fa-IR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+                  results.push(
+                    'ℹ️ Rate Limit: ' +
+                      core.remaining +
+                      '/' +
+                      core.limit +
+                      ' باقی (' +
+                      usedPct +
+                      '% استفاده)',
+                  );
+                  if (core.remaining < 100) {
+                    results.push(
+                      '⚠️ به Rate Limit نزدیک شدی! ریست: ' + resetTime,
+                    );
+                  }
+                }
+              }
+            } catch (e) {}
+          }
+
+          // نمایش نتیجه
+          const allOk = results.every(function (r) {
+            return r.startsWith('✅') || r.startsWith('ℹ️');
+          });
+          const anyFailed = results.some(function (r) {
+            return r.startsWith('❌');
+          });
+
+          resultEl.innerHTML = results.join('<br>');
+          if (allOk) {
+            resultEl.innerHTML +=
+              '<br><br><b style="color:#10b981">🎉 همه چیز عالیه!</b>';
+            resultEl.style.color = '#10b981';
+          } else if (anyFailed) {
+            resultEl.innerHTML +=
+              '<br><br><b style="color:#ef4444">🚨 مشکل پیدا شد ↑</b>';
+            resultEl.style.color = '#ef4444';
+          } else {
+            resultEl.innerHTML +=
+              '<br><br><b style="color:#f59e0b">⚠️ چند مورد بررسی</b>';
+            resultEl.style.color = '#f59e0b';
+          }
+        };
         // ===== HEALTH CHECK =====
         A.runHealthCheck = function () {
           const results = [];
@@ -8815,6 +9088,20 @@
             (navigator.onLine ? ok : warn) +
               ' آنلاین: ' +
               (navigator.onLine ? 'بله' : 'خیر'),
+          );
+          results.push('');
+          // === NETWORK TEST ===
+          results.push('<b style="color:#a78bfa">🌐 تست شبکه</b>');
+          results.push(
+            (navigator.onLine ? ok : bad) +
+              ' اینترنت: ' +
+              (navigator.onLine ? 'وصل' : 'قطع'),
+          );
+          results.push(
+            '<button type="button" onclick="window.testGitHubConnection()" style="margin-top:8px;padding:8px 14px;background:rgba(139,92,246,.15);border:1px solid var(--border);color:var(--accent2);border-radius:8px;cursor:pointer;font-family:var(--font-family);font-size:.8rem">🔬 تست اتصال GitHub</button>',
+          );
+          results.push(
+            '<div id="githubTestResult" style="margin-top:8px;padding:10px;background:rgba(0,0,0,.15);border-radius:6px;font-size:.75rem;min-height:20px;color:var(--muted);line-height:1.6">هنوز تست نشده — دکمه بالا رو بزن</div>',
           );
           results.push('');
 
@@ -9513,7 +9800,8 @@
             setupCalcs();
             if (typeof window.setupGoalEditor === 'function')
               window.setupGoalEditor();
-            setupAIHelper();
+            if (typeof window.setupAIHelper === 'function')
+              window.setupAIHelper();
             loadCloudConfig();
             bindEvents();
             renderAll();
