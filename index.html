@@ -658,6 +658,28 @@
       .streak-map {
         width: 100%;
         overflow: hidden;
+        --sm-size: 12px;
+        --sm-gap: 3px;
+      }
+      @media (min-width: 1024px) {
+        .sm-stats {
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin-top: 16px;
+        }
+        .sm-stat-val {
+          font-size: 1.6rem;
+        }
+        .sm-stat-lbl {
+          font-size: 0.75rem;
+        }
+        .sm-stat {
+          padding: 14px 10px;
+        }
+        .sm-ylabel {
+          width: 18px;
+          font-size: 0.65rem;
+        }
       }
       .sm-header {
         display: flex;
@@ -702,14 +724,14 @@
       .sm-ylabels {
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        gap: var(--sm-gap);
         margin-right: 3px;
         padding-top: 17px;
         flex-shrink: 0;
       }
       .sm-ylabel {
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: var(--sm-size);
         font-size: 0.55rem;
         color: var(--muted);
         display: flex;
@@ -724,13 +746,13 @@
       .sm-xlabels {
         display: flex;
         flex-direction: row;
-        height: 15px;
+        height: 16px;
         margin-bottom: 2px;
-        gap: 3px;
+        gap: var(--sm-gap);
       }
       .sm-xlabel {
-        width: 12px;
-        min-width: 12px;
+        width: var(--sm-size);
+        min-width: var(--sm-size);
         font-size: 0.58rem;
         color: var(--muted);
         text-align: left;
@@ -741,7 +763,7 @@
       .sm-cols {
         display: flex;
         flex-direction: row;
-        gap: 3px;
+        gap: var(--sm-gap);
       }
       @media (min-width: 768px) {
         .sm-cols {
@@ -751,7 +773,7 @@
       .sm-col {
         display: flex;
         flex-direction: column;
-        gap: 3px;
+        gap: var(--sm-gap);
         flex-shrink: 0;
       }
       @media (min-width: 768px) {
@@ -760,13 +782,13 @@
         }
       }
       .sm-cell {
-        width: 12px;
-        height: 12px;
-        border-radius: 2px;
+        width: var(--sm-size);
+        height: var(--sm-size);
+        border-radius: 3px;
         flex-shrink: 0;
         position: relative;
         cursor: pointer;
-        transition: transform 0.1s;
+        transition: transform 0.12s;
       }
       @media (min-width: 600px) {
         .sm-cell {
@@ -3863,7 +3885,28 @@
               <option value="optimize">⚡ بهینه‌سازی کد</option>
             </select>
           </div>
-
+          <div style="margin-top: 12px">
+            <label class="form-label">📝 تغییرات اخیر کد (برای AI)</label>
+            <textarea
+              id="aiRecentChanges"
+              class="form-input"
+              rows="2"
+              placeholder="مثلاً: renderStreakMap اضافه شد، CORS fix شد..."
+              style="font-size: 0.8rem"
+              oninput="safeStorage.setItem('ai_recent_changes', this.value)"
+            ></textarea>
+          </div>
+          <div style="margin-top: 8px">
+            <label class="form-label">🐛 باگ/مشکل فعلی</label>
+            <textarea
+              id="aiCurrentBug"
+              class="form-input"
+              rows="2"
+              placeholder="مثلاً: streak map روی موبایل کوچیکه..."
+              style="font-size: 0.8rem"
+              oninput="safeStorage.setItem('ai_current_bug', this.value)"
+            ></textarea>
+          </div>
           <div class="form-group">
             <label>💬 توضیح مشکل / درخواستت (اختیاری)</label>
             <textarea
@@ -5794,13 +5837,32 @@
         // STREAK MAP v2 — پنجره متحرک ۱۲ هفته
         // ═══════════════════════════════════════
         function renderStreakMap() {
-          var WEEKS =
-            window.innerWidth >= 1024 ? 52 : window.innerWidth >= 600 ? 24 : 12;
           var rows = window._app.state().rows || [];
+          var maxWeeks = 52;
+          if (window.innerWidth < 1024) maxWeeks = 24;
+          if (window.innerWidth < 600) maxWeeks = 14;
+          var WEEKS = 6;
+          if (rows.length) {
+            var sorted = rows.slice().sort(function (a, b) {
+              return a.jdate > b.jdate ? 1 : -1;
+            });
+            var firstDate = sorted[0].jdate;
+            var todayStr2 = window._app.Jalali.today();
+            var diffDays = 0;
+            var cur = firstDate;
+            while (cur <= todayStr2 && diffDays < 400) {
+              cur = window._app.Jalali.addDays(cur, 1);
+              diffDays++;
+            }
+            var weeksNeeded = Math.ceil(diffDays / 7) + 1;
+            WEEKS = Math.min(Math.max(weeksNeeded, 6), maxWeeks);
+          }
+
           var dateMap = {};
           rows.forEach(function (r) {
             if (r.jdate) dateMap[r.jdate] = r;
           });
+
           var FA_DAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
           var FA_MONTHS = [
             'فروردین',
@@ -5830,24 +5892,18 @@
           var labelEl = document.getElementById('streakLabel');
           if (!mapEl) return;
 
-          // امروز و روز هفته
-          var todayStr = Jalali.today();
-          var todayDow = DOW_MAP[Jalali.weekdayName(todayStr)] || 0;
-          var todayParsed = Jalali.parseKey(todayStr);
-
-          // اهداف
+          var todayStr = window._app.Jalali.today();
+          var todayDow = DOW_MAP[window._app.Jalali.weekdayName(todayStr)] || 0;
+          var todayParsed = window._app.Jalali.parseKey(todayStr);
           var goals = window._app.state().goals || {};
           var sleepGoalMin = (goals.sleepGoalHours || 6.5) * 60;
           var actGoalMin = goals.activityGoalMin || 20;
-
-          // futsal dates
           var futsalSet = new Set(
             (window._app.state().futsal || []).map(function (f) {
               return f.jdate;
             }),
           );
 
-          // امتیاز هر روز
           function scoreDay(r) {
             if (!r) return 0;
             var sc = 0;
@@ -5878,13 +5934,10 @@
             return 4;
           }
 
-          // ساخت داده گرید
-          // col=0 قدیمی‌ترین، col=WEEKS-1 جدیدترین (امروز)
-          // row=0 شنبه، row=6 جمعه
-          // daysBack = (WEEKS-1-col)*7 + (todayDow-row)
           var gridData = [];
-          var monthLabels = {}; // col → نام ماه
+          var monthLabels = {};
           var lastMonth = -1;
+          var lastLabelCol = -1;
 
           for (var col = 0; col < WEEKS; col++) {
             var colArr = [];
@@ -5893,13 +5946,15 @@
               if (daysBack < 0) {
                 colArr.push({ future: true });
               } else {
-                var ds = Jalali.addDays(todayStr, -daysBack);
-                var parsed = Jalali.parseKey(ds);
+                var ds = window._app.Jalali.addDays(todayStr, -daysBack);
+                var parsed = window._app.Jalali.parseKey(ds);
                 var r = dateMap[ds];
                 var sc = scoreDay(r);
-                // label ماه: اولین روز هفته که ماه عوض شده
                 if (row === 0 && parsed && parsed.jm !== lastMonth) {
-                  monthLabels[col] = FA_MONTHS[parsed.jm - 1].substring(0, 3);
+                  if (lastLabelCol === -1 || col - lastLabelCol >= 3) {
+                    monthLabels[col] = FA_MONTHS[parsed.jm - 1];
+                    lastLabelCol = col;
+                  }
                   lastMonth = parsed.jm;
                 }
                 colArr.push({
@@ -5918,7 +5973,6 @@
             gridData.push(colArr);
           }
 
-          // ─── ساخت HTML ───
           var tip = document.getElementById('smTip');
           if (!tip) {
             tip = document.createElement('div');
@@ -5927,7 +5981,6 @@
             document.body.appendChild(tip);
           }
 
-          // container
           mapEl.innerHTML =
             '<div class="sm-header">' +
             '<span class="sm-title">🗓️ نقشه فعالیت</span>' +
@@ -5952,7 +6005,6 @@
             '</div>' +
             '<div class="sm-stats" id="smStatCards"></div>';
 
-          // Y labels (روزهای هفته)
           var ylEl = document.getElementById('smYLabels');
           if (ylEl) {
             ylEl.innerHTML = FA_DAYS.map(function (d) {
@@ -5960,21 +6012,40 @@
             }).join('');
           }
 
-          // X labels (ماه‌ها)
           var xlEl = document.getElementById('smXLabels');
           if (xlEl) {
             xlEl.innerHTML = '';
             for (var c = 0; c < WEEKS; c++) {
               var xl = document.createElement('div');
               xl.className = 'sm-xlabel';
-              xl.style.width = '12px';
-              xl.style.minWidth = '12px';
-              if (monthLabels[c]) xl.textContent = monthLabels[c];
+              if (monthLabels[c]) {
+                xl.textContent = monthLabels[c];
+                xl.style.fontWeight = '600';
+                xl.style.color = 'var(--text)';
+              }
               xlEl.appendChild(xl);
             }
+            setTimeout(function () {
+              var firstCol = document.querySelector('.sm-col');
+              if (!firstCol) return;
+              var colW = firstCol.offsetWidth;
+              var colGap =
+                parseInt(
+                  getComputedStyle(document.querySelector('.sm-cols')).gap,
+                ) || 3;
+              var total = colW + colGap;
+              var xls = document.querySelectorAll('.sm-xlabel');
+              xls.forEach(function (xl) {
+                xl.style.width = total + 'px';
+                xl.style.minWidth = total + 'px';
+              });
+              if (xls[xls.length - 1]) {
+                xls[xls.length - 1].style.width = colW + 'px';
+                xls[xls.length - 1].style.minWidth = colW + 'px';
+              }
+            }, 80);
           }
 
-          // ستون‌ها
           var colsEl = document.getElementById('smCols');
           if (colsEl) {
             colsEl.innerHTML = '';
@@ -5990,9 +6061,7 @@
                   if (cell.isFutsal) cls += ' sm-futsal';
                   if (cell.isToday) cls += ' sm-today';
                   div.className = cls;
-
-                  // tooltip
-                  function attachEvents(d, c) {
+                  (function (d, c) {
                     d.addEventListener('mouseenter', function () {
                       var html =
                         '<span class="sm-tip-date">📅 ' + c.ds + '</span>';
@@ -6038,8 +6107,7 @@
                       },
                       { passive: false },
                     );
-                  }
-                  attachEvents(div, cell);
+                  })(div, cell);
                 }
                 colDiv.appendChild(div);
               });
@@ -6047,22 +6115,19 @@
             });
           }
 
-          // ─── کارت‌های آمار ───
           var statsEl = document.getElementById('smStatCards');
           if (statsEl) {
-            // استریک فعلی
             var curStreak = 0;
             for (var i = 0; i < 365; i++) {
-              var ds2 = Jalali.addDays(todayStr, -i);
+              var ds2 = window._app.Jalali.addDays(todayStr, -i);
               var rr = dateMap[ds2];
               if (rr && rr.completed) curStreak++;
               else break;
             }
 
-            // بهترین استریک
             var bestStreak = 0,
               tmpS = 0;
-            var allRows = (window._app.state().rows || [])
+            var allRows = rows
               .filter(function (r) {
                 return r.completed && r.jdate;
               })
@@ -6073,14 +6138,13 @@
               if (i === 0) {
                 tmpS = 1;
               } else {
-                var prev = Jalali.addDays(r.jdate, -1);
+                var prev = window._app.Jalali.addDays(r.jdate, -1);
                 tmpS = dateMap[prev] && dateMap[prev].completed ? tmpS + 1 : 1;
               }
               if (tmpS > bestStreak) bestStreak = tmpS;
             });
             if (curStreak > bestStreak) bestStreak = curStreak;
 
-            // فعال‌ترین روز هفته
             var dowCount = [0, 0, 0, 0, 0, 0, 0];
             var FA_DAYS_FULL = [
               'شنبه',
@@ -6091,62 +6155,49 @@
               'پنج‌شنبه',
               'جمعه',
             ];
-            (window._app.state().rows || []).forEach(function (r) {
+            rows.forEach(function (r) {
               if (!r.completed || !r.jdate) return;
-              var wd = DOW_MAP[Jalali.weekdayName(r.jdate)];
+              var wd = DOW_MAP[window._app.Jalali.weekdayName(r.jdate)];
               if (wd !== undefined) dowCount[wd]++;
             });
             var bestDow = dowCount.indexOf(Math.max.apply(null, dowCount));
 
-            // فعال ماه جاری
             var curPrefix =
               todayParsed.jy + '-' + String(todayParsed.jm).padStart(2, '0');
-            var activeMonth = (window._app.state().rows || []).filter(
-              function (r) {
-                return r.jdate && r.jdate.startsWith(curPrefix) && r.completed;
-              },
-            ).length;
+            var activeMonth = rows.filter(function (r) {
+              return r.jdate && r.jdate.startsWith(curPrefix) && r.completed;
+            }).length;
 
+            var bestDowName = FA_DAYS_FULL[bestDow] || '—';
             statsEl.innerHTML =
-              '<div class="sm-stat">' +
-                '<span class="sm-stat-val">🔥 ' +
-                curStreak +
-                '</span>' +
-                '<span class="sm-stat-lbl">استریک فعلی</span>' +
-                '</div>' +
-                '<div class="sm-stat">' +
-                '<span class="sm-stat-val">🏆 ' +
-                bestStreak +
-                '</span>' +
-                '<span class="sm-stat-lbl">بهترین استریک</span>' +
-                '</div>' +
-                '<div class="sm-stat">' +
-                '<span class="sm-stat-val">📅 ' +
-                FA_DAYS_FULL[bestDow] ||
-              '—' +
-                '</span>' +
-                '<span class="sm-stat-lbl">فعال‌ترین روز</span>' +
-                '</div>' +
-                '<div class="sm-stat">' +
-                '<span class="sm-stat-val">📈 ' +
-                activeMonth +
-                '/' +
-                todayParsed.jd +
-                '</span>' +
-                '<span class="sm-stat-lbl">فعال ماه جاری</span>' +
-                '</div>';
+              '<div class="sm-stat"><span class="sm-stat-val">🔥 ' +
+              curStreak +
+              '</span><span class="sm-stat-lbl">استریک فعلی</span></div>' +
+              '<div class="sm-stat"><span class="sm-stat-val">🏆 ' +
+              bestStreak +
+              '</span><span class="sm-stat-lbl">بهترین استریک</span></div>' +
+              '<div class="sm-stat"><span class="sm-stat-val">📅 ' +
+              bestDowName +
+              '</span><span class="sm-stat-lbl">فعال‌ترین روز</span></div>' +
+              '<div class="sm-stat"><span class="sm-stat-val">📈 ' +
+              activeMonth +
+              '/' +
+              todayParsed.jd +
+              '</span><span class="sm-stat-lbl">فعال ماه جاری</span></div>';
           }
 
-          // label قدیمی رو مخفی کن
           if (labelEl) labelEl.style.display = 'none';
 
-          // آمار کلی برای label
-          var totalOk = (window._app.state().rows || []).filter(function (r) {
-            return r.completed;
-          }).length;
-          var totalNo = (window._app.state().rows || []).filter(function (r) {
-            return r.jdate && !r.completed;
-          }).length;
+          setTimeout(function () {
+            var firstCol = document.querySelector('.sm-col');
+            var colW = firstCol ? firstCol.offsetWidth : 0;
+            if (colW > 0) {
+              document.querySelectorAll('.sm-xlabel').forEach(function (xl) {
+                xl.style.width = colW + 'px';
+                xl.style.minWidth = colW + 'px';
+              });
+            }
+          }, 60);
         }
 
         function renderInsights() {
@@ -8973,6 +9024,11 @@
         };
         // ===== AI HELPER =====
         window.generateAIMessage = function () {
+          // لود مقادیر ذخیره شده
+          var rcEl = document.getElementById('aiRecentChanges');
+          var cbEl = document.getElementById('aiCurrentBug');
+          if (rcEl) rcEl.value = safeStorage.getItem('ai_recent_changes') || '';
+          if (cbEl) cbEl.value = safeStorage.getItem('ai_current_bug') || '';
           const type = document.getElementById('aiRequestType').value;
           const userMsg = document.getElementById('aiUserMessage').value.trim();
           const incStats = document.getElementById('aiIncStats').checked;
@@ -9018,14 +9074,24 @@
 
           msg += '## 📦 اطلاعات پروژه\n';
           msg += '- **نام:** گزارش ورزش، خواب و انرژی\n';
-          msg += '- **ساختار:** تک فایل HTML (~5000 خط)\n';
+          var lineCount = document.documentElement.innerHTML.split('\n').length;
+          msg +=
+            '- **ساختار:** تک فایل HTML (~' +
+            Math.round(lineCount / 100) * 100 +
+            ' خط)\n';
           msg += '- **زبان:** فارسی (RTL)\n';
           msg += '- **تقویم:** جلالی (jalaali-js از CDN)\n';
           msg += '- **نمودار:** Chart.js 4.4.7 از CDN\n';
           msg += '- **فونت:** Vazirmatn (اصلی) + Sahel + Samim\n';
           msg += '- **Cloud Sync:** GitHub Gist API\n';
           msg += '- **Login:** SHA-256 hash + salt (localStorage)\n';
-          msg += '- **نسخه:** v5.0\n';
+          // نسخه رو داینامیک بخون
+          var versionEl = document.querySelector('[data-version]');
+          var currentVersion =
+            (versionEl ? versionEl.getAttribute('data-version') : null) ||
+            (document.title.match(/v[\d.]+/) || ['v5.x'])[0] ||
+            'v5.x';
+          msg += '- **نسخه:** ' + currentVersion + '\n';
           msg += '- **پلتفرم:** موبایل (اولویت) + دسکتاپ\n\n';
 
           // === STATS ===
@@ -9186,7 +9252,15 @@
               '/main/index.html\n\n';
             msg += 'می‌تونی از این لینک، کد کامل رو fetch کنی.\n\n';
           }
-
+          // === تغییرات اخیر (از localStorage میخونه) ===
+          var recentChanges = safeStorage.getItem('ai_recent_changes') || '';
+          var currentBug = safeStorage.getItem('ai_current_bug') || '';
+          if (recentChanges || currentBug) {
+            msg += '## 🔄 وضعیت فعلی کد\n';
+            if (recentChanges)
+              msg += '**تغییرات اخیر:**\n' + recentChanges + '\n\n';
+            if (currentBug) msg += '**باگ/مشکل فعلی:**\n' + currentBug + '\n\n';
+          }
           // === INSTRUCTIONS BY TYPE ===
           msg += '## 🎯 چطور کمک کنی\n\n';
           msg += typeInstructions[type] + '\n\n';
