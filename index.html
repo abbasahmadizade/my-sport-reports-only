@@ -8115,6 +8115,7 @@
               // اگه تلاش آخر نبود، صبر کن
               if (attempt < MAX_RETRIES) {
                 const delay = RETRY_DELAYS[attempt - 1] || 3000;
+                alert('تلاش ' + attempt + ' ناموفق:\n' + errMsg);
                 console.warn(
                   '☁️ Cloud attempt ' +
                     attempt +
@@ -8314,6 +8315,15 @@
         }
 
         function openCloudModal() {
+          const cfg = JSON.parse(
+            localStorage.getItem('sport_cloud_v2') || '{}',
+          );
+          alert(
+            'توکن: ' +
+              (cfg.token || '').length +
+              ' کاراکتر\nGist: ' +
+              (cfg.gistId || 'خالی').substring(0, 15),
+          );
           document.getElementById('cloudApiKey').value =
             cloudConfig.token || '';
           document.getElementById('cloudBinId').value =
@@ -8344,6 +8354,16 @@
         }
 
         function saveCloudSettings() {
+          alert(
+            'توکن: ' +
+              document.getElementById('cloudApiKey').value.trim().length +
+              ' کاراکتر\nGist: ' +
+              document
+                .getElementById('cloudBinId')
+                .value.trim()
+                .substring(0, 10) +
+              '...',
+          );
           const newToken = document.getElementById('cloudApiKey').value.trim();
           const newGistId = document.getElementById('cloudBinId').value.trim();
           const isNewConfig =
