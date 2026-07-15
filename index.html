@@ -652,57 +652,280 @@
         border-color: var(--accent);
       }
 
-      /* === STREAK MAP === */
+      /* ═══════════════════════════════════
+   STREAK MAP v2 — GitHub Style
+═══════════════════════════════════ */
       .streak-map {
+        width: 100%;
+        overflow: hidden;
+      }
+      .sm-header {
         display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
         flex-wrap: wrap;
         gap: 4px;
-        margin: 10px 0;
       }
-      .streak-cell {
-        width: 16px;
-        height: 16px;
-        border-radius: 4px;
+      .sm-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .sm-legend {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        font-size: 0.65rem;
+        color: var(--muted);
+        direction: ltr;
+      }
+      .sm-leg-cell {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+      }
+      .sm-scroll {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+      }
+      .sm-wrap {
+        display: flex;
+        flex-direction: row;
+        gap: 0;
+        direction: ltr;
+        min-width: max-content;
+        align-items: flex-start;
+      }
+      .sm-ylabels {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-right: 3px;
+        padding-top: 17px;
+        flex-shrink: 0;
+      }
+      .sm-ylabel {
+        width: 12px;
+        height: 12px;
+        font-size: 0.55rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+      }
+      .sm-gridwrap {
+        display: flex;
+        flex-direction: column;
+      }
+      .sm-xlabels {
+        display: flex;
+        flex-direction: row;
+        height: 15px;
+        margin-bottom: 2px;
+        gap: 3px;
+      }
+      .sm-xlabel {
+        width: 12px;
+        min-width: 12px;
+        font-size: 0.58rem;
+        color: var(--muted);
+        text-align: left;
+        direction: rtl;
+        overflow: visible;
+        white-space: nowrap;
+      }
+      .sm-cols {
+        display: flex;
+        flex-direction: row;
+        gap: 3px;
+      }
+      @media (min-width: 768px) {
+        .sm-cols {
+          gap: 4px;
+        }
+      }
+      .sm-col {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex-shrink: 0;
+      }
+      @media (min-width: 768px) {
+        .sm-col {
+          gap: 4px;
+        }
+      }
+      .sm-cell {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        flex-shrink: 0;
         position: relative;
         cursor: pointer;
-        transition: 0.15s;
+        transition: transform 0.1s;
       }
-      .streak-cell:hover {
-        transform: scale(1.3);
-        z-index: 2;
+      @media (min-width: 600px) {
+        .sm-cell {
+          width: 13px;
+          height: 13px;
+          border-radius: 3px;
+        }
+        .sm-col {
+          gap: 3px;
+        }
+        .sm-cols {
+          gap: 3px;
+        }
       }
-      .streak-cell.ok {
-        background: var(--green);
+      @media (min-width: 1024px) {
+        .sm-cell {
+          width: 14px;
+          height: 14px;
+          border-radius: 3px;
+        }
+        .sm-col {
+          gap: 3px;
+        }
+        .sm-cols {
+          gap: 3px;
+        }
+        .sm-stats {
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin-top: 16px;
+        }
+        .sm-stat-val {
+          font-size: 1.6rem;
+        }
+        .sm-stat-lbl {
+          font-size: 0.75rem;
+        }
+        .sm-stat {
+          padding: 14px 10px;
+        }
       }
-      .streak-cell.no {
-        background: var(--red);
+
+      .sm-cell:hover {
+        transform: scale(1.6);
+        z-index: 10;
+      }
+      .sm-cell.sm-future {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .sm-cell.sm-today {
+        outline: 2px solid var(--text);
+        outline-offset: 1px;
+      }
+
+      /* ۵ سطح رنگ */
+      .sm-l0 {
+        background: var(--border);
         opacity: 0.6;
       }
-      .streak-cell.future {
-        background: rgba(255, 255, 255, 0.06);
+      .sm-l1 {
+        background: #0e4429;
       }
-      .streak-cell.today {
-        box-shadow: 0 0 0 2px var(--accent);
+      .sm-l2 {
+        background: #006d32;
       }
-      .streak-tooltip {
-        position: absolute;
-        bottom: calc(100% + 6px);
-        left: 50%;
-        transform: translateX(-50%);
-        background: #1a1533;
+      .sm-l3 {
+        background: #26a641;
+      }
+      .sm-l4 {
+        background: #39d353;
+      }
+
+      /* فوتسال */
+      .sm-futsal {
+        outline: 2px solid var(--yellow);
+        outline-offset: 1px;
+      }
+      .sm-cell.sm-today.sm-futsal {
+        outline: 2px solid var(--yellow);
+      }
+
+      /* Tooltip */
+      .sm-tip {
+        position: fixed;
+        background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 5px 9px;
-        font-size: 0.7rem;
-        white-space: nowrap;
+        border-radius: 10px;
+        padding: 8px 11px;
+        font-size: 0.74rem;
         color: var(--text);
-        z-index: 10;
+        z-index: 9999;
         pointer-events: none;
-        opacity: 0;
-        transition: 0.15s;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+        max-width: 155px;
+        min-width: 120px;
+        text-align: right;
+        direction: rtl;
+        line-height: 1.8;
+        display: none;
       }
-      .streak-cell:hover .streak-tooltip {
-        opacity: 1;
+      .sm-tip.on {
+        display: block;
+      }
+      .sm-tip-date {
+        font-weight: 700;
+        font-size: 0.76rem;
+        color: var(--green);
+        margin-bottom: 2px;
+        display: block;
+      }
+
+      /* کارت‌های آمار */
+      .sm-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 7px;
+        margin-top: 11px;
+      }
+      @media (min-width: 400px) {
+        .sm-stats {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      .sm-stat {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 8px 5px;
+        text-align: center;
+      }
+      .sm-stat-val {
+        display: block;
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--green);
+        line-height: 1.2;
+      }
+      @media (min-width: 768px) {
+        .sm-stat-val {
+          font-size: 1.5rem;
+        }
+        .sm-stat-lbl {
+          font-size: 0.75rem;
+        }
+        .sm-stat {
+          padding: 12px 8px;
+          border-radius: 14px;
+        }
+        .sm-stats {
+          gap: 10px;
+          margin-top: 16px;
+        }
+      }
+      .sm-stat-lbl {
+        display: block;
+        font-size: 0.62rem;
+        color: var(--muted);
+        margin-top: 2px;
       }
 
       /* === SLEEP TIMELINE === */
@@ -5567,68 +5790,363 @@
               });
             });
         };
+        // ═══════════════════════════════════════
+        // STREAK MAP v2 — پنجره متحرک ۱۲ هفته
+        // ═══════════════════════════════════════
         function renderStreakMap() {
-          const map = document.getElementById('streakMap');
-          const label = document.getElementById('streakLabel');
-          if (!map) return;
-          const sorted = state()
-            .rows.slice()
-            .sort(function (a, b) {
-              return Jalali.cmp(a.jdate, b.jdate);
-            });
-          if (!sorted.length) {
-            map.innerHTML =
-              '<span class="text-muted text-sm">داده‌ای نیست</span>';
-            return;
-          }
-          const today = Jalali.today();
-          const dateMap = {};
-          sorted.forEach(function (r) {
-            dateMap[r.jdate] = r;
+          var WEEKS =
+            window.innerWidth >= 1024 ? 52 : window.innerWidth >= 600 ? 24 : 12;
+          var rows = window._app.state().rows || [];
+          var dateMap = {};
+          rows.forEach(function (r) {
+            if (r.jdate) dateMap[r.jdate] = r;
           });
-          const startJdn = Jalali.diffDays(sorted[0].jdate, today);
-          const endOffset = 7;
-          let html = '',
-            totalOk = 0,
-            totalNo = 0;
-          for (let off = startJdn; off <= endOffset; off++) {
-            const key = Jalali.addDays(today, off);
-            const row = dateMap[key];
-            const isToday = key === today;
-            const isFuture = off > 0;
-            let cls = 'streak-cell';
-            if (isFuture) cls += ' future';
-            else if (row && row.completed) {
-              cls += ' ok';
-              totalOk++;
-            } else if (row && !row.completed) {
-              cls += ' no';
-              totalNo++;
-            } else cls += ' future';
-            if (isToday) cls += ' today';
-            const p = Jalali.parseKey(key);
-            const status = row ? (row.completed ? '✅' : '❌') : '—';
-            html +=
-              '<div class="' +
-              cls +
-              '"><span class="streak-tooltip">' +
-              p.jd +
-              ' ' +
-              Jalali.monthName(p.jm) +
-              ' ' +
-              status +
-              '</span></div>';
+          var FA_DAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+          var FA_MONTHS = [
+            'فروردین',
+            'اردیبهشت',
+            'خرداد',
+            'تیر',
+            'مرداد',
+            'شهریور',
+            'مهر',
+            'آبان',
+            'آذر',
+            'دی',
+            'بهمن',
+            'اسفند',
+          ];
+          var DOW_MAP = {
+            شنبه: 0,
+            یک‌شنبه: 1,
+            دوشنبه: 2,
+            سه‌شنبه: 3,
+            چهارشنبه: 4,
+            پنج‌شنبه: 5,
+            جمعه: 6,
+          };
+
+          var mapEl = document.getElementById('streakMap');
+          var labelEl = document.getElementById('streakLabel');
+          if (!mapEl) return;
+
+          // امروز و روز هفته
+          var todayStr = Jalali.today();
+          var todayDow = DOW_MAP[Jalali.weekdayName(todayStr)] || 0;
+          var todayParsed = Jalali.parseKey(todayStr);
+
+          // اهداف
+          var goals = window._app.state().goals || {};
+          var sleepGoalMin = (goals.sleepGoalHours || 6.5) * 60;
+          var actGoalMin = goals.activityGoalMin || 20;
+
+          // futsal dates
+          var futsalSet = new Set(
+            (window._app.state().futsal || []).map(function (f) {
+              return f.jdate;
+            }),
+          );
+
+          // امتیاز هر روز
+          function scoreDay(r) {
+            if (!r) return 0;
+            var sc = 0;
+            if (r.completed) sc += 35;
+            if ((r.runMin || 0) >= 5) sc += 20;
+            if ((r.runMin || 0) + (r.walkMin || 0) >= actGoalMin) sc += 15;
+            if (r.sleepBlocks && r.sleepBlocks.length) {
+              var tot = 0;
+              r.sleepBlocks.forEach(function (b) {
+                if (!b.start || !b.end) return;
+                var s2 = b.start.split(':').map(Number);
+                var e2 = b.end.split(':').map(Number);
+                var m = e2[0] * 60 + e2[1] - (s2[0] * 60 + s2[1]);
+                if (m < 0) m += 1440;
+                tot += m;
+              });
+              if (tot >= sleepGoalMin) sc += 15;
+            }
+            sc += Math.round(((r.energy || 0) / 10) * 15);
+            return Math.min(sc, 100);
           }
-          map.innerHTML = html;
-          if (label)
-            label.textContent =
-              '✅ ' +
-              totalOk +
-              ' فعال • ❌ ' +
-              totalNo +
-              ' غیرفعال • ' +
-              sorted.length +
-              ' روز ثبت';
+
+          function toLevel(sc) {
+            if (sc === 0) return 0;
+            if (sc <= 25) return 1;
+            if (sc <= 50) return 2;
+            if (sc <= 75) return 3;
+            return 4;
+          }
+
+          // ساخت داده گرید
+          // col=0 قدیمی‌ترین، col=WEEKS-1 جدیدترین (امروز)
+          // row=0 شنبه، row=6 جمعه
+          // daysBack = (WEEKS-1-col)*7 + (todayDow-row)
+          var gridData = [];
+          var monthLabels = {}; // col → نام ماه
+          var lastMonth = -1;
+
+          for (var col = 0; col < WEEKS; col++) {
+            var colArr = [];
+            for (var row = 0; row < 7; row++) {
+              var daysBack = (WEEKS - 1 - col) * 7 + (todayDow - row);
+              if (daysBack < 0) {
+                colArr.push({ future: true });
+              } else {
+                var ds = Jalali.addDays(todayStr, -daysBack);
+                var parsed = Jalali.parseKey(ds);
+                var r = dateMap[ds];
+                var sc = scoreDay(r);
+                // label ماه: اولین روز هفته که ماه عوض شده
+                if (row === 0 && parsed && parsed.jm !== lastMonth) {
+                  monthLabels[col] = FA_MONTHS[parsed.jm - 1].substring(0, 3);
+                  lastMonth = parsed.jm;
+                }
+                colArr.push({
+                  ds: ds,
+                  row: r,
+                  sc: sc,
+                  level: r ? toLevel(sc) : 0,
+                  noData: !r,
+                  isFutsal: futsalSet.has(ds),
+                  isToday: daysBack === 0,
+                  jd: parsed ? parsed.jd : 0,
+                  jm: parsed ? parsed.jm : 0,
+                });
+              }
+            }
+            gridData.push(colArr);
+          }
+
+          // ─── ساخت HTML ───
+          var tip = document.getElementById('smTip');
+          if (!tip) {
+            tip = document.createElement('div');
+            tip.id = 'smTip';
+            tip.className = 'sm-tip';
+            document.body.appendChild(tip);
+          }
+
+          // container
+          mapEl.innerHTML =
+            '<div class="sm-header">' +
+            '<span class="sm-title">🗓️ نقشه فعالیت</span>' +
+            '<div class="sm-legend">' +
+            '<span>کم</span>' +
+            '<div class="sm-leg-cell sm-l0"></div>' +
+            '<div class="sm-leg-cell sm-l1"></div>' +
+            '<div class="sm-leg-cell sm-l2"></div>' +
+            '<div class="sm-leg-cell sm-l3"></div>' +
+            '<div class="sm-leg-cell sm-l4"></div>' +
+            '<span>زیاد</span>' +
+            '</div>' +
+            '</div>' +
+            '<div class="sm-scroll">' +
+            '<div class="sm-wrap">' +
+            '<div class="sm-ylabels" id="smYLabels"></div>' +
+            '<div class="sm-gridwrap">' +
+            '<div class="sm-xlabels" id="smXLabels"></div>' +
+            '<div class="sm-cols" id="smCols"></div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="sm-stats" id="smStatCards"></div>';
+
+          // Y labels (روزهای هفته)
+          var ylEl = document.getElementById('smYLabels');
+          if (ylEl) {
+            ylEl.innerHTML = FA_DAYS.map(function (d) {
+              return '<div class="sm-ylabel">' + d + '</div>';
+            }).join('');
+          }
+
+          // X labels (ماه‌ها)
+          var xlEl = document.getElementById('smXLabels');
+          if (xlEl) {
+            xlEl.innerHTML = '';
+            for (var c = 0; c < WEEKS; c++) {
+              var xl = document.createElement('div');
+              xl.className = 'sm-xlabel';
+              xl.style.width = '12px';
+              xl.style.minWidth = '12px';
+              if (monthLabels[c]) xl.textContent = monthLabels[c];
+              xlEl.appendChild(xl);
+            }
+          }
+
+          // ستون‌ها
+          var colsEl = document.getElementById('smCols');
+          if (colsEl) {
+            colsEl.innerHTML = '';
+            gridData.forEach(function (colArr) {
+              var colDiv = document.createElement('div');
+              colDiv.className = 'sm-col';
+              colArr.forEach(function (cell) {
+                var div = document.createElement('div');
+                if (cell.future) {
+                  div.className = 'sm-cell sm-future';
+                } else {
+                  var cls = 'sm-cell sm-l' + cell.level;
+                  if (cell.isFutsal) cls += ' sm-futsal';
+                  if (cell.isToday) cls += ' sm-today';
+                  div.className = cls;
+
+                  // tooltip
+                  function attachEvents(d, c) {
+                    d.addEventListener('mouseenter', function () {
+                      var html =
+                        '<span class="sm-tip-date">📅 ' + c.ds + '</span>';
+                      if (c.noData) {
+                        html +=
+                          '<span style="color:var(--muted)">ثبت نشده</span>';
+                      } else {
+                        var rr = c.row;
+                        if (rr.completed) html += '✅ روز کامل<br>';
+                        else html += '❌ ناقص<br>';
+                        if (rr.runMin) html += '🏃 ' + rr.runMin + ' دقیقه<br>';
+                        if (rr.energy != null)
+                          html += '⚡ ' + rr.energy + '/10<br>';
+                        if (c.isFutsal) html += '⚽ فوتسال<br>';
+                        html +=
+                          '<span style="color:var(--muted);font-size:.62rem">امتیاز: ' +
+                          c.sc +
+                          '/100</span>';
+                      }
+                      tip.innerHTML = html;
+                      tip.classList.add('on');
+                      var rect = d.getBoundingClientRect();
+                      var top = rect.top - tip.offsetHeight - 6;
+                      var left = rect.left - 60;
+                      if (top < 8) top = rect.bottom + 6;
+                      if (left < 4) left = 4;
+                      if (left + 160 > window.innerWidth)
+                        left = window.innerWidth - 164;
+                      tip.style.top = top + 'px';
+                      tip.style.left = left + 'px';
+                    });
+                    d.addEventListener('mouseleave', function () {
+                      tip.classList.remove('on');
+                    });
+                    d.addEventListener(
+                      'touchstart',
+                      function (e) {
+                        e.preventDefault();
+                        d.dispatchEvent(new MouseEvent('mouseenter'));
+                        setTimeout(function () {
+                          tip.classList.remove('on');
+                        }, 2500);
+                      },
+                      { passive: false },
+                    );
+                  }
+                  attachEvents(div, cell);
+                }
+                colDiv.appendChild(div);
+              });
+              colsEl.appendChild(colDiv);
+            });
+          }
+
+          // ─── کارت‌های آمار ───
+          var statsEl = document.getElementById('smStatCards');
+          if (statsEl) {
+            // استریک فعلی
+            var curStreak = 0;
+            for (var i = 0; i < 365; i++) {
+              var ds2 = Jalali.addDays(todayStr, -i);
+              var rr = dateMap[ds2];
+              if (rr && rr.completed) curStreak++;
+              else break;
+            }
+
+            // بهترین استریک
+            var bestStreak = 0,
+              tmpS = 0;
+            var allRows = (window._app.state().rows || [])
+              .filter(function (r) {
+                return r.completed && r.jdate;
+              })
+              .sort(function (a, b) {
+                return a.jdate > b.jdate ? 1 : -1;
+              });
+            allRows.forEach(function (r, i) {
+              if (i === 0) {
+                tmpS = 1;
+              } else {
+                var prev = Jalali.addDays(r.jdate, -1);
+                tmpS = dateMap[prev] && dateMap[prev].completed ? tmpS + 1 : 1;
+              }
+              if (tmpS > bestStreak) bestStreak = tmpS;
+            });
+            if (curStreak > bestStreak) bestStreak = curStreak;
+
+            // فعال‌ترین روز هفته
+            var dowCount = [0, 0, 0, 0, 0, 0, 0];
+            var FA_DAYS_FULL = [
+              'شنبه',
+              'یک‌شنبه',
+              'دوشنبه',
+              'سه‌شنبه',
+              'چهارشنبه',
+              'پنج‌شنبه',
+              'جمعه',
+            ];
+            (window._app.state().rows || []).forEach(function (r) {
+              if (!r.completed || !r.jdate) return;
+              var wd = DOW_MAP[Jalali.weekdayName(r.jdate)];
+              if (wd !== undefined) dowCount[wd]++;
+            });
+            var bestDow = dowCount.indexOf(Math.max.apply(null, dowCount));
+
+            // فعال ماه جاری
+            var curPrefix =
+              todayParsed.jy + '-' + String(todayParsed.jm).padStart(2, '0');
+            var activeMonth = (window._app.state().rows || []).filter(
+              function (r) {
+                return r.jdate && r.jdate.startsWith(curPrefix) && r.completed;
+              },
+            ).length;
+
+            statsEl.innerHTML =
+              '<div class="sm-stat">' +
+                '<span class="sm-stat-val">🔥 ' +
+                curStreak +
+                '</span>' +
+                '<span class="sm-stat-lbl">استریک فعلی</span>' +
+                '</div>' +
+                '<div class="sm-stat">' +
+                '<span class="sm-stat-val">🏆 ' +
+                bestStreak +
+                '</span>' +
+                '<span class="sm-stat-lbl">بهترین استریک</span>' +
+                '</div>' +
+                '<div class="sm-stat">' +
+                '<span class="sm-stat-val">📅 ' +
+                FA_DAYS_FULL[bestDow] ||
+              '—' +
+                '</span>' +
+                '<span class="sm-stat-lbl">فعال‌ترین روز</span>' +
+                '</div>' +
+                '<div class="sm-stat">' +
+                '<span class="sm-stat-val">📈 ' +
+                activeMonth +
+                '/' +
+                todayParsed.jd +
+                '</span>' +
+                '<span class="sm-stat-lbl">فعال ماه جاری</span>' +
+                '</div>';
+          }
+
+          // label قدیمی رو مخفی کن
+          if (labelEl) labelEl.style.display = 'none';
+
+          // آمار کلی برای label
+          var totalOk = (window._app.state().rows || []).filter(function (r) {
+            return r.completed;
+          }).length;
+          var totalNo = (window._app.state().rows || []).filter(function (r) {
+            return r.jdate && !r.completed;
+          }).length;
         }
 
         function renderInsights() {
