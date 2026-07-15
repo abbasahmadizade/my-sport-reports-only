@@ -8050,9 +8050,6 @@
                   'Content-Type': 'application/json',
                   Authorization: 'token ' + cloudConfig.token,
                   Accept: 'application/vnd.github.v3+json',
-                  'Cache-Control': 'no-cache, no-store, must-revalidate',
-                  Pragma: 'no-cache',
-                  'X-Retry-Attempt': attempt.toString(),
                 },
                 body: JSON.stringify({
                   files: {
@@ -8230,8 +8227,6 @@
                 headers: {
                   Authorization: 'token ' + cloudConfig.token,
                   Accept: 'application/vnd.github.v3+json',
-                  'Cache-Control': 'no-cache, no-store, must-revalidate',
-                  Pragma: 'no-cache',
                 },
               });
 
@@ -8349,21 +8344,40 @@
         }
 
         function saveCloudSettings() {
-          cloudConfig.token = document
-            .getElementById('cloudApiKey')
-            .value.trim();
-          cloudConfig.gistId = document
-            .getElementById('cloudBinId')
-            .value.trim();
+          const newToken = document.getElementById('cloudApiKey').value.trim();
+          const newGistId = document.getElementById('cloudBinId').value.trim();
+          const isNewConfig =
+            newToken !== cloudConfig.token || newGistId !== cloudConfig.gistId;
+
+          cloudConfig.token = newToken;
+          cloudConfig.gistId = newGistId;
           cloudConfig.autoSync =
             document.getElementById('cloudAutoSync').checked;
           saveCloudConfig();
           startAutoSync();
           closeCloudModal();
-          if (cloudConfig.token && cloudConfig.gistId) {
-            toast('☁️ ذخیره شد! حالا ⬆️ ذخیره آنلاین بزن', 'success', 3000);
-          } else {
+
+          if (!cloudConfig.token || !cloudConfig.gistId) {
             toast('تنظیمات ناقصه', 'error');
+            return;
+          }
+
+          // اگه توکن یا gist جدیده، اول دانلود کن (دیتای قدیم بیاد)
+          if (isNewConfig) {
+            if (
+              confirm(
+                '☁️ تنظیمات جدید ذخیره شد!\n\nمیخوای دیتای موجود در Gist رو بارگذاری کنی؟\n(اگه Gist خالیه، «لغو» بزن تا دیتای فعلی آپلود بشه)',
+              )
+            ) {
+              cloudDownload();
+            } else {
+              toast('☁️ در حال آپلود دیتای فعلی...', 'default', 2000);
+              setTimeout(function () {
+                cloudUpload(false);
+              }, 800);
+            }
+          } else {
+            toast('☁️ تنظیمات ذخیره شد', 'success', 2000);
           }
         }
 
