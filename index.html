@@ -536,6 +536,7 @@
       .num-stepper input::-webkit-outer-spin-button,
       .num-stepper input::-webkit-inner-spin-button {
         -webkit-appearance: none;
+        appearance: none;
         margin: 0;
       }
       .num-stepper input[type='number'] {
@@ -1176,14 +1177,63 @@
       .step-page.active {
         display: block;
       }
-
-      /* === SLEEP BLOCK === */
+      /* === فیلد mm:ss === */
+      .mmss-input {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+        flex: 1;
+      }
+      .mmss-input input {
+        border: none !important;
+        background: transparent !important;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text);
+        padding: 8px 4px;
+        width: 52px;
+        font-family: monospace;
+        outline: none;
+      }
+      .mmss-input .sep {
+        color: var(--muted);
+        font-size: 1.2rem;
+        font-weight: 700;
+        user-select: none;
+        padding: 0 2px;
+      }
+      .mmss-input .unit {
+        color: var(--muted);
+        font-size: 0.72rem;
+        padding-left: 6px;
+        padding-right: 4px;
+        white-space: nowrap;
+      }
+      .mmss-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .mmss-label {
+        font-size: 0.8rem;
+        color: var(--muted);
+        min-width: 80px;
+        text-align: right;
+      }
+      /* === SLEEP BLOCKS v2 === */
       .sleep-block-card {
-        background: rgba(var(--accent-rgb), 0.05);
+        background: var(--bg);
         border: 1px solid var(--border);
         border-radius: 14px;
         padding: 12px;
         margin-bottom: 10px;
+        position: relative;
       }
       .sleep-block-row-1 {
         display: flex;
@@ -1191,63 +1241,92 @@
         gap: 8px;
         margin-bottom: 10px;
       }
-      .sleep-block-row-1 input {
+      .sleep-block-row-1 input[type='text'] {
         flex: 1;
-        background: #1a1533;
+        background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 10px 12px;
+        border-radius: 8px;
+        padding: 7px 10px;
         color: var(--text);
-        font-family: var(--font-family);
-        font-size: 0.88rem;
-        min-height: 42px;
+        font-size: 0.85rem;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .sleep-block-row-1 input[type='text']:focus {
+        border-color: var(--green);
       }
       .sleep-block-remove-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
+        background: rgba(239, 68, 68, 0.12);
         border: none;
-        flex-shrink: 0;
-        background: rgba(239, 68, 68, 0.15);
-        color: #f87171;
+        color: #ef4444;
+        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
         cursor: pointer;
-        font-size: 1.05rem;
+        flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
+        transition: background 0.2s;
+      }
+      .sleep-block-remove-btn:hover {
+        background: rgba(239, 68, 68, 0.25);
       }
       .sleep-block-row-2 {
-        display: grid;
-        grid-template-columns: 1fr auto 1fr auto;
-        gap: 8px;
+        display: flex;
         align-items: center;
+        gap: 8px;
       }
       .sleep-block-row-2 input[type='time'] {
-        background: #1a1533;
+        flex: 1;
+        background: var(--card);
         border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 10px 8px;
+        border-radius: 8px;
+        padding: 8px 10px;
         color: var(--text);
-        font-family: var(--font-family);
-        font-size: 0.95rem;
+        font-size: 1rem;
+        font-weight: 600;
+        font-family: monospace;
         text-align: center;
-        min-height: 44px;
-        font-weight: 700;
+        outline: none;
+        transition: border-color 0.2s;
+        -webkit-appearance: none;
+        appearance: none;
+        min-height: 42px;
+      }
+      .sleep-block-row-2 input[type='time']:focus {
+        border-color: var(--green);
       }
       .sleep-block-row-2 .sep {
         color: var(--muted);
-        font-weight: 700;
         font-size: 0.85rem;
+        flex-shrink: 0;
+        padding: 0 2px;
       }
-      .sleep-block-row-2 .dur-badge {
-        background: rgba(var(--accent-rgb), 0.15);
-        color: var(--accent2);
-        padding: 9px 10px;
-        border-radius: 10px;
+      .sleep-block-duration {
         font-size: 0.75rem;
-        font-weight: 700;
-        min-width: 60px;
+        color: var(--green);
         text-align: center;
+        margin-top: 6px;
+        font-weight: 600;
+      }
+      #addSleepBlock {
+        width: 100%;
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px dashed var(--green);
+        color: var(--green);
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-family: inherit;
+        margin-top: 4px;
+      }
+      #addSleepBlock:hover {
+        background: rgba(16, 185, 129, 0.15);
       }
 
       /* === CALENDAR === */
@@ -3333,61 +3412,84 @@
 
           <div class="step-page" id="step-2">
             <div class="form-group">
-              <label>🏃 دویدن (دقیقه)</label>
-              <div class="num-stepper">
-                <button type="button" data-target="mdRun" data-step="-0.5">
-                  −
-                </button>
-                <input
-                  type="number"
-                  id="mdRun"
-                  value="0"
-                  min="0"
-                  max="120"
-                  step="0.5"
-                />
-                <button type="button" data-target="mdRun" data-step="0.5">
-                  +
-                </button>
+              <label>🏃 دویدن</label>
+              <div class="mmss-row">
+                <div class="mmss-input">
+                  <input
+                    type="text"
+                    id="mdRunMm"
+                    value="0"
+                    inputmode="numeric"
+                    maxlength="3"
+                    placeholder="0"
+                  />
+                  <span class="sep">:</span>
+                  <input
+                    type="text"
+                    id="mdRunSs"
+                    value="00"
+                    inputmode="numeric"
+                    maxlength="2"
+                    placeholder="00"
+                  />
+                  <span class="unit">دقیقه:ثانیه</span>
+                </div>
               </div>
+              <input type="hidden" id="mdRun" value="0" />
             </div>
+
             <div class="form-group">
-              <label>🚶 پیاده (دقیقه)</label>
-              <div class="num-stepper">
-                <button type="button" data-target="mdWalk" data-step="-1">
-                  −
-                </button>
-                <input
-                  type="number"
-                  id="mdWalk"
-                  value="0"
-                  min="0"
-                  max="120"
-                  step="1"
-                />
-                <button type="button" data-target="mdWalk" data-step="1">
-                  +
-                </button>
+              <label>🚶 پیاده‌روی</label>
+              <div class="mmss-row">
+                <div class="mmss-input">
+                  <input
+                    type="text"
+                    id="mdWalkMm"
+                    value="0"
+                    inputmode="numeric"
+                    maxlength="3"
+                    placeholder="0"
+                  />
+                  <span class="sep">:</span>
+                  <input
+                    type="text"
+                    id="mdWalkSs"
+                    value="00"
+                    inputmode="numeric"
+                    maxlength="2"
+                    placeholder="00"
+                  />
+                  <span class="unit">دقیقه:ثانیه</span>
+                </div>
               </div>
+              <input type="hidden" id="mdWalk" value="0" />
             </div>
+
             <div class="form-group">
-              <label>🏅 بیشترین دویدن پیوسته (دقیقه)</label>
-              <div class="num-stepper">
-                <button type="button" data-target="mdLongest" data-step="-0.5">
-                  −
-                </button>
-                <input
-                  type="number"
-                  id="mdLongest"
-                  value="0"
-                  min="0"
-                  max="60"
-                  step="0.5"
-                />
-                <button type="button" data-target="mdLongest" data-step="0.5">
-                  +
-                </button>
+              <label>🏅 بیشترین دویدن پیوسته</label>
+              <div class="mmss-row">
+                <div class="mmss-input">
+                  <input
+                    type="text"
+                    id="mdLongestMm"
+                    value="0"
+                    inputmode="numeric"
+                    maxlength="3"
+                    placeholder="0"
+                  />
+                  <span class="sep">:</span>
+                  <input
+                    type="text"
+                    id="mdLongestSs"
+                    value="00"
+                    inputmode="numeric"
+                    maxlength="2"
+                    placeholder="00"
+                  />
+                  <span class="unit">دقیقه:ثانیه</span>
+                </div>
               </div>
+              <input type="hidden" id="mdLongest" value="0" />
             </div>
             <div class="form-group">
               <label>📝 شرح فعالیت</label>
@@ -7500,14 +7602,79 @@
         A.generateTips = generateTips;
       })();
     </script>
+
     <!-- ============================================================ -->
     <!-- ██████ PART 4/5 - JS RENDER - END ██████ -->
     <!-- ============================================================ -->
-
-    <!-- ============================================================ -->
-    <!-- ██████ PART 5/5 - JS FINAL - START ██████ -->
-    <!-- ============================================================ -->
     <script>
+      // ═══════════════════════════════
+      // mm:ss helpers — GLOBAL SCOPE
+      // ═══════════════════════════════
+      function minToMmss(min) {
+        if (!min || isNaN(min)) return { mm: '0', ss: '00' };
+        var totalSec = Math.round(min * 60);
+        var m = Math.floor(totalSec / 60);
+        var s = totalSec % 60;
+        return { mm: String(m), ss: String(s).padStart(2, '0') };
+      }
+
+      function mmssToMin(mm, ss) {
+        var m = parseInt(mm) || 0;
+        var s = parseInt(ss) || 0;
+        if (s > 59) s = 59;
+        if (m < 0) m = 0;
+        return Math.round((m + s / 60) * 100) / 100;
+      }
+
+      function setupMmssField(mmId, ssId, hiddenId) {
+        var mmInp = document.getElementById(mmId);
+        var ssInp = document.getElementById(ssId);
+        var hidden = document.getElementById(hiddenId);
+        if (!mmInp || !ssInp || !hidden) return;
+
+        function update() {
+          hidden.value = mmssToMin(mmInp.value, ssInp.value);
+        }
+
+        [mmInp, ssInp].forEach(function (inp) {
+          inp.addEventListener('input', function () {
+            this.value = this.value.replace(/[^\d]/g, '');
+            if (inp === ssInp && parseInt(this.value) > 59) this.value = '59';
+            update();
+          });
+          inp.addEventListener('focus', function () {
+            setTimeout(function () {
+              inp.select();
+            }, 30);
+          });
+          inp.addEventListener('blur', function () {
+            if (inp === ssInp) {
+              inp.value = String(parseInt(inp.value) || 0).padStart(2, '0');
+            }
+            update();
+          });
+          if (inp === mmInp) {
+            inp.addEventListener('keydown', function (e) {
+              if (e.key === ':' || (e.key === 'Tab' && !e.shiftKey)) {
+                e.preventDefault();
+                ssInp.focus();
+                ssInp.select();
+              }
+            });
+          }
+        });
+      }
+
+      function loadMmssField(mmId, ssId, hiddenId, minValue) {
+        var v = minToMmss(minValue || 0);
+        var mmEl = document.getElementById(mmId);
+        var ssEl = document.getElementById(ssId);
+        var hiddenEl = document.getElementById(hiddenId);
+        if (mmEl) mmEl.value = v.mm;
+        if (ssEl) ssEl.value = v.ss;
+        if (hiddenEl) hiddenEl.value = minValue || 0;
+        setupMmssField(mmId, ssId, hiddenId);
+      }
       (function () {
         'use strict';
 
@@ -7728,7 +7895,27 @@
               return;
             }
             document.getElementById('modalDayTitle').textContent =
-              'ویرایش ' + row.jdate;
+              (function () {
+                var p = window._app.Jalali.parseKey(row.jdate);
+                var FA_MONTHS = [
+                  'فروردین',
+                  'اردیبهشت',
+                  'خرداد',
+                  'تیر',
+                  'مرداد',
+                  'شهریور',
+                  'مهر',
+                  'آبان',
+                  'آذر',
+                  'دی',
+                  'بهمن',
+                  'اسفند',
+                ];
+                var title = p
+                  ? p.jd + ' ' + FA_MONTHS[p.jm - 1] + ' ' + p.jy
+                  : row.jdate;
+                return '✏️ ویرایش ' + title;
+              })();
             document.getElementById('mdDate').value = row.jdate;
             document.getElementById('mdCompleted').value = String(
               row.completed,
@@ -7737,9 +7924,14 @@
               row.futsalRef || false;
             RatingSlider.setValue('energy', row.energy || 5);
             RatingSlider.setValue('mood', row.mood || 5);
-            document.getElementById('mdRun').value = row.runMin || 0;
-            document.getElementById('mdWalk').value = row.walkMin || 0;
-            document.getElementById('mdLongest').value = row.longestRun || 0;
+            loadMmssField('mdRunMm', 'mdRunSs', 'mdRun', row.runMin || 0);
+            loadMmssField('mdWalkMm', 'mdWalkSs', 'mdWalk', row.walkMin || 0);
+            loadMmssField(
+              'mdLongestMm',
+              'mdLongestSs',
+              'mdLongest',
+              row.longestRun || 0,
+            );
             document.getElementById('mdActivity').value = row.activity || '';
             document.getElementById('mdNote').value = row.note || '';
             document.getElementById('mdOfficialWake').value =
@@ -7902,10 +8094,9 @@
             mood: RatingSlider.getValue('mood'),
             completed: document.getElementById('mdCompleted').value === 'true',
             futsalRef: document.getElementById('mdFutsalRef').checked,
-            runMin: parseFloat(document.getElementById('mdRun').value) || 0,
-            walkMin: parseFloat(document.getElementById('mdWalk').value) || 0,
-            longestRun:
-              parseFloat(document.getElementById('mdLongest').value) || 0,
+            runMin: mmssToMin(document.getElementById('mdRun').value),
+            walkMin: mmssToMin(document.getElementById('mdWalk').value),
+            longestRun: mmssToMin(document.getElementById('mdLongest').value),
             activity: document.getElementById('mdActivity').value.trim(),
             note: document.getElementById('mdNote').value.trim(),
             sleepBlocks: valid,
