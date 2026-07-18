@@ -6351,7 +6351,25 @@
               todayParsed.jd +
               '</span><span class="sm-stat-lbl">فعال ماه جاری</span></div>';
           }
-
+          // تست موقت موبایل - بعد حذف کن
+          if (window.innerWidth < 768) {
+            var dbg = [
+              'عرض: ' + window.innerWidth,
+              'WEEKS: ' + WEEKS,
+              'cell: ' +
+                (document.querySelector('.sm-cell')?.offsetWidth || '?') +
+                'px',
+              'گرید: ' +
+                (document.querySelector('.sm-cols')?.offsetWidth || '?') +
+                'px',
+              'کارت: ' +
+                (document.querySelector('.streak-map')?.offsetWidth || '?') +
+                'px',
+            ].join('\n');
+            setTimeout(function () {
+              alert(dbg);
+            }, 500);
+          }
           if (labelEl) labelEl.style.display = 'none';
         }
 
