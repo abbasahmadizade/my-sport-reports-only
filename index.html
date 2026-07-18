@@ -5986,32 +5986,20 @@
         // ═══════════════════════════════════════
         function renderStreakMap() {
           var rows = window._app.state().rows || [];
-          var maxWeeks = 52;
-          var minWeeks = 8;
-          if (window.innerWidth < 600) {
-            minWeeks = 8;
-            maxWeeks = 14;
-          } else if (window.innerWidth < 1024) {
-            minWeeks = 12;
-            maxWeeks = 24;
-          } else {
-            // لپتاپ: عرض کارت رو بخون، WEEKS رو بهینه حساب کن
-            var cardW =
-              (
-                document.querySelector('.streak-map') ||
-                document.querySelector('.card')
-              )?.offsetWidth || 800;
-            var cellSize = 16;
-            var cellGap = 3;
-            var ylabelW = 22;
-            var paddingW = 32;
-            var availW = cardW - ylabelW - paddingW;
-            var weeksFromWidth = Math.floor(availW / (cellSize + cellGap)) - 1;
-            weeksFromWidth = Math.min(Math.max(weeksFromWidth, 8), 52);
-            minWeeks = weeksFromWidth;
-            maxWeeks = weeksFromWidth;
-          }
-          var WEEKS = minWeeks;
+          var cardEl =
+            document.querySelector('.streak-map') ||
+            document.querySelector('.card');
+          var cardW = cardEl ? cardEl.offsetWidth : window.innerWidth - 32;
+          var cellSize = 12;
+          var cellGap = 3;
+          if (window.innerWidth >= 1024) cellSize = 16;
+          else if (window.innerWidth >= 600) cellSize = 13;
+          var ylabelW = 20;
+          var paddingW = 16;
+          var availW = cardW - ylabelW - paddingW;
+          var maxFromWidth = Math.floor(availW / (cellSize + cellGap));
+          maxFromWidth = Math.min(Math.max(maxFromWidth, 6), 52);
+          var WEEKS = maxFromWidth;
           if (rows.length) {
             var sorted = rows.slice().sort(function (a, b) {
               return a.jdate > b.jdate ? 1 : -1;
@@ -6025,7 +6013,7 @@
               diffDays++;
             }
             var weeksNeeded = Math.ceil(diffDays / 7) + 1;
-            WEEKS = Math.min(Math.max(weeksNeeded, minWeeks), maxWeeks);
+            WEEKS = Math.min(Math.max(weeksNeeded, maxFromWidth), maxFromWidth);
           }
 
           var dateMap = {};
@@ -6247,9 +6235,14 @@
                       tip.style.top = top + 'px';
                       tip.style.left = left + 'px';
                     });
+
+                    d.addEventListener('mouseleave', function () {
+                      tip.classList.remove('on');
+                    });
+
                     d.addEventListener('click', function () {
                       if (c.noData) return;
-                      if (tip) tip.classList.remove('on');
+                      tip.classList.remove('on');
                       window._app.goto('log');
                       setTimeout(function () {
                         var search = document.getElementById('logSearch');
@@ -6259,17 +6252,35 @@
                         }
                       }, 300);
                     });
-                    d.addEventListener('mouseleave', function () {
-                      tip.classList.remove('on');
-                    });
+
+                    var tapCount = 0;
                     d.addEventListener(
-                      'touchstart',
+                      'touchend',
                       function (e) {
                         e.preventDefault();
-                        d.dispatchEvent(new MouseEvent('mouseenter'));
+                        tapCount++;
+                        if (tapCount === 1) {
+                          d.dispatchEvent(new MouseEvent('mouseenter'));
+                          setTimeout(function () {
+                            tapCount = 0;
+                          }, 500);
+                        } else {
+                          tapCount = 0;
+                          tip.classList.remove('on');
+                          if (!c.noData) {
+                            window._app.goto('log');
+                            setTimeout(function () {
+                              var search = document.getElementById('logSearch');
+                              if (search) {
+                                search.value = c.ds;
+                                search.dispatchEvent(new Event('input'));
+                              }
+                            }, 300);
+                          }
+                        }
                         setTimeout(function () {
                           tip.classList.remove('on');
-                        }, 2500);
+                        }, 3000);
                       },
                       { passive: false },
                     );
@@ -6350,25 +6361,6 @@
               '/' +
               todayParsed.jd +
               '</span><span class="sm-stat-lbl">فعال ماه جاری</span></div>';
-          }
-          // تست موقت موبایل - بعد حذف کن
-          if (window.innerWidth < 768) {
-            var dbg = [
-              'عرض: ' + window.innerWidth,
-              'WEEKS: ' + WEEKS,
-              'cell: ' +
-                (document.querySelector('.sm-cell')?.offsetWidth || '?') +
-                'px',
-              'گرید: ' +
-                (document.querySelector('.sm-cols')?.offsetWidth || '?') +
-                'px',
-              'کارت: ' +
-                (document.querySelector('.streak-map')?.offsetWidth || '?') +
-                'px',
-            ].join('\n');
-            setTimeout(function () {
-              alert(dbg);
-            }, 500);
           }
           if (labelEl) labelEl.style.display = 'none';
         }
