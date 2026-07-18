@@ -654,8 +654,8 @@
       }
 
       /* ═══════════════════════════════════
-   STREAK MAP v2 — GitHub Style
-═══════════════════════════════════ */
+               STREAK MAP v2 — GitHub Style
+            ═══════════════════════════════════ */
       .streak-map {
         width: 100%;
         overflow: hidden;
@@ -732,13 +732,26 @@
       }
       .sm-ylabel {
         width: 14px;
-        height: var(--sm-size);
+        height: var(--sm-size, 12px);
         font-size: 0.55rem;
         color: var(--muted);
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
         line-height: 1;
+      }
+      @media (min-width: 600px) {
+        .sm-ylabel {
+          height: 13px;
+        }
+      }
+      @media (min-width: 1024px) {
+        .sm-ylabel {
+          height: 16px;
+          width: 18px;
+          font-size: 0.65rem;
+        }
       }
       .sm-gridwrap {
         display: flex;
@@ -749,18 +762,30 @@
         flex-direction: row;
         height: 16px;
         margin-bottom: 2px;
-        gap: var(--sm-gap);
+        gap: 3px;
       }
       .sm-xlabel {
-        width: var(--sm-size);
-        min-width: var(--sm-size);
+        flex-shrink: 0;
         font-size: 0.58rem;
         color: var(--muted);
-        text-align: left;
-        direction: rtl;
         overflow: visible;
         white-space: nowrap;
+        width: 12px;
+        min-width: 12px;
       }
+      @media (min-width: 600px) {
+        .sm-xlabel {
+          width: 13px;
+          min-width: 13px;
+        }
+      }
+      @media (min-width: 1024px) {
+        .sm-xlabel {
+          width: 16px;
+          min-width: 16px;
+        }
+      }
+
       .sm-cols {
         display: flex;
         flex-direction: row;
@@ -806,8 +831,8 @@
       }
       @media (min-width: 1024px) {
         .sm-cell {
-          width: 14px;
-          height: 14px;
+          width: 16px;
+          height: 16px;
           border-radius: 3px;
         }
         .sm-col {
@@ -832,6 +857,21 @@
         }
       }
 
+      .sm-stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .sm-stat-val {
+        font-size: 1.6rem;
+      }
+      .sm-stat-lbl {
+        font-size: 0.75rem;
+      }
+      .sm-stat {
+        padding: 14px 10px;
+      }
+
       .sm-cell:hover {
         transform: scale(1.6);
         z-index: 10;
@@ -842,7 +882,9 @@
       }
       .sm-cell.sm-today {
         outline: 2px solid var(--text);
-        outline-offset: 1px;
+        outline-offset: 2px;
+        border-radius: 4px;
+        box-shadow: 0 0 0 2px var(--green);
       }
 
       /* ۵ سطح رنگ */
@@ -5945,9 +5987,31 @@
         function renderStreakMap() {
           var rows = window._app.state().rows || [];
           var maxWeeks = 52;
-          if (window.innerWidth < 1024) maxWeeks = 24;
-          if (window.innerWidth < 600) maxWeeks = 14;
-          var WEEKS = 6;
+          var minWeeks = 8;
+          if (window.innerWidth < 600) {
+            minWeeks = 8;
+            maxWeeks = 14;
+          } else if (window.innerWidth < 1024) {
+            minWeeks = 12;
+            maxWeeks = 24;
+          } else {
+            // لپتاپ: عرض کارت رو بخون، WEEKS رو بهینه حساب کن
+            var cardW =
+              (
+                document.querySelector('.streak-map') ||
+                document.querySelector('.card')
+              )?.offsetWidth || 800;
+            var cellSize = 16;
+            var cellGap = 3;
+            var ylabelW = 22;
+            var paddingW = 32;
+            var availW = cardW - ylabelW - paddingW;
+            var weeksFromWidth = Math.floor(availW / (cellSize + cellGap)) - 1;
+            weeksFromWidth = Math.min(Math.max(weeksFromWidth, 8), 52);
+            minWeeks = weeksFromWidth;
+            maxWeeks = weeksFromWidth;
+          }
+          var WEEKS = minWeeks;
           if (rows.length) {
             var sorted = rows.slice().sort(function (a, b) {
               return a.jdate > b.jdate ? 1 : -1;
@@ -5961,7 +6025,7 @@
               diffDays++;
             }
             var weeksNeeded = Math.ceil(diffDays / 7) + 1;
-            WEEKS = Math.min(Math.max(weeksNeeded, 6), maxWeeks);
+            WEEKS = Math.min(Math.max(weeksNeeded, minWeeks), maxWeeks);
           }
 
           var dateMap = {};
@@ -6131,25 +6195,6 @@
               }
               xlEl.appendChild(xl);
             }
-            setTimeout(function () {
-              var firstCol = document.querySelector('.sm-col');
-              if (!firstCol) return;
-              var colW = firstCol.offsetWidth;
-              var colGap =
-                parseInt(
-                  getComputedStyle(document.querySelector('.sm-cols')).gap,
-                ) || 3;
-              var total = colW + colGap;
-              var xls = document.querySelectorAll('.sm-xlabel');
-              xls.forEach(function (xl) {
-                xl.style.width = total + 'px';
-                xl.style.minWidth = total + 'px';
-              });
-              if (xls[xls.length - 1]) {
-                xls[xls.length - 1].style.width = colW + 'px';
-                xls[xls.length - 1].style.minWidth = colW + 'px';
-              }
-            }, 80);
           }
 
           var colsEl = document.getElementById('smCols');
@@ -6178,7 +6223,10 @@
                         var rr = c.row;
                         if (rr.completed) html += '✅ روز کامل<br>';
                         else html += '❌ ناقص<br>';
-                        if (rr.runMin) html += '🏃 ' + rr.runMin + ' دقیقه<br>';
+                        if (rr.runMin)
+                          html += '🏃 ' + formatMin(rr.runMin) + '<br>';
+                        if (rr.walkMin)
+                          html += '🚶 ' + formatMin(rr.walkMin) + '<br>';
                         if (rr.energy != null)
                           html += '⚡ ' + rr.energy + '/10<br>';
                         if (c.isFutsal) html += '⚽ فوتسال<br>';
@@ -6198,6 +6246,18 @@
                         left = window.innerWidth - 164;
                       tip.style.top = top + 'px';
                       tip.style.left = left + 'px';
+                    });
+                    d.addEventListener('click', function () {
+                      if (c.noData) return;
+                      if (tip) tip.classList.remove('on');
+                      window._app.goto('log');
+                      setTimeout(function () {
+                        var search = document.getElementById('logSearch');
+                        if (search) {
+                          search.value = c.ds;
+                          search.dispatchEvent(new Event('input'));
+                        }
+                      }, 300);
                     });
                     d.addEventListener('mouseleave', function () {
                       tip.classList.remove('on');
@@ -6293,17 +6353,6 @@
           }
 
           if (labelEl) labelEl.style.display = 'none';
-
-          setTimeout(function () {
-            var firstCol = document.querySelector('.sm-col');
-            var colW = firstCol ? firstCol.offsetWidth : 0;
-            if (colW > 0) {
-              document.querySelectorAll('.sm-xlabel').forEach(function (xl) {
-                xl.style.width = colW + 'px';
-                xl.style.minWidth = colW + 'px';
-              });
-            }
-          }, 60);
         }
 
         function renderInsights() {
