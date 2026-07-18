@@ -7141,7 +7141,13 @@
               '</p></div>';
           }
         }
-
+        function formatHour(h) {
+          if (!h || isNaN(h)) return '0:00';
+          var totalMin = Math.round(h * 60);
+          var hh = Math.floor(totalMin / 60);
+          var mm = totalMin % 60;
+          return hh + ':' + String(mm).padStart(2, '0');
+        }
         function renderAllCharts() {
           const sorted = state()
             .rows.slice()
@@ -7259,7 +7265,33 @@
                   },
                 ],
               },
-              options: opts,
+              options: Object.assign({}, opts, {
+                plugins: Object.assign({}, opts.plugins, {
+                  tooltip: Object.assign({}, opts.plugins.tooltip, {
+                    callbacks: {
+                      label: function (ctx) {
+                        var val = ctx.raw;
+                        if (
+                          ctx.dataset.label &&
+                          ctx.dataset.label.indexOf('خواب') !== -1
+                        ) {
+                          return ctx.dataset.label + ': ' + formatHour(val);
+                        }
+                        return ctx.dataset.label + ': ' + val;
+                      },
+                    },
+                  }),
+                }),
+                scales: Object.assign({}, opts.scales, {
+                  y: Object.assign({}, opts.scales.y, {
+                    ticks: Object.assign({}, opts.scales.y.ticks, {
+                      callback: function (v) {
+                        return formatHour(v);
+                      },
+                    }),
+                  }),
+                }),
+              }),
             });
           }
 
@@ -7349,7 +7381,17 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 animation: { duration: 900 },
-                plugins: opts.plugins,
+                plugins: Object.assign({}, opts.plugins, {
+                  tooltip: {
+                    titleFont: font,
+                    bodyFont: font,
+                    callbacks: {
+                      label: function (ctx) {
+                        return ctx.dataset.label + ': ' + formatMin(ctx.raw);
+                      },
+                    },
+                  },
+                }),
                 scales: {
                   x: Object.assign({}, opts.scales.x, {
                     stacked: true,
@@ -7358,6 +7400,11 @@
                   y: Object.assign({}, opts.scales.y, {
                     stacked: true,
                     beginAtZero: true,
+                    ticks: Object.assign({}, opts.scales.y.ticks, {
+                      callback: function (v) {
+                        return formatMin(v);
+                      },
+                    }),
                   }),
                 },
               },
@@ -7417,6 +7464,25 @@
                 ],
               },
               options: Object.assign({}, opts, {
+                plugins: Object.assign({}, opts.plugins, {
+                  tooltip: Object.assign({}, opts.plugins.tooltip, {
+                    callbacks: {
+                      label: function (ctx) {
+                        var v = ctx.raw;
+                        if (v === null) return null;
+                        var h = Math.floor(v) % 24;
+                        var m = Math.round((v - Math.floor(v)) * 60);
+                        return (
+                          ctx.dataset.label +
+                          ': ' +
+                          String(h).padStart(2, '0') +
+                          ':' +
+                          String(m).padStart(2, '0')
+                        );
+                      },
+                    },
+                  }),
+                }),
                 scales: Object.assign({}, opts.scales, {
                   y: Object.assign({}, opts.scales.y, {
                     min: 0,
@@ -7516,7 +7582,23 @@
                       },
                       position: 'top',
                     },
-                    tooltip: { titleFont: font, bodyFont: font },
+                    tooltip: {
+                      titleFont: font,
+                      bodyFont: font,
+                      callbacks: {
+                        label: function (ctx) {
+                          var label = ctx.dataset.label || '';
+                          var val = ctx.raw;
+                          if (label.indexOf('خواب') !== -1) {
+                            return label + ': ' + formatHour(val);
+                          }
+                          if (label.indexOf('🏃') !== -1) {
+                            return '🏃 دویدن: ' + formatMin(val * 5);
+                          }
+                          return label + ': ' + val;
+                        },
+                      },
+                    },
                   },
                   scales: {
                     x: {
@@ -7645,7 +7727,21 @@
                     max: 10,
                   },
                 },
-                plugins: { legend: { labels: { color: '#ddd', font: font } } },
+                plugins: {
+                  legend: { labels: { color: '#ddd', font: font } },
+                  tooltip: {
+                    callbacks: {
+                      label: function (ctx) {
+                        return (
+                          'خواب: ' +
+                          formatHour(ctx.parsed.x) +
+                          ' | انرژی: ' +
+                          ctx.parsed.y
+                        );
+                      },
+                    },
+                  },
+                },
               },
             });
           }
