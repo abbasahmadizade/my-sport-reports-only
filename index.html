@@ -5814,7 +5814,7 @@
               stats.avgSleepDisplay +
               '</div><div class="kpi-label">😴 میانگین خواب</div><div class="kpi-sub">ساعت:دقیقه</div></div>' +
               '<div class="kpi"><div class="kpi-value" id="kpiEnergy">0</div><div class="kpi-label">⚡ انرژی</div><div class="kpi-sub">از ۱۰</div></div>' +
-              '<div class="kpi"><div class="kpi-value" id="kpiRun">0</div><div class="kpi-label">🏃 رکورد</div><div class="kpi-sub">دقیقه</div></div>';
+              '<div class="kpi"><div class="kpi-value" id="kpiRun">0</div><div class="kpi-label">🏃 رکورد</div><div class="kpi-sub">دقیقه:ثانیه</div></div>';
             setTimeout(function () {
               animateValue(
                 document.getElementById('kpiStreak'),
@@ -5838,6 +5838,10 @@
                 true,
               );
             }, 100);
+            setTimeout(function () {
+              var el = document.getElementById('kpiRun');
+              if (el) el.textContent = formatMin(stats.runBest);
+            }, 900);
           }
           checkBackupReminder();
           renderProgramGoal();
@@ -6361,10 +6365,14 @@
                 r.mood +
                 '</span>' +
                 (r.runMin
-                  ? '<span class="pill pill-info">🏃' + r.runMin + '′</span>'
+                  ? '<span class="pill pill-info">🏃' +
+                    formatMin(r.runMin) +
+                    '</span>'
                   : '') +
                 (r.walkMin
-                  ? '<span class="pill pill-info">🚶' + r.walkMin + '′</span>'
+                  ? '<span class="pill pill-info">🚶' +
+                    formatMin(r.walkMin) +
+                    '</span>'
                   : '') +
                 '<span class="pill pill-info">😴' +
                 si.totalDisplay +
@@ -6814,9 +6822,9 @@
                   '</td><td>' +
                   r.mood +
                   '</td><td>' +
-                  (r.runMin || 0) +
+                  formatMin(r.runMin || 0) +
                   '</td><td>' +
-                  (r.walkMin || 0) +
+                  formatMin(r.walkMin || 0) +
                   '</td><td>' +
                   si.totalDisplay +
                   '</td>' +
@@ -7610,6 +7618,13 @@
       // ═══════════════════════════════
       // mm:ss helpers — GLOBAL SCOPE
       // ═══════════════════════════════
+      function formatMin(min) {
+        if (!min || isNaN(min)) return '0:00';
+        var totalSec = Math.round(min * 60);
+        var m = Math.floor(totalSec / 60);
+        var s = totalSec % 60;
+        return m + ':' + String(s).padStart(2, '0');
+      }
       function minToMmss(min) {
         if (!min || isNaN(min)) return { mm: '0', ss: '00' };
         var totalSec = Math.round(min * 60);
@@ -7631,6 +7646,11 @@
         var ssInp = document.getElementById(ssId);
         var hidden = document.getElementById(hiddenId);
         if (!mmInp || !ssInp || !hidden) return;
+
+        // جلوگیری از تجمع event listener
+        if (mmInp.dataset.mmssSetup === '1') return;
+        mmInp.dataset.mmssSetup = '1';
+        ssInp.dataset.mmssSetup = '1';
 
         function update() {
           hidden.value = mmssToMin(mmInp.value, ssInp.value);
@@ -7813,13 +7833,15 @@
           popup.innerHTML = html;
           document
             .getElementById('calPrev')
-            .addEventListener('click', function () {
-              calNav(-1);
+            .addEventListener('click', function (e) {
+              e.stopPropagation();
+              calNav(1);
             });
           document
             .getElementById('calNext')
-            .addEventListener('click', function () {
-              calNav(1);
+            .addEventListener('click', function (e) {
+              e.stopPropagation();
+              calNav(-1);
             });
           document
             .getElementById('calMonthSel')
@@ -8094,9 +8116,10 @@
             mood: RatingSlider.getValue('mood'),
             completed: document.getElementById('mdCompleted').value === 'true',
             futsalRef: document.getElementById('mdFutsalRef').checked,
-            runMin: mmssToMin(document.getElementById('mdRun').value),
-            walkMin: mmssToMin(document.getElementById('mdWalk').value),
-            longestRun: mmssToMin(document.getElementById('mdLongest').value),
+            runMin: parseFloat(document.getElementById('mdRun').value) || 0,
+            walkMin: parseFloat(document.getElementById('mdWalk').value) || 0,
+            longestRun:
+              parseFloat(document.getElementById('mdLongest').value) || 0,
             activity: document.getElementById('mdActivity').value.trim(),
             note: document.getElementById('mdNote').value.trim(),
             sleepBlocks: valid,
@@ -8375,9 +8398,9 @@
             t += '- میانگین خواب: ' + s.avgSleepDisplay + '\n';
             t += '- میانگین انرژی: ' + s.avgEnergy + '/10\n';
             t += '- میانگین حال: ' + s.avgMood + '/10\n';
-            t += '- مجموع دویدن: ' + s.totalRun + '′\n';
-            t += '- مجموع پیاده‌روی: ' + s.totalWalk + '′\n';
-            t += '- رکورد دویدن پیوسته: ' + s.runBest + '′\n';
+            t += '- مجموع دویدن: ' + formatMin(s.totalRun) + '\n';
+            t += '- مجموع پیاده‌روی: ' + formatMin(s.totalWalk) + '\n';
+            t += '- رکورد دویدن پیوسته: ' + formatMin(s.runBest) + '\n';
             t +=
               '- روزهای فعال: ' +
               s.completedCount +
@@ -8403,10 +8426,10 @@
                 ' M' +
                 r.mood +
                 ' R' +
-                (r.runMin || 0) +
-                '′ W' +
-                (r.walkMin || 0) +
-                '′ S' +
+                formatMin(r.runMin) +
+                ' W' +
+                formatMin(r.walkMin) +
+                ' S' +
                 si.totalDisplay;
               const act = (r.activity || '').slice(0, 80).replace(/\n/g, ' ');
               if (act) l += '\n  فعالیت: ' + act;
