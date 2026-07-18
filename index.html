@@ -758,32 +758,9 @@
         flex-direction: column;
       }
       .sm-xlabels {
-        display: flex;
-        flex-direction: row;
-        height: 16px;
+        position: relative;
+        height: 18px;
         margin-bottom: 2px;
-        gap: 3px;
-      }
-      .sm-xlabel {
-        flex-shrink: 0;
-        font-size: 0.58rem;
-        color: var(--muted);
-        overflow: visible;
-        white-space: nowrap;
-        width: 12px;
-        min-width: 12px;
-      }
-      @media (min-width: 600px) {
-        .sm-xlabel {
-          width: 13px;
-          min-width: 13px;
-        }
-      }
-      @media (min-width: 1024px) {
-        .sm-xlabel {
-          width: 16px;
-          min-width: 16px;
-        }
       }
 
       .sm-cols {
@@ -791,22 +768,14 @@
         flex-direction: row;
         gap: var(--sm-gap);
       }
-      @media (min-width: 768px) {
-        .sm-cols {
-          gap: 4px;
-        }
-      }
+
       .sm-col {
         display: flex;
         flex-direction: column;
         gap: var(--sm-gap);
         flex-shrink: 0;
       }
-      @media (min-width: 768px) {
-        .sm-col {
-          gap: 4px;
-        }
-      }
+
       .sm-cell {
         width: var(--sm-size);
         height: var(--sm-size);
@@ -856,22 +825,6 @@
           padding: 14px 10px;
         }
       }
-
-      .sm-stats {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-        margin-top: 16px;
-      }
-      .sm-stat-val {
-        font-size: 1.6rem;
-      }
-      .sm-stat-lbl {
-        font-size: 0.75rem;
-      }
-      .sm-stat {
-        padding: 14px 10px;
-      }
-
       .sm-cell:hover {
         transform: scale(1.6);
         z-index: 10;
@@ -6108,7 +6061,7 @@
                 var parsed = window._app.Jalali.parseKey(ds);
                 var r = dateMap[ds];
                 var sc = scoreDay(r);
-                if (row === 0 && parsed && parsed.jm !== lastMonth) {
+                if (parsed && parsed.jd === 14 && parsed.jm !== lastMonth) {
                   if (lastLabelCol === -1 || col - lastLabelCol >= 3) {
                     monthLabels[col] = FA_MONTHS[parsed.jm - 1];
                     lastLabelCol = col;
@@ -6172,17 +6125,11 @@
 
           var xlEl = document.getElementById('smXLabels');
           if (xlEl) {
+            xlEl.style.position = 'relative';
+            xlEl.style.height = '16px';
+            xlEl.style.width = '100%';
+            xlEl.style.direction = 'ltr'; // مهم: کانتینر رو LTR کن تا محاسبات ساده بشه
             xlEl.innerHTML = '';
-            for (var c = 0; c < WEEKS; c++) {
-              var xl = document.createElement('div');
-              xl.className = 'sm-xlabel';
-              if (monthLabels[c]) {
-                xl.textContent = monthLabels[c];
-                xl.style.fontWeight = '600';
-                xl.style.color = 'var(--text)';
-              }
-              xlEl.appendChild(xl);
-            }
           }
 
           var colsEl = document.getElementById('smCols');
@@ -6361,8 +6308,59 @@
               '/' +
               todayParsed.jd +
               '</span><span class="sm-stat-lbl">فعال ماه جاری</span></div>';
-          }
-          if (labelEl) labelEl.style.display = 'none';
+          } // رندر label ماه‌ها با absolute positioning (RTL-aware)
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              var xlEl2 = document.getElementById('smXLabels');
+              var colsEl2 = document.getElementById('smCols');
+              if (!xlEl2 || !colsEl2) return;
+              xlEl2.innerHTML = '';
+              xlEl2.style.position = 'relative';
+              xlEl2.style.width = '100%';
+              xlEl2.style.height = '16px';
+
+              var colEls = colsEl2.querySelectorAll('.sm-col');
+              var gridRect = colsEl2.getBoundingClientRect();
+              // تشخیص RTL بودن
+              var isRTL = getComputedStyle(colsEl2).direction === 'rtl';
+
+              Object.keys(monthLabels).forEach(function (col) {
+                var colEl = colEls[parseInt(col)];
+                if (!colEl) return;
+                var colRect = colEl.getBoundingClientRect();
+
+                var span = document.createElement('span');
+                span.textContent = monthLabels[col];
+
+                var baseStyle = [
+                  'position:absolute',
+                  'transform:translateX(-50%)',
+                  'top:0',
+                  'font-size:0.6rem',
+                  'color:var(--text)',
+                  'font-weight:600',
+                  'white-space:nowrap',
+                  'line-height:16px',
+                  'text-align:center',
+                  'pointer-events:none',
+                ];
+
+                if (isRTL) {
+                  // در RTL: از راست حساب کن، نه از چپ
+                  var colCenterFromRight =
+                    gridRect.right - (colRect.left + colRect.width / 2);
+                  baseStyle.push('right:' + colCenterFromRight + 'px');
+                } else {
+                  var colCenterFromLeft =
+                    colRect.left - gridRect.left + colRect.width / 2;
+                  baseStyle.push('left:' + colCenterFromLeft + 'px');
+                }
+
+                span.style.cssText = baseStyle.join(';');
+                xlEl2.appendChild(span);
+              });
+            });
+          });
         }
 
         function renderInsights() {
