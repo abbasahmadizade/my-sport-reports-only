@@ -1,4 +1,4 @@
-<!-- SPORT REPORT v5.5 ONE-FILE INSIGHT VAULT
+<!-- SPORT REPORT v5.6 ONE-FILE SYNC & CHART VAULT
      Deploy: replace the repository root index.html with this file.
      Existing localStorage keys are preserved. Before the first Gist write, remote and local migration backups are created. -->
 <!-- ============================================================ -->
@@ -14,14 +14,14 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-xUJC8es05zN/lUh3lYFobBgFk7W4C3A/6ktFA4cd4IY=' 'sha256-kd8QYy35DjR2LHsOSNHx9fK91x2qCiFP4uW7DOzaY3o=' 'sha256-ZgyhRfEev936ybe8gljD8ijLFn8V2uY8x0TqcxeHcwE='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-xUJC8es05zN/lUh3lYFobBgFk7W4C3A/6ktFA4cd4IY=' 'sha256-DsfPRMtiNidjgQNFHdMXfyBoFbMuhSU7UkKvV3LM3HM=' 'sha256-aHqbGJzFlke6zRB4pXPFfJbDvZVMX8sb7njFHcyrXdA='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sport Report" />
-    <title>🏃 گزارش ورزش، خواب و انرژی — v5.5 One File</title>
+    <title>🏃 گزارش ورزش، خواب و انرژی — v5.6 One File</title>
 
     <link
       rel="icon"
@@ -1493,6 +1493,45 @@
         height: 380px !important;
       }
 
+      .chart-view-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
+      .chart-view-head h2 { font-size:1.05rem; margin:0 0 2px; }
+      .chart-controls { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+      .chart-controls label { color:var(--muted); font-size:.72rem; }
+      .chart-controls select { width:auto; min-width:90px; padding:7px 9px; min-height:40px; }
+      .chart-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:10px; }
+      .chart-summary-item { padding:9px; border:1px solid var(--border); background:rgba(var(--accent-rgb),.06); border-radius:11px; min-width:0; }
+      .chart-summary-value { color:var(--accent2); font-weight:900; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .chart-summary-label { color:var(--muted); font-size:.65rem; margin-top:2px; }
+      .chart-landscape-hint { display:none; color:var(--muted); font-size:.68rem; margin:-3px 0 8px; }
+      #view-charts.chart-focus-mode {
+        display:block !important; position:fixed; inset:0; z-index:9000; overflow:auto;
+        background:var(--bg); padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right))
+          max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+      }
+      #view-charts.chart-focus-mode .chart-landscape-hint { display:block; }
+      #view-charts.chart-focus-mode .chart-panel:not(.active) { display:none !important; }
+      #view-charts.chart-focus-mode .chart-card { margin:0; min-height:calc(100dvh - 230px); }
+      #view-charts.chart-focus-mode .chart-card canvas { height:calc(100dvh - 245px) !important; min-height:320px; }
+      #view-charts.chart-focus-mode #heatmapContainer { min-height:calc(100dvh - 245px) !important; overflow:auto; }
+      body.chart-focus-open { overflow:hidden !important; }
+      @media (max-width:759px) {
+        .chart-view-head { display:block; }
+        .chart-controls { justify-content:stretch; margin-top:9px; }
+        .chart-controls select { flex:1; }
+        .chart-controls .btn { flex:1; }
+        .chart-summary { grid-template-columns:repeat(2,1fr); }
+        .chart-tabs { scroll-snap-type:x proximity; }
+        .chart-tab { scroll-snap-align:start; min-height:44px; }
+      }
+      @media (orientation:landscape) and (max-height:600px) {
+        #view-charts.chart-focus-mode .chart-view-head { margin-bottom:4px; }
+        #view-charts.chart-focus-mode .chart-summary { display:none; }
+        #view-charts.chart-focus-mode .chart-tabs { margin-bottom:5px; }
+        #view-charts.chart-focus-mode .chart-landscape-hint { display:none; }
+        #view-charts.chart-focus-mode .chart-card { min-height:calc(100dvh - 125px); }
+        #view-charts.chart-focus-mode .chart-card canvas { height:calc(100dvh - 140px) !important; min-height:220px; }
+      }
+
       /* === HEATMAP === */
       .heatmap-container {
         padding: 16px 8px;
@@ -2294,7 +2333,7 @@
       }
 
 
-      /* === v5.5 ACCESSIBILITY / RELIABILITY === */
+      /* === v5.6 ACCESSIBILITY / RELIABILITY === */
       :where(button, a, input, select, textarea, [tabindex]):focus-visible {
         outline: 3px solid var(--accent2);
         outline-offset: 2px;
@@ -2319,7 +2358,7 @@
         }
       }
 
-      /* === v5.5 SAFE VAULT / PWA === */
+      /* === v5.6 SAFE VAULT / PWA === */
       .cloud-recovery-panel {
         margin-top: 14px; padding: 12px; border-radius: 12px;
         border: 1px solid rgba(16,185,129,.3); background: rgba(16,185,129,.07);
@@ -2333,7 +2372,7 @@
         .cloud-recovery-actions { grid-template-columns: repeat(3,1fr); }
       }
 
-      /* === v5.5 INSIGHT VAULT DESIGN SYSTEM === */
+      /* === v5.6 INSIGHT VAULT DESIGN SYSTEM === */
       body.modal-open { overflow: hidden !important; }
       button, [role='button'] { touch-action: manipulation; }
       .today-hero {
@@ -2799,7 +2838,22 @@
 
       <!-- === VIEW: CHARTS === -->
       <div class="view" id="view-charts">
-        <h2 style="font-size: 1.05rem; margin-bottom: 10px">📊 نمودارها</h2>
+        <div class="chart-view-head">
+          <div><h2>📊 نمودارها و تحلیل روند</h2><div class="text-sm text-muted">بازه را انتخاب کن؛ برای نمای افقی دکمه بزرگ‌نمایی را بزن.</div></div>
+          <div class="chart-controls">
+            <label for="chartRange">بازه</label>
+            <select id="chartRange" class="form-input" aria-label="بازه نمودار">
+              <option value="14">۱۴ روز</option>
+              <option value="30" selected>۳۰ روز</option>
+              <option value="90">۹۰ روز</option>
+              <option value="all">همه</option>
+            </select>
+            <button type="button" class="btn btn-ghost btn-sm" id="chartDownloadBtn">📥 تصویر</button>
+            <button type="button" class="btn btn-primary btn-sm" id="chartFocusBtn" aria-expanded="false">⛶ نمایش بزرگ</button>
+          </div>
+        </div>
+        <div class="chart-summary" id="chartSummary" aria-live="polite"></div>
+        <div class="chart-landscape-hint">📱 در حالت نمایش بزرگ، گوشی را افقی بچرخان.</div>
         <div class="chart-tabs" id="chartTabs">
           <button type="button" class="chart-tab active" data-chart="sleep">
             😴 خواب
@@ -4058,7 +4112,7 @@
           </div>
           <label class="checkbox-item"
             ><input type="checkbox" id="cloudAutoSync" checked /> 🔄 همگام‌سازی خودکار و امن
-            هر ۵ دقیقه</label
+            بعد از ثبت + بررسی هر ۱۵ دقیقه</label
           >
           <label class="checkbox-item mt-2"
             ><input type="checkbox" id="cloudRememberToken" checked /> 🔐 Token روی این دستگاه بماند</label
@@ -4376,7 +4430,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- === EXTERNAL LIBRARIES === -->
-    <!-- v5.5: dependencies embedded locally for offline use and supply-chain hardening -->
+    <!-- v5.6: dependencies embedded locally for offline use and supply-chain hardening -->
     <script>
 /**
  * Skipped minification because the original files appears to be already minified.
@@ -5736,11 +5790,9 @@
 
         function analyzePatterns() {
           const patterns = [];
-          const sorted = state()
-            .rows.slice()
-            .sort(function (a, b) {
-              return Jalali.cmp(a.jdate, b.jdate);
-            });
+          const sorted = state().rows.slice().sort(function (a, b) {
+            return Jalali.cmp(a.jdate, b.jdate);
+          });
           if (sorted.length < 5) return patterns;
 
           const sleepEnergy = [];
@@ -6438,14 +6490,7 @@
           renderProgramGoal();
           closeGoalModal();
           toast('✅ هدف ذخیره شد', 'success');
-          if (
-            typeof cloudConfig !== 'undefined' &&
-            cloudConfig.autoSync &&
-            cloudConfig.gistId &&
-            cloudConfig.token
-          ) {
-            if (typeof scheduleCloudSync === 'function') scheduleCloudSync();
-          }
+          if (A.scheduleCloudSync) A.scheduleCloudSync('after-save');
         }
 
         window.setupGoalEditor = function () {
@@ -7502,6 +7547,79 @@
 
         // ===== CHARTS =====
         let chartInstances = {};
+        let chartRangeValue = safeStorage.getItem('sport_chart_range_v1') || '30';
+        let chartFocusOpen = false;
+
+        function chartRowsForRange() {
+          const sorted = state().rows.slice().sort(function (a, b) { return Jalali.cmp(a.jdate, b.jdate); });
+          if (!sorted.length || chartRangeValue === 'all') return sorted;
+          const days = Math.max(7, parseInt(chartRangeValue) || 30);
+          const latest = sorted[sorted.length - 1].jdate;
+          return sorted.filter(function (r) {
+            const age = Jalali.diffDays(latest, r.jdate);
+            return age >= 0 && age < days;
+          });
+        }
+        function chartCorrelation(rows) {
+          const x = [], y = [];
+          for (let i = 0; i < rows.length - 1; i++) {
+            if (Jalali.diffDays(rows[i + 1].jdate, rows[i].jdate) !== 1) continue;
+            const sleep = sleepInfo(rows[i].sleepBlocks).totalH;
+            const energy = Number(rows[i + 1].energy);
+            if (sleep > 0 && Number.isFinite(energy)) { x.push(sleep); y.push(energy); }
+          }
+          if (x.length < 3) return { r:null, n:x.length };
+          const mx=x.reduce(function(a,b){return a+b;},0)/x.length;
+          const my=y.reduce(function(a,b){return a+b;},0)/y.length;
+          let num=0,dx=0,dy=0;
+          x.forEach(function(v,i){const a=v-mx,b=y[i]-my;num+=a*b;dx+=a*a;dy+=b*b;});
+          return { r:dx&&dy?num/Math.sqrt(dx*dy):0, n:x.length };
+        }
+        function renderChartSummary(rows) {
+          const el = document.getElementById('chartSummary');
+          if (!el) return;
+          if (!rows.length) { el.innerHTML='<div class="empty-state" style="grid-column:1/-1;padding:14px">داده‌ای در این بازه نیست</div>'; return; }
+          const st = computeStats(rows);
+          const corr = chartCorrelation(rows);
+          const span = Math.max(1, Jalali.diffDays(rows[rows.length-1].jdate, rows[0].jdate)+1);
+          const activity = st.totalRun + st.totalWalk;
+          const corrText = corr.r === null ? 'داده کم' : (corr.r>0?'+':'')+corr.r.toFixed(2);
+          el.innerHTML =
+            '<div class="chart-summary-item"><div class="chart-summary-value">'+rows.length+'/'+span+'</div><div class="chart-summary-label">پوشش ثبت در بازه</div></div>'+
+            '<div class="chart-summary-item"><div class="chart-summary-value">'+st.avgSleepDisplay+'</div><div class="chart-summary-label">میانگین خواب • '+st.sleepDays+' شب</div></div>'+
+            '<div class="chart-summary-item"><div class="chart-summary-value">'+formatMin(activity)+'</div><div class="chart-summary-label">مجموع فعالیت</div></div>'+
+            '<div class="chart-summary-item"><div class="chart-summary-value">'+corrText+'</div><div class="chart-summary-label">خواب→انرژی • n='+corr.n+'</div></div>';
+        }
+        function resizeActiveChart() {
+          const active = document.querySelector('.chart-panel.active');
+          if (!active) return;
+          const key = active.id.replace('chartPanel-','');
+          setTimeout(function () { if (chartInstances[key] && chartInstances[key].resize) chartInstances[key].resize(); }, 80);
+        }
+        function setChartFocus(open) {
+          chartFocusOpen = !!open;
+          const view = document.getElementById('view-charts');
+          const btn = document.getElementById('chartFocusBtn');
+          if (!view || !btn) return;
+          view.classList.toggle('chart-focus-mode', chartFocusOpen);
+          document.body.classList.toggle('chart-focus-open', chartFocusOpen);
+          btn.setAttribute('aria-expanded', String(chartFocusOpen));
+          btn.textContent = chartFocusOpen ? '✕ بستن' : '⛶ نمایش بزرگ';
+          if (chartFocusOpen && view.requestFullscreen) view.requestFullscreen().catch(function(){});
+          if (!chartFocusOpen && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){});
+          resizeActiveChart();
+        }
+        function downloadActiveChart() {
+          const panel = document.querySelector('.chart-panel.active');
+          const canvas = panel && panel.querySelector('canvas');
+          if (!canvas) { toast('برای هیت‌مپ از Screenshot گوشی استفاده کن', 'default', 3500); return; }
+          try {
+            const a=document.createElement('a');
+            a.download='sport-chart-'+panel.id.replace('chartPanel-','')+'-'+Jalali.today()+'.png';
+            a.href=canvas.toDataURL('image/png',1); a.click();
+            toast('📥 تصویر نمودار ذخیره شد','success',2200);
+          } catch(e) { toast('ذخیره تصویر ناموفق بود','error'); }
+        }
 
         function destroyChart(k) {
           if (chartInstances[k]) {
@@ -7524,11 +7642,7 @@
           const container = document.getElementById('heatmapContainer');
           if (!container) return;
           try {
-            const sorted = state()
-              .rows.slice()
-              .sort(function (a, b) {
-                return Jalali.cmp(a.jdate, b.jdate);
-              });
+            const sorted = chartRowsForRange();
             if (!sorted.length) {
               container.innerHTML =
                 '<div class="empty-state"><span class="emoji">📭</span><p>داده‌ای نیست</p></div>';
@@ -7659,16 +7773,14 @@
           return hh + ':' + String(mm).padStart(2, '0');
         }
         function renderAllCharts() {
-          const sorted = state()
-            .rows.slice()
-            .sort(function (a, b) {
-              return Jalali.cmp(a.jdate, b.jdate);
-            });
+          const sorted = chartRowsForRange();
+          renderChartSummary(sorted);
           const labels = sorted.map(function (r) {
             return r.jdate.slice(5);
           });
           const sleepData = sorted.map(function (r) {
-            return sleepInfo(r.sleepBlocks).totalH;
+            const h = sleepInfo(r.sleepBlocks).totalH;
+            return h > 0 ? h : null;
           });
           const energyData = sorted.map(function (r) {
             return r.energy || 0;
@@ -7697,12 +7809,9 @@
           function ma(arr, n) {
             return arr.map(function (_, i) {
               const s = Math.max(0, i - n + 1);
-              const sl = arr.slice(s, i + 1);
-              return +(
-                sl.reduce(function (a, b) {
-                  return a + b;
-                }, 0) / sl.length
-              ).toFixed(2);
+              const sl = arr.slice(s, i + 1).filter(function (v) { return Number.isFinite(v); });
+              if (!sl.length) return null;
+              return +(sl.reduce(function (a, b) { return a + b; }, 0) / sl.length).toFixed(2);
             });
           }
 
@@ -7713,7 +7822,8 @@
           const opts = {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: 900, easing: 'easeOutQuart' },
+            animation: { duration: isMobile ? 450 : 900, easing: 'easeOutQuart' },
+            interaction: { mode: 'index', intersect: false },
             plugins: {
               legend: {
                 labels: { color: '#ddd', font: font, padding: 12 },
@@ -7727,6 +7837,7 @@
                   color: '#aaa',
                   font: { family: font.family, size: 10 },
                   maxRotation: 45,
+                  maxTicksLimit: isMobile ? 7 : 14,
                 },
                 grid: { color: 'rgba(255,255,255,.05)' },
               },
@@ -7752,7 +7863,9 @@
                     backgroundColor: accentAlpha(.18),
                     fill: true,
                     tension: 0.4,
-                    pointRadius: 3,
+                    pointRadius: isMobile ? 2 : 3,
+                    pointHoverRadius: 6,
+                    spanGaps: false,
                     borderWidth: 2.5,
                   },
                   {
@@ -8276,6 +8389,10 @@
             if (chartInstances[key] && typeof chartInstances[key].resize === 'function') chartInstances[key].resize();
           }, 50);
         };
+        A.setChartFocus = setChartFocus;
+        A.downloadActiveChart = downloadActiveChart;
+        A.setChartRange = function (value) { chartRangeValue=value; safeStorage.setItem('sport_chart_range_v1',value); renderAllCharts(); };
+        A.getChartRange = function () { return chartRangeValue; };
         A.renderGoalProgress = renderGoalProgress;
         A.checkBackupReminder = checkBackupReminder;
         A.generateInsights = generateInsights;
@@ -8943,9 +9060,12 @@
           closeDayModal(true);
           A.renderLog();
           A.renderDashboard();
-          toast('✅ ذخیره شد!', 'success');
-          if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token)
-            scheduleCloudSync();
+          if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) {
+            scheduleCloudSync('after-save');
+            toast('✅ محلی ذخیره شد؛ Sync خودکار شروع شد', 'success', 2600);
+          } else {
+            toast('✅ روی دستگاه ذخیره شد', 'success');
+          }
         }
 
         A.editDay = function (id) {
@@ -9148,9 +9268,12 @@
           if (!save()) { toast('ذخیره دائمی ناموفق بود؛ JSON خروجی بگیر', 'error', 6000); return; }
           closeFutsalModal();
           A.renderFutsal();
-          toast('⚽ ذخیره شد!', 'success');
-          if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token)
-            scheduleCloudSync();
+          if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) {
+            scheduleCloudSync('after-save');
+            toast('⚽ محلی ذخیره شد؛ Sync خودکار شروع شد', 'success', 2600);
+          } else {
+            toast('⚽ روی دستگاه ذخیره شد', 'success');
+          }
         }
 
         A.editFutsal = function (id) {
@@ -9534,7 +9657,7 @@
               if (!save()) throw new Error('ذخیره مرورگر ناموفق بود');
               renderAll();
               toast('✅ ' + state().rows.length + ' روز وارد شد', 'success');
-              if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) scheduleCloudSync();
+              if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) scheduleCloudSync('import');
             } catch (err) {
               toast('ورود فایل ناموفق: ' + (err.message || 'فایل خراب است'), 'error', 6000);
               console.error(err);
@@ -9559,15 +9682,17 @@
           if (!save()) { toast('ریست در حافظه دائمی ذخیره نشد', 'error', 5000); return; }
           renderAll();
           toast('🗑️ داده‌ها پاک شد');
-          if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) scheduleCloudSync();
+          if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) scheduleCloudSync('reset');
         }
 
-        // ===== CLOUD - GITHUB GIST (v5.5 MIGRATION-SAFE SHARDED SYNC) =====
+        // ===== CLOUD - GITHUB GIST (v5.6 MIGRATION-SAFE SHARDED SYNC) =====
         const CLOUD_SESSION_KEY = 'sport_cloud_session_v1';
-        const MIGRATION_BACKUP_FILE = 'sport-migration-backup-v55.json';
+        const MIGRATION_BACKUP_FILE = 'sport-migration-backup-v56.json';
         let cloudConfig = {
           token: '', gistId: '', autoSync: true, rememberToken: true,
-          lastSync: 0, lastError: '', migrationReady: false, migrationVersion: 0,
+          lastSync: 0, lastWriteAt: 0, lastError: '', migrationReady: false, migrationVersion: 0,
+          rateLimit: null, rateRemaining: null, rateReset: 0,
+          lastSyncRequests: 0, lastSyncWrote: false, lastSyncReason: '', lastSyncDuration: 0,
         };
 
         function getCloudDeviceId() {
@@ -9584,11 +9709,14 @@
           return id;
         }
         const cloudDeviceId = getCloudDeviceId();
-        const LOCAL_PRE_MIGRATION_FILE = 'sport-local-before-v55-' + cloudDeviceId + '.json';
+        const LOCAL_PRE_MIGRATION_FILE = 'sport-local-before-v56-' + cloudDeviceId + '.json';
         let cloudSyncTimer = null;
         let cloudSyncPendingTimer = null;
         let cloudSyncInFlight = null;
         let cloudSyncQueued = false;
+        let cloudSyncQueuedReason = '';
+        let cloudPendingLocalChange = false;
+        let cloudRequestCounter = 0;
 
         function loadCloudConfig() {
           try {
@@ -9650,7 +9778,10 @@
           const mins = Math.max(0, Math.floor((Date.now() - cloudConfig.lastSync) / 60000));
           const last = mins < 1 ? 'الان' : mins < 60 ? mins + 'د پیش' : Math.floor(mins / 60) + 'س پیش';
           setCloudVisual('ok', '☁️ ✓');
-          if (textEl) textEl.textContent = 'آخرین Sync: ' + last;
+          if (textEl) {
+            const mode = cloudConfig.lastSyncWrote ? 'ذخیره روی GitHub' : 'بررسی بدون تغییر';
+            textEl.textContent = 'آخرین Sync: ' + last + ' • ' + mode;
+          }
         }
 
         function cloudHeaders() {
@@ -9660,6 +9791,21 @@
             'X-GitHub-Api-Version': '2022-11-28',
           };
         }
+        function captureRateInfo(res) {
+          cloudRequestCounter++;
+          if (!res || !res.headers) return;
+          const limit = Number(res.headers.get('x-ratelimit-limit'));
+          const remaining = Number(res.headers.get('x-ratelimit-remaining'));
+          const reset = Number(res.headers.get('x-ratelimit-reset'));
+          if (Number.isFinite(limit) && limit > 0) cloudConfig.rateLimit = limit;
+          if (Number.isFinite(remaining) && remaining >= 0) cloudConfig.rateRemaining = remaining;
+          if (Number.isFinite(reset) && reset > 0) cloudConfig.rateReset = reset * 1000;
+        }
+        function isRateBudgetLow() {
+          return Number.isFinite(cloudConfig.rateRemaining) && cloudConfig.rateRemaining < 25 &&
+            (!cloudConfig.rateReset || Date.now() < cloudConfig.rateReset);
+        }
+
         async function fetchWithTimeout(url, options, timeoutMs) {
           const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
           const timer = controller ? setTimeout(function () { controller.abort(); }, timeoutMs || 20000) : null;
@@ -9683,6 +9829,7 @@
         }
         async function fetchGistDocument() {
           const res = await fetchWithTimeout(gistUrl() + '?_t=' + Date.now(), { headers: cloudHeaders() }, 20000);
+          captureRateInfo(res);
           if (!res.ok) throw new Error(await parseGithubError(res));
           return await res.json();
         }
@@ -9710,6 +9857,7 @@
             headers: Object.assign({ 'Content-Type': 'application/json' }, cloudHeaders()),
             body: JSON.stringify({ files: files }),
           }, 30000);
+          captureRateInfo(res);
           if (!res.ok) throw new Error(await parseGithubError(res));
           return await res.json();
         }
@@ -9746,14 +9894,14 @@
           const files = gist.files || {};
           const names = Object.keys(files).filter(function (name) {
             if (name === MIGRATION_BACKUP_FILE) return false;
-            if (/^sport-(snapshot|local-before-v5[45])-/.test(name)) return false;
+            if (/^sport-(snapshot|local-before-v5[456])-/.test(name)) return false;
             return mode === 'all' ? true : isDataFileName(name);
           }).sort();
           const snapshot = {
             format: 'sport-report-gist-snapshot-v1',
-            appVersion: '5.5',
+            appVersion: '5.6',
             createdAt: new Date().toISOString(),
-            reason: mode === 'all' ? 'automatic-before-v55-first-write' : 'manual-snapshot',
+            reason: mode === 'all' ? 'automatic-before-v56-first-write' : 'manual-snapshot',
             files: {},
           };
           let total = 0;
@@ -9778,7 +9926,7 @@
           }
           if (!files[LOCAL_PRE_MIGRATION_FILE]) {
             additions[LOCAL_PRE_MIGRATION_FILE] = { content: JSON.stringify({
-              format: 'sport-report-local-before-v55-v1',
+              format: 'sport-report-local-before-v56-v1',
               createdAt: new Date().toISOString(),
               deviceId: cloudDeviceId,
               state: A.normalizeState(state()),
@@ -9786,7 +9934,7 @@
           }
           if (Object.keys(additions).length) await patchGistFiles(additions);
           cloudConfig.migrationReady = true;
-          cloudConfig.migrationVersion = 55;
+          cloudConfig.migrationVersion = 56;
           saveCloudConfig();
           return Object.keys(additions).length;
         }
@@ -9812,40 +9960,82 @@
         }
         function stateFingerprint(data) { return JSON.stringify(A.normalizeState(data)); }
 
-        async function performCloudSync(silent) {
+        function setPendingCloudVisual() {
+          const textEl = document.getElementById('cloudStatusText');
+          setCloudVisual('syncing', '☁️ •');
+          if (textEl) textEl.textContent = navigator.onLine ? 'تغییر ذخیره شد؛ Sync در صف…' : 'محلی ذخیره شد؛ منتظر اینترنت';
+        }
+
+        async function performCloudSync(silent, reason) {
+          reason = typeof reason === 'string' ? reason : 'manual';
           if (!cloudConfig.token || !cloudConfig.gistId) {
             if (!silent) toast('اول Token و Gist ID را تنظیم کن', 'error', 4000);
             return false;
           }
           if (!navigator.onLine) {
+            cloudPendingLocalChange = cloudPendingLocalChange || reason === 'after-save' || reason === 'undo';
             cloudConfig.lastError = 'offline'; saveCloudConfig();
-            if (!silent) toast('اینترنت قطع است', 'error', 3500);
+            if (!silent) toast('اینترنت قطع است؛ داده محلی محفوظ و Sync در انتظار است', 'error', 4000);
+            return false;
+          }
+          if (silent && isRateBudgetLow()) {
+            const textEl = document.getElementById('cloudStatusText');
+            setCloudVisual('err', '☁️ ⏸');
+            if (textEl) textEl.textContent = 'Sync خودکار تا Reset محدودیت متوقف شد';
             return false;
           }
           setCloudVisual('syncing', '☁️ ⏳');
+          const textEl = document.getElementById('cloudStatusText');
+          if (textEl) textEl.textContent = 'در حال Sync امن…';
+          const started = Date.now();
+          const requestsBefore = cloudRequestCounter;
           let lastError = null;
           for (let attempt = 1; attempt <= 3; attempt++) {
             try {
-              // Absolutely no canonical write happens before both remote and local pre-migration copies exist.
-              if (cloudConfig.migrationVersion !== 55) await ensureMigrationBackups();
+              if (cloudConfig.migrationVersion !== 56) await ensureMigrationBackups();
               const remote = preferRemoteLegacy(await fetchRemoteState());
-              let merged = A.mergeStates(state(), remote);
-              if (stateFingerprint(merged) !== stateFingerprint(state())) {
+              const localBefore = stateFingerprint(state());
+              const remoteFingerprint = stateFingerprint(remote);
+              const merged = A.mergeStates(state(), remote);
+              const mergedFingerprint = stateFingerprint(merged);
+              const localReceivedChanges = mergedFingerprint !== localBefore;
+              const remoteNeedsChanges = mergedFingerprint !== remoteFingerprint;
+
+              if (localReceivedChanges) {
                 A.setState(merged);
                 if (!save()) throw new Error('ذخیره نسخه ادغام‌شده در مرورگر ناموفق بود');
                 renderAll();
               }
-              await writeRemoteState(merged);
-              const verifyRemote = preferRemoteLegacy(await fetchRemoteState());
-              const verified = A.mergeStates(merged, verifyRemote);
-              if (stateFingerprint(verified) !== stateFingerprint(verifyRemote)) await writeRemoteState(verified);
-              A.setState(verified);
-              if (!save()) throw new Error('ذخیره نهایی مرورگر ناموفق بود');
+
+              let wrote = false;
+              if (remoteNeedsChanges) {
+                await writeRemoteState(merged);
+                wrote = true;
+                const verifyRemote = preferRemoteLegacy(await fetchRemoteState());
+                const verified = A.mergeStates(merged, verifyRemote);
+                if (stateFingerprint(verified) !== stateFingerprint(verifyRemote)) {
+                  await writeRemoteState(verified);
+                }
+                A.setState(verified);
+                if (!save()) throw new Error('ذخیره نهایی مرورگر ناموفق بود');
+                renderAll();
+              } else if (!localReceivedChanges) {
+                A.setState(merged);
+              }
+
+              cloudPendingLocalChange = false;
               cloudConfig.lastSync = Date.now();
+              if (wrote) cloudConfig.lastWriteAt = cloudConfig.lastSync;
               cloudConfig.lastError = '';
+              cloudConfig.lastSyncRequests = cloudRequestCounter - requestsBefore;
+              cloudConfig.lastSyncWrote = wrote;
+              cloudConfig.lastSyncReason = reason;
+              cloudConfig.lastSyncDuration = Date.now() - started;
               saveCloudConfig();
-              renderAll();
-              if (!silent) toast('☁️ Sync امن انجام شد؛ بکاپ مهاجرت محفوظ است', 'success', 4000);
+              updateCloudStatus();
+              if (!silent) {
+                toast(wrote ? '☁️ تغییرات روی GitHub ذخیره و تأیید شد' : '☁️ همه‌چیز از قبل همگام بود', 'success', 3500);
+              }
               return true;
             } catch (e) {
               lastError = e;
@@ -9854,20 +10044,30 @@
             }
           }
           cloudConfig.lastError = lastError ? (lastError.message || String(lastError)) : 'خطای نامعلوم';
+          cloudConfig.lastSyncRequests = cloudRequestCounter - requestsBefore;
+          cloudConfig.lastSyncReason = reason;
+          cloudConfig.lastSyncDuration = Date.now() - started;
           saveCloudConfig();
           if (!silent) toast('Sync متوقف شد: ' + cloudConfig.lastError, 'error', 7000);
           return false;
         }
 
-        async function cloudUpload(silent) {
-          if (cloudSyncInFlight) { cloudSyncQueued = true; return cloudSyncInFlight; }
-          cloudSyncInFlight = performCloudSync(!!silent);
+        async function cloudUpload(silent, reason) {
+          reason = typeof reason === 'string' ? reason : (silent ? 'automatic' : 'manual');
+          if (cloudSyncInFlight) {
+            cloudSyncQueued = true;
+            cloudSyncQueuedReason = reason;
+            return cloudSyncInFlight;
+          }
+          cloudSyncInFlight = performCloudSync(!!silent, reason);
           try { return await cloudSyncInFlight; }
           finally {
             cloudSyncInFlight = null;
             if (cloudSyncQueued) {
+              const queuedReason = cloudSyncQueuedReason || 'queued';
               cloudSyncQueued = false;
-              setTimeout(function () { cloudUpload(true); }, 500);
+              cloudSyncQueuedReason = '';
+              setTimeout(function () { cloudUpload(true, queuedReason); }, 400);
             }
           }
         }
@@ -9875,19 +10075,29 @@
           if (!cloudConfig.token || !cloudConfig.gistId) { toast('اول تنظیمات ابری را کامل کن', 'error', 4000); return; }
           if (!confirm('داده محلی و ابری با Merge امن ترکیب شوند؟\nهیچ جایگزینی کورکورانه انجام نمی‌شود.')) return;
           downloadFile(JSON.stringify(state(), null, 2), 'backup-before-sync-' + Date.now() + '.json', 'application/json');
-          await cloudUpload(false);
+          await cloudUpload(false, 'manual-merge');
         }
-        function scheduleCloudSync() {
+        function scheduleCloudSync(reason) {
+          reason = typeof reason === 'string' ? reason : 'after-save';
           if (!cloudConfig.autoSync || !cloudConfig.gistId || !cloudConfig.token) return;
+          if (reason === 'after-save' || reason === 'undo' || reason === 'reset' || reason === 'import') {
+            cloudPendingLocalChange = true;
+            setPendingCloudVisual();
+          }
           if (cloudSyncPendingTimer) clearTimeout(cloudSyncPendingTimer);
-          cloudSyncPendingTimer = setTimeout(function () { cloudSyncPendingTimer = null; cloudUpload(true); }, 1500);
+          const delay = reason === 'after-save' || reason === 'undo' ? 700 : 1200;
+          cloudSyncPendingTimer = setTimeout(function () {
+            cloudSyncPendingTimer = null;
+            cloudUpload(true, reason);
+          }, delay);
         }
         function startAutoSync() {
           if (cloudSyncTimer) clearInterval(cloudSyncTimer);
           cloudSyncTimer = null;
           if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) {
-            setTimeout(function () { cloudUpload(true); }, 1200);
-            cloudSyncTimer = setInterval(function () { cloudUpload(true); }, 5 * 60 * 1000);
+            setTimeout(function () { cloudUpload(true, 'startup'); }, 1000);
+            // No-change sync normally performs one GET. 15 minutes protects quota and still receives other-device changes.
+            cloudSyncTimer = setInterval(function () { cloudUpload(true, 'periodic-15m'); }, 15 * 60 * 1000);
           }
         }
 
@@ -9912,7 +10122,7 @@
               'روزهای ابری: ' + remote.rows.length + '\n' +
               'فوتسال: ' + remote.futsal.length + '\n' +
               'فایل دستگاه‌ها: ' + shards + '\n' +
-              'بکاپ محافظ v5.5: ' + (backup ? 'موجود ✅' : 'هنوز ساخته نشده ⚠️') + '\n' +
+              'بکاپ محافظ v5.6: ' + (backup ? 'موجود ✅' : 'هنوز ساخته نشده ⚠️') + '\n' +
               'روزهای محلی: ' + state().rows.length,
               false
             );
@@ -9935,12 +10145,12 @@
         async function downloadMigrationBackup() {
           if (!cloudConfig.token || !cloudConfig.gistId) { toast('اول تنظیمات را ذخیره کن', 'error'); return; }
           try {
-            if (cloudConfig.migrationVersion !== 55) await ensureMigrationBackups();
+            if (cloudConfig.migrationVersion !== 56) await ensureMigrationBackups();
             const gist = await fetchGistDocument();
             const file = gist.files && gist.files[MIGRATION_BACKUP_FILE];
             if (!file) throw new Error('بکاپ مهاجرت پیدا نشد');
             const text = await readGistFileText(file);
-            downloadFile(text, 'sport-gist-before-v55.json', 'application/json');
+            downloadFile(text, 'sport-gist-before-v56.json', 'application/json');
             toast('📥 بکاپ اصلی Gist دانلود شد', 'success', 3500);
           } catch (e) { toast('دانلود بکاپ ناموفق: ' + (e.message || e), 'error', 6000); }
         }
@@ -9964,6 +10174,13 @@
             if (cloudConfig.lastSync) {
               info.appendChild(document.createElement('br'));
               info.appendChild(document.createTextNode('آخرین Sync: ' + new Date(cloudConfig.lastSync).toLocaleString('fa-IR')));
+              info.appendChild(document.createElement('br'));
+              info.appendChild(document.createTextNode('آخرین عملیات: ' + cloudConfig.lastSyncRequests + ' درخواست • ' +
+                (cloudConfig.lastSyncWrote ? 'ذخیره و Verify' : 'فقط بررسی؛ بدون Write')));
+            }
+            if (Number.isFinite(cloudConfig.rateRemaining) && Number.isFinite(cloudConfig.rateLimit)) {
+              info.appendChild(document.createElement('br'));
+              info.appendChild(document.createTextNode('سهم API: ' + cloudConfig.rateRemaining + '/' + cloudConfig.rateLimit + ' باقی'));
             }
             info.appendChild(document.createElement('br'));
             info.appendChild(document.createTextNode('Token: ' + (cloudConfig.rememberToken === false ? 'فقط این session' : 'ذخیره روی دستگاه')));
@@ -9994,14 +10211,16 @@
           startAutoSync();
           if (isNewConfig) {
             if (confirm('تنظیمات ذخیره شد. ابتدا از Gist فعلی و دیتای محلی بکاپ محافظ ساخته شود و بعد Merge انجام شود؟')) {
-              downloadFile(JSON.stringify(state(), null, 2), 'backup-before-v55-first-sync-' + Date.now() + '.json', 'application/json');
+              downloadFile(JSON.stringify(state(), null, 2), 'backup-before-v56-first-sync-' + Date.now() + '.json', 'application/json');
               cloudUpload(false);
             } else toast('تنظیمات ذخیره شد؛ هنوز هیچ تغییری در Gist انجام نشده', 'default', 3500);
           } else toast('☁️ تنظیمات ذخیره شد', 'success', 2000);
         }
         function clearCloudSettings() {
           if (!confirm('Token و تنظیمات ابری از این مرورگر پاک شود؟ خود Gist و داده‌ها حذف نمی‌شوند.')) return;
-          cloudConfig = { token: '', gistId: '', autoSync: true, rememberToken: true, lastSync: 0, lastError: '', migrationReady: false, migrationVersion: 0 };
+          cloudConfig = { token: '', gistId: '', autoSync: true, rememberToken: true, lastSync: 0, lastWriteAt: 0, lastError: '', migrationReady: false, migrationVersion: 0,
+            rateLimit: null, rateRemaining: null, rateReset: 0, lastSyncRequests: 0, lastSyncWrote: false,
+            lastSyncReason: '', lastSyncDuration: 0 };
           try { sessionStorage.removeItem(CLOUD_SESSION_KEY); } catch (e) {}
           saveCloudConfig();
           if (cloudSyncTimer) clearInterval(cloudSyncTimer);
@@ -10014,6 +10233,8 @@
         window.cloudDownload = cloudDownload;
         A.cloudUpload = cloudUpload;
         A.cloudDownload = cloudDownload;
+        A.scheduleCloudSync = scheduleCloudSync;
+        A.cloudStatus = function () { return Object.assign({}, cloudConfig, { pending: cloudPendingLocalChange, inFlight: !!cloudSyncInFlight }); };
         A.cloudAudit = cloudAudit;
         A.createManualCloudSnapshot = createManualCloudSnapshot;
         A.downloadMigrationBackup = downloadMigrationBackup;
@@ -10525,153 +10746,74 @@
         window.testGitHubConnection = async function () {
           const resultEl = document.getElementById('githubTestResult');
           if (!resultEl) return;
-
-          resultEl.innerHTML = '⏳ در حال تست...';
-          resultEl.style.color = '#f59e0b';
-
-          const results = [];
-
-          // Test 1: Basic connection
-          try {
-            const t1Start = Date.now();
-            const res = await fetch('https://api.github.com', {
-              method: 'HEAD',
-              cache: 'no-cache',
-            });
-            const t1 = Date.now() - t1Start;
-            if (res.ok || res.status === 200) {
-              results.push('✅ اتصال به GitHub: ' + t1 + 'ms');
-            } else {
-              results.push('⚠️ GitHub پاسخ داد ولی ' + res.status);
-            }
-          } catch (e) {
-            results.push('❌ اتصال به GitHub: ناموفق');
-            results.push('   خطا: ' + (e.message || 'نامعلوم'));
-            resultEl.innerHTML =
-              results.join('<br>') +
-              '<br><br><b style="color:#ef4444">🚨 GitHub در دسترس نیست!</b><br>احتمالاً فیلتره یا اینترنت مشکل داره.<br>💡 راه حل: VPN یا اینترنت دیگه';
-            resultEl.style.color = '#ef4444';
+          resultEl.style.whiteSpace = 'pre-line';
+          resultEl.style.color = 'var(--yellow)';
+          resultEl.textContent = '⏳ تست فقط‌خواندنی GitHub…';
+          const lines = [];
+          if (!navigator.onLine) {
+            resultEl.style.color = 'var(--red)';
+            resultEl.textContent = '❌ مرورگر آفلاین است؛ بعد از اتصال دوباره تست کن.';
             return;
           }
-
-          // Test 2: With auth
-          if (typeof cloudConfig !== 'undefined' && cloudConfig.token) {
-            try {
-              const t2Start = Date.now();
-              const res = await fetch('https://api.github.com/user', {
-                headers: { Authorization: 'token ' + cloudConfig.token },
-              });
-              const t2 = Date.now() - t2Start;
-              if (res.ok) {
-                const user = await res.json();
-                results.push(
-                  '✅ Token معتبر: ' + user.login + ' (' + t2 + 'ms)',
-                );
-              } else if (res.status === 401) {
-                results.push('❌ Token نامعتبر (401) — Token expire شده');
-              } else {
-                results.push('⚠️ Token: HTTP ' + res.status);
-              }
-            } catch (e) {
-              results.push('❌ تست Token: ' + (e.message || 'نامعلوم'));
+          if (!cloudConfig.token || !cloudConfig.gistId) {
+            resultEl.style.color = 'var(--yellow)';
+            resultEl.textContent = '⚠️ Token یا Gist ID تنظیم نشده است.\nاین تست هیچ Tokenی را نمایش نمی‌دهد.';
+            return;
+          }
+          const before = cloudRequestCounter;
+          const started = Date.now();
+          try {
+            const gist = await fetchGistDocument(); // exactly one normal API request
+            const elapsed = Date.now() - started;
+            const remote = await aggregateGistData(gist);
+            const names = Object.keys(gist.files || {});
+            const shards = names.filter(function (name) { return /^sport-device-[a-f0-9]{16}\.json$/.test(name); });
+            const hasCanonical = !!(gist.files && gist.files['sport-data.json']);
+            const hasBackup = !!(gist.files && gist.files[MIGRATION_BACKUP_FILE]);
+            const merged = A.mergeStates(state(), remote);
+            const localHasUnpushedChanges = stateFingerprint(merged) !== stateFingerprint(remote);
+            lines.push('✅ اتصال و Token معتبر (' + elapsed + 'ms)');
+            lines.push('✅ دسترسی خواندن Gist برقرار است');
+            lines.push((hasCanonical ? '✅' : '⚠️') + ' فایل اصلی sport-data.json: ' + (hasCanonical ? 'موجود' : 'پیدا نشد'));
+            lines.push('ℹ️ رکورد ابری: ' + remote.rows.length + ' روز • ' + remote.futsal.length + ' فوتسال');
+            lines.push('ℹ️ فایل دستگاه‌ها: ' + shards.length);
+            lines.push((hasBackup ? '✅' : '⚠️') + ' بکاپ محافظ v5.6: ' + (hasBackup ? 'موجود' : 'هنوز ساخته نشده'));
+            lines.push((localHasUnpushedChanges || cloudPendingLocalChange ? '⏳' : '✅') + ' وضعیت محلی: ' +
+              (localHasUnpushedChanges || cloudPendingLocalChange ? 'تغییر در انتظار Sync' : 'با نسخه ابری سازگار'));
+            if (cloudConfig.lastWriteAt) {
+              lines.push('✅ دسترسی نوشتن قبلاً تأیید شده: ' + new Date(cloudConfig.lastWriteAt).toLocaleString('fa-IR'));
+            } else {
+              lines.push('ℹ️ تست فعلی چیزی نمی‌نویسد؛ دسترسی نوشتن با اولین Sync موفق تأیید می‌شود');
             }
-          } else {
-            results.push('⚠️ Token تنظیم نشده');
-          }
-
-          // Test 3: Gist access
-          if (
-            typeof cloudConfig !== 'undefined' &&
-            cloudConfig.token &&
-            cloudConfig.gistId
-          ) {
-            try {
-              const t3Start = Date.now();
-              const res = await fetch(
-                'https://api.github.com/gists/' + cloudConfig.gistId,
-                {
-                  headers: { Authorization: 'token ' + cloudConfig.token },
-                },
-              );
-              const t3 = Date.now() - t3Start;
-              if (res.ok) {
-                const gist = await res.json();
-                const fileCount = gist.files
-                  ? Object.keys(gist.files).length
-                  : 0;
-                results.push(
-                  '✅ Gist در دسترس: ' + fileCount + ' فایل (' + t3 + 'ms)',
-                );
-              } else if (res.status === 404) {
-                results.push('❌ Gist پیدا نشد (404)');
-              } else {
-                results.push('⚠️ Gist: HTTP ' + res.status);
-              }
-            } catch (e) {
-              results.push('❌ تست Gist: ' + (e.message || 'نامعلوم'));
+            if (Number.isFinite(cloudConfig.rateRemaining) && Number.isFinite(cloudConfig.rateLimit)) {
+              const used = cloudConfig.rateLimit - cloudConfig.rateRemaining;
+              lines.push((cloudConfig.rateRemaining < 100 ? '⚠️' : '✅') + ' سهم API: ' +
+                cloudConfig.rateRemaining + '/' + cloudConfig.rateLimit + ' باقی • ' + used + ' مصرف‌شده');
+              if (cloudConfig.rateReset) lines.push('ℹ️ Reset محدودیت: ' + new Date(cloudConfig.rateReset).toLocaleTimeString('fa-IR', {hour:'2-digit',minute:'2-digit'}));
+            } else {
+              lines.push('ℹ️ GitHub در این پاسخ هدر Rate Limit برنگرداند');
             }
-          } else {
-            results.push('⚠️ Gist ID تنظیم نشده');
-          }
-
-          // Test 4: Rate Limit
-          if (typeof cloudConfig !== 'undefined' && cloudConfig.token) {
-            try {
-              const res = await fetch('https://api.github.com/rate_limit', {
-                headers: { Authorization: 'token ' + cloudConfig.token },
-              });
-              if (res.ok) {
-                const data = await res.json();
-                const core = data.resources && data.resources.core;
-                if (core) {
-                  const usedPct = Math.round(
-                    ((core.limit - core.remaining) / core.limit) * 100,
-                  );
-                  const resetDate = new Date(core.reset * 1000);
-                  const resetTime = resetDate.toLocaleTimeString('fa-IR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  });
-                  results.push(
-                    'ℹ️ Rate Limit: ' +
-                      core.remaining +
-                      '/' +
-                      core.limit +
-                      ' باقی (' +
-                      usedPct +
-                      '% استفاده)',
-                  );
-                  if (core.remaining < 100) {
-                    results.push(
-                      '⚠️ به Rate Limit نزدیک شدی! ریست: ' + resetTime,
-                    );
-                  }
-                }
-              }
-            } catch (e) {}
-          }
-
-          // نمایش نتیجه
-          const allOk = results.every(function (r) {
-            return r.startsWith('✅') || r.startsWith('ℹ️');
-          });
-          const anyFailed = results.some(function (r) {
-            return r.startsWith('❌');
-          });
-
-          resultEl.innerHTML = results.join('<br>');
-          if (allOk) {
-            resultEl.innerHTML +=
-              '<br><br><b style="color:#10b981">🎉 همه چیز عالیه!</b>';
-            resultEl.style.color = '#10b981';
-          } else if (anyFailed) {
-            resultEl.innerHTML +=
-              '<br><br><b style="color:#ef4444">🚨 مشکل پیدا شد ↑</b>';
-            resultEl.style.color = '#ef4444';
-          } else {
-            resultEl.innerHTML +=
-              '<br><br><b style="color:#f59e0b">⚠️ چند مورد بررسی</b>';
-            resultEl.style.color = '#f59e0b';
+            if (cloudConfig.lastSync) {
+              lines.push('ℹ️ آخرین Sync: ' + new Date(cloudConfig.lastSync).toLocaleString('fa-IR') +
+                ' • ' + cloudConfig.lastSyncRequests + ' درخواست • ' +
+                (cloudConfig.lastSyncWrote ? 'با نوشتن' : 'فقط بررسی') +
+                ' • ' + cloudConfig.lastSyncDuration + 'ms');
+            }
+            lines.push('🛡️ سیاست خودکار: حدود ۰٫۷ ثانیه بعد از ثبت؛ بررسی دوره‌ای هر ۱۵ دقیقه');
+            lines.push('ℹ️ هزینه همین تست: ' + (cloudRequestCounter - before) + ' درخواست API');
+            lines.push('\n🎉 تست بدون تغییر هیچ داده‌ای تمام شد.');
+            cloudConfig.lastError = '';
+            saveCloudConfig();
+            resultEl.style.color = 'var(--text)';
+            resultEl.textContent = lines.join('\n');
+          } catch (e) {
+            lines.push('❌ تست GitHub ناموفق بود');
+            lines.push('خطا: ' + (e.message || String(e)));
+            lines.push('هزینه تست: ' + (cloudRequestCounter - before) + ' درخواست');
+            if (cloudConfig.rateReset && isRateBudgetLow())
+              lines.push('Sync خودکار تا Reset محدودیت متوقف می‌ماند.');
+            resultEl.style.color = 'var(--red)';
+            resultEl.textContent = lines.join('\n');
           }
         };
         // ===== HEALTH CHECK =====
@@ -10684,7 +10826,7 @@
 
           // === VERSION ===
           results.push('<b style="color:#a78bfa;font-size:1rem">📦 نسخه</b>');
-          results.push(info + ' Version: v5.2');
+          results.push(info + ' Version: v5.6 One-File');
           results.push(
             info + ' تاریخ چک: ' + new Date().toLocaleString('fa-IR'),
           );
@@ -11433,9 +11575,9 @@
                 setTimeout(scheduleDayDraft, 0);
             });
           }
-          // v5.5: backdrop tap does not close data-entry modal; draft survives navigation/reload.
+          // v5.6: backdrop tap does not close data-entry modal; draft survives navigation/reload.
           const modalFutsal = document.getElementById('modalFutsal');
-          // v5.5: backdrop tap does not close data-entry modal.
+          // v5.6: backdrop tap does not close data-entry modal.
           const modalCloud = document.getElementById('modalCloud');
           if (modalCloud)
             modalCloud.addEventListener('click', function (e) {
@@ -11474,7 +11616,7 @@
                 cloudConfig.gistId &&
                 cloudConfig.token
               )
-                scheduleCloudSync();
+                scheduleCloudSync('after-save');
             });
 
           const exPreset = document.getElementById('exPreset');
@@ -11634,6 +11776,23 @@
           const cloudDownloadMigrationBtn = document.getElementById('cloudDownloadMigrationBtn');
           if (cloudDownloadMigrationBtn) cloudDownloadMigrationBtn.addEventListener('click', A.downloadMigrationBackup);
 
+          // Chart controls
+          const chartRange = document.getElementById('chartRange');
+          if (chartRange) {
+            chartRange.value = A.getChartRange ? A.getChartRange() : '30';
+            chartRange.addEventListener('change', function () { A.setChartRange(this.value); });
+          }
+          const chartFocusBtn = document.getElementById('chartFocusBtn');
+          if (chartFocusBtn) chartFocusBtn.addEventListener('click', function () {
+            A.setChartFocus(!document.getElementById('view-charts').classList.contains('chart-focus-mode'));
+          });
+          const chartDownloadBtn = document.getElementById('chartDownloadBtn');
+          if (chartDownloadBtn) chartDownloadBtn.addEventListener('click', A.downloadActiveChart);
+          document.addEventListener('fullscreenchange', function () {
+            const view = document.getElementById('view-charts');
+            if (view && view.classList.contains('chart-focus-mode') && !document.fullscreenElement) A.setChartFocus(false);
+          });
+
           // Charts tabs
           document.addEventListener('click', function (e) {
             const tab = e.target.closest('.chart-tab');
@@ -11773,9 +11932,11 @@
               const main = document.querySelector('.main');
               if (main) main.insertBefore(warning, main.firstChild);
             }
-            window.addEventListener('online', scheduleCloudSync);
+            window.addEventListener('online', function () { scheduleCloudSync('online'); });
             document.addEventListener('visibilitychange', function () {
-              if (document.visibilityState === 'visible') scheduleCloudSync();
+              if (document.visibilityState !== 'visible') return;
+              if (cloudPendingLocalChange || !cloudConfig.lastSync || Date.now() - cloudConfig.lastSync > 2 * 60 * 1000)
+                scheduleCloudSync('resume');
             });
             window.addEventListener('storage', function (e) {
               if (e.key === A.LS_KEY && e.newValue) {
@@ -11785,7 +11946,7 @@
               }
             });
             console.log(
-              '🏃 Sport Report v5.5 Insight Vault Ready:',
+              '🏃 Sport Report v5.6 Sync & Chart Vault Ready:',
               state().rows.length,
               'rows',
             );
@@ -11807,7 +11968,7 @@
         }
       })();
     </script>
-  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a236e2e20e0fe6fc',t:'MTc4NTQ0MDk2Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a23dc8d409411f00',t:'MTc4NTUxMzI5Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 <!-- ============================================================ -->
 <!-- ██████ PART 5/5 - JS FINAL - END ██████ -->
