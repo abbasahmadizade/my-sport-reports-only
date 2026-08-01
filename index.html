@@ -1,6 +1,8 @@
-<!-- SPORT REPORT v5.6 ONE-FILE SYNC & CHART VAULT
+<!-- SPORT REPORT v6.0 ONE-FILE MOMENTUM & COACH
      Deploy: replace the repository root index.html with this file.
-     Existing localStorage keys are preserved. Before the first Gist write, remote and local migration backups are created. -->
+     localStorage keys and Gist backup filenames are unchanged from v5.6, so
+     existing data migrates in place. Before the first Gist write, remote and
+     local migration backups are created. -->
 <!-- ============================================================ -->
 <!-- ██████ PART 1/5 - HEAD + CSS - START ██████ -->
 <!-- ============================================================ -->
@@ -14,14 +16,14 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-xUJC8es05zN/lUh3lYFobBgFk7W4C3A/6ktFA4cd4IY=' 'sha256-DsfPRMtiNidjgQNFHdMXfyBoFbMuhSU7UkKvV3LM3HM=' 'sha256-aHqbGJzFlke6zRB4pXPFfJbDvZVMX8sb7njFHcyrXdA='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-/HjADRCdm1sKuZSNdXosU+d2mh3L1HhU/p/fqH3wrbQ=' 'sha256-wtx/wwXpJf8TN+ZflOpRJJZT5/NmYuHgzQvHpojY+gU=' 'sha256-JzEcvGZCyCLDfAUMuL5I/ejtfuI96hf6jnCd+jN1fbM='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sport Report" />
-    <title>🏃 گزارش ورزش، خواب و انرژی — v5.6 One File</title>
+    <title>🏃 گزارش ورزش، خواب و انرژی — v6.0</title>
 
     <link
       rel="icon"
@@ -1525,12 +1527,47 @@
       }
       @media (orientation:landscape) and (max-height:600px) {
         #view-charts.chart-focus-mode .chart-view-head { margin-bottom:4px; }
-        #view-charts.chart-focus-mode .chart-summary { display:none; }
         #view-charts.chart-focus-mode .chart-tabs { margin-bottom:5px; }
         #view-charts.chart-focus-mode .chart-landscape-hint { display:none; }
-        #view-charts.chart-focus-mode .chart-card { min-height:calc(100dvh - 125px); }
-        #view-charts.chart-focus-mode .chart-card canvas { height:calc(100dvh - 140px) !important; min-height:220px; }
+        #view-charts.chart-focus-mode .chart-card { min-height:calc(100dvh - 150px); }
+        #view-charts.chart-focus-mode .chart-card canvas { height:calc(100dvh - 165px) !important; min-height:210px; }
+        /* v6: keep the numbers visible in landscape, just make them compact. */
+        #view-charts.chart-focus-mode .chart-summary {
+          display:flex; gap:6px; margin-bottom:5px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+        }
+        #view-charts.chart-focus-mode .chart-summary-item { flex:0 0 auto; padding:5px 9px; }
+        #view-charts.chart-focus-mode .chart-summary-value { font-size:.8rem; }
+        #view-charts.chart-focus-mode .chart-summary-label { font-size:.58rem; }
       }
+
+      /* v6: software rotation fallback when the device refuses orientation.lock.
+         The panel is rotated 90deg and sized against the opposite viewport axis. */
+      /* The browser's fullscreen UA stylesheet forces `transform:none` on the
+         fullscreen element itself, so the rotation is applied to an inner
+         wrapper instead. Sizes swap dvw/dvh because the wrapper is turned 90deg. */
+      #view-charts.chart-focus-mode.chart-force-rotate { overflow:hidden; padding:0; }
+      #view-charts.chart-focus-mode.chart-force-rotate > .chart-rotor {
+        position:absolute; top:0; left:100dvw;
+        width:100dvh; height:100dvw;
+        transform:rotate(90deg); transform-origin:top left;
+        overflow:auto; -webkit-overflow-scrolling:touch;
+        padding:10px 14px; box-sizing:border-box;
+      }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-landscape-hint { display:none; }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-summary {
+        display:flex; gap:6px; margin-bottom:5px; overflow-x:auto;
+      }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-summary-item { flex:0 0 auto; padding:5px 9px; }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-summary-value { font-size:.8rem; }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-summary-label { font-size:.58rem; }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-view-head { margin-bottom:4px; }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-card {
+        margin:0; min-height:calc(100dvw - 150px);
+      }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-card canvas {
+        height:calc(100dvw - 165px) !important; min-height:200px;
+      }
+      body.chart-rotated { overflow:hidden !important; }
 
       /* === HEATMAP === */
       .heatmap-container {
@@ -2388,6 +2425,53 @@
         left:-55px; bottom:-75px; border:24px solid rgba(var(--accent-rgb),.09); pointer-events:none;
       }
       .today-hero-grid { display:grid; grid-template-columns: 88px 1fr; align-items:center; gap:14px; position:relative; z-index:1; }
+      /* === v6 FORM HELPERS === */
+      .lbl-opt { color: var(--muted); font-weight: 400; font-size: .72rem; }
+      .field-hint { color: var(--muted); font-size: .68rem; margin-top: 5px; line-height: 1.6; }
+
+      /* === v6 WEEK STRIP (flexible goal, replaces streak) === */
+      .week-strip {
+        margin-top: 12px; padding: 11px 13px; border-radius: 14px;
+        border: 1px solid var(--border);
+        background: linear-gradient(135deg, rgba(var(--accent-rgb), .10), rgba(var(--accent-rgb), .03));
+      }
+      .week-strip.achieved {
+        border-color: rgba(var(--accent-rgb), .55);
+        background: linear-gradient(135deg, rgba(var(--accent-rgb), .22), rgba(var(--accent-rgb), .06));
+      }
+      .week-strip-head {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 8px; flex-wrap: wrap; margin-bottom: 9px;
+      }
+      .week-strip-title { font-size: .82rem; color: var(--text); }
+      .week-strip-title b { color: var(--accent2); font-size: .95rem; }
+      .wk-auto {
+        font-size: .58rem; color: var(--muted); border: 1px solid var(--border);
+        border-radius: 6px; padding: 1px 5px; vertical-align: middle;
+      }
+      .week-strip-msg { font-size: .7rem; color: var(--muted); }
+      .week-dots { display: flex; gap: 6px; justify-content: space-between; }
+      .wk-dot {
+        flex: 1; min-width: 0; height: 32px; border-radius: 9px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: .7rem; font-weight: 700;
+        border: 1px solid var(--border); background: var(--card2); color: var(--muted);
+        transition: transform .15s ease, background .2s ease;
+      }
+      .wk-dot.done {
+        background: linear-gradient(160deg, var(--accent), var(--accent3));
+        border-color: var(--accent); color: #fff;
+        box-shadow: 0 2px 10px rgba(var(--accent-rgb), .35);
+      }
+      .wk-dot.logged { background: rgba(var(--accent-rgb), .14); color: var(--accent2); }
+      .wk-dot.missed { opacity: .5; }
+      .wk-dot.future { opacity: .35; border-style: dashed; }
+      .wk-dot.today { outline: 2px solid var(--accent2); outline-offset: 1px; }
+      @media (max-width: 400px) {
+        .wk-dot { height: 28px; font-size: .64rem; }
+        .week-strip-msg { font-size: .65rem; }
+      }
+
       .readiness-ring {
         --score:0; width:84px; height:84px; border-radius:50%; display:grid; place-items:center;
         background: conic-gradient(var(--accent) calc(var(--score) * 1%), rgba(255,255,255,.08) 0);
@@ -2666,6 +2750,46 @@
               <button type="button" data-target="goalActivity" data-step="5">
                 +
               </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="goalWeeklyMode">📅 هدف هفتگی</label>
+            <select class="form-input" id="goalWeeklyMode">
+              <option value="auto">خودکار — از روی روند خودم</option>
+              <option value="manual">دستی — خودم تعیین می‌کنم</option>
+            </select>
+            <div class="field-hint" id="goalWeeklyHint"></div>
+          </div>
+          <div class="form-group" id="goalWeeklyDaysWrap" style="display: none">
+            <label>چند روز در هفته؟</label>
+            <div class="num-stepper">
+              <button type="button" data-target="goalWeeklyDays" data-step="-1">
+                −
+              </button>
+              <input
+                type="number"
+                id="goalWeeklyDays"
+                value="3"
+                min="1"
+                max="7"
+                step="1"
+              />
+              <button type="button" data-target="goalWeeklyDays" data-step="1">
+                +
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="goalPreferredTime">🕐 معمولاً کِی ورزش می‌کنی؟</label>
+            <select class="form-input" id="goalPreferredTime">
+              <option value="morning">🌅 صبح (۵ تا ۱۱)</option>
+              <option value="noon">🌞 ظهر (۱۱ تا ۱۵)</option>
+              <option value="evening">🌤️ عصر (۱۵ تا ۲۰)</option>
+              <option value="night">🌙 شب (۲۰ به بعد)</option>
+              <option value="flexible">🔄 منعطف — ثابت نیست</option>
+            </select>
+            <div class="field-hint">
+              تحلیل‌ها بر همین بازه تنظیم می‌شوند و توصیه‌ی بی‌ربط داده نمی‌شود.
             </div>
           </div>
           <button
@@ -3485,6 +3609,13 @@
               ><input type="checkbox" id="mdFutsalRef" /> ⚽ مرتبط با
               فوتسال</label
             >
+            <div class="form-group">
+              <label for="mdTrainHour">🕐 ساعت تمرین <span class="lbl-opt">(اختیاری)</span></label>
+              <select class="form-input" id="mdTrainHour">
+                <option value="">— ثبت نشده —</option>
+              </select>
+              <div class="field-hint">با پر کردنش، اپ می‌فهمد کدام ساعت برایت بهتر جواب می‌دهد.</div>
+            </div>
           </div>
 
           <div class="step-page" id="step-1">
@@ -4923,7 +5054,10 @@
           rows: [],
           futsal: [],
           notes: [],
-          goals: { sleepGoalHours: 7, activityGoalMin: 20 },
+          goals: {
+            sleepGoalHours: 7, activityGoalMin: 20,
+            weeklyTargetMode: 'auto', weeklyTargetDays: 3, preferredTime: 'morning',
+          },
           programGoal:
             'هدف: تقویت اراده و ساخت روتین ورزشی روزانه (دویدن + پیاده‌روی) و خواب منظم. این روتین قراره پایه‌ای باشه برای اراده قوی‌تر در آینده — مخصوصاً برای درس خوندن ارشد. تمرکز اصلی: ثبات (Consistency) بیشتر از شدت (Intensity).',
         };
@@ -5039,6 +5173,16 @@
             futsalRef: r.futsalRef === true || r.futsalRef === 'true' || r.futsalRef === 1,
             sleepBlocks: normalizeSleepBlocks(r.sleepBlocks),
             officialWake: validTime(r.officialWake) ? r.officialWake : null,
+            // v6: optional hour of the training session (0-23). Powers the
+            // "which time of day actually works for you" analysis. null = unknown.
+            trainHour: (function () {
+              // Careful: Number(null) === 0, which would silently turn "not
+              // recorded" into "midnight" on every re-normalise.
+              const raw = r.trainHour;
+              if (raw === null || raw === undefined || raw === '') return null;
+              const h = Number(raw);
+              return Number.isFinite(h) && h >= 0 && h <= 23 ? Math.floor(h) : null;
+            })(),
             events: Array.isArray(r.events) ? r.events.slice(0, 100) : [],
             _updatedAt: normalizeRevision(r._updatedAt),
           };
@@ -5088,9 +5232,16 @@
           input = input && typeof input === 'object' ? input : {};
           const out = deepClone(DEFAULT_DATA);
           out._schemaVersion = 6;
+          const gi = input.goals && typeof input.goals === 'object' ? input.goals : {};
+          const wtMode = gi.weeklyTargetMode === 'manual' ? 'manual' : 'auto';
+          const prefRaw = typeof gi.preferredTime === 'string' ? gi.preferredTime : 'morning';
+          const prefOk = ['morning', 'noon', 'evening', 'night', 'flexible'].indexOf(prefRaw) >= 0;
           out.goals = {
-            sleepGoalHours: finiteNumber(input.goals && input.goals.sleepGoalHours, 7, 4, 12),
-            activityGoalMin: Math.round(finiteNumber(input.goals && input.goals.activityGoalMin, 20, 5, 120)),
+            sleepGoalHours: finiteNumber(gi.sleepGoalHours, 7, 4, 12),
+            activityGoalMin: Math.round(finiteNumber(gi.activityGoalMin, 20, 5, 120)),
+            weeklyTargetMode: wtMode,
+            weeklyTargetDays: Math.round(finiteNumber(gi.weeklyTargetDays, 3, 1, 7)),
+            preferredTime: prefOk ? prefRaw : 'morning',
           };
           out.programGoal = cleanText(input.programGoal || DEFAULT_DATA.programGoal, 5000);
           out.notes = Array.isArray(input.notes) ? input.notes.slice(0, 1000) : [];
@@ -5362,6 +5513,171 @@
           stats.activeRate = stats.completedCount / Math.max(1, n);
           stats.avgActivityPerCalendarDay = (stats.totalRun + stats.totalWalk) / Math.max(1, n);
           return stats;
+        }
+
+        // ===== v6 MOMENTUM ENGINE =====
+        // Replaces the brittle "consecutive days" streak. A rest day should never
+        // reset progress to zero: it should only slightly lower a rolling score.
+        // Momentum = exponentially weighted activity over a 14-day window, so
+        // recent days matter more but a single gap costs only a few points.
+        const MOMENTUM_WINDOW = 14;
+        const MOMENTUM_HALFLIFE = 7; // days for a day's contribution to halve
+
+        function dayEffort(r, goals) {
+          // 0..1 quality of a single day, tolerant of partial logging.
+          if (!r) return 0;
+          const actGoal = (goals && goals.activityGoalMin) || 20;
+          const act = (Number(r.runMin) || 0) + (Number(r.walkMin) || 0);
+          let v = 0;
+          if (r.completed) v += 0.6;
+          if (act > 0) v += 0.4 * Math.min(1, act / Math.max(1, actGoal));
+          if (!r.completed && act === 0 && Number(r.energy) > 0) v += 0.05; // logged, but rested
+          return Math.max(0, Math.min(1, v));
+        }
+
+        function momentumScore(rows, goals, endDate) {
+          rows = Array.isArray(rows) ? rows : state.rows;
+          endDate = endDate || Jalali.today();
+          goals = goals || (state.goals || {});
+          const byDate = {};
+          rows.forEach(function (r) {
+            const age = Jalali.diffDays(endDate, r.jdate);
+            if (age >= 0 && age < MOMENTUM_WINDOW) byDate[r.jdate] = r;
+          });
+          let weighted = 0, maxWeighted = 0;
+          for (let i = 0; i < MOMENTUM_WINDOW; i++) {
+            const d = Jalali.addDays(endDate, -i);
+            const w = Math.pow(0.5, i / MOMENTUM_HALFLIFE);
+            maxWeighted += w;
+            weighted += w * dayEffort(byDate[d], goals);
+          }
+          return Math.round((weighted / Math.max(0.0001, maxWeighted)) * 100);
+        }
+
+        function momentumTrend(rows, goals) {
+          // Compare current momentum against the value 7 days ago.
+          const now = momentumScore(rows, goals, Jalali.today());
+          const prev = momentumScore(rows, goals, Jalali.addDays(Jalali.today(), -7));
+          const delta = now - prev;
+          let label, emoji;
+          if (delta >= 8) { label = 'در حال اوج‌گیری'; emoji = '📈'; }
+          else if (delta <= -8) { label = 'در حال افت'; emoji = '📉'; }
+          else { label = 'پایدار'; emoji = '➡️'; }
+          return { score: now, prev: prev, delta: delta, label: label, emoji: emoji };
+        }
+
+        function momentumLevel(score) {
+          if (score >= 75) return { name: 'عالی', emoji: '🔥', color: 'good' };
+          if (score >= 50) return { name: 'خوب', emoji: '💪', color: 'good' };
+          if (score >= 30) return { name: 'در حال ساختن', emoji: '🌱', color: 'info' };
+          if (score > 0) return { name: 'تازه شروع', emoji: '🌤️', color: 'warn' };
+          return { name: 'بی‌حرکت', emoji: '💤', color: 'warn' };
+        }
+
+        // ---- Flexible weekly target (auto-calibrated to real behaviour) ----
+        function jWeekStart(jdate) {
+          // Persian week starts Saturday. Walk back to the most recent Saturday.
+          let d = jdate;
+          for (let i = 0; i < 7; i++) {
+            if (Jalali.weekday(d) === 0) return d;
+            d = Jalali.addDays(d, -1);
+          }
+          return jdate;
+        }
+
+        function autoWeeklyTarget(rows) {
+          // Derive a realistic target from the last 4 complete weeks.
+          // Only weeks the user actually used the app count, and a rest-only week
+          // still counts (as a zero) so the target cannot drift upward.
+          rows = Array.isArray(rows) ? rows : state.rows;
+          const today = Jalali.today();
+          const thisWeek = jWeekStart(today);
+          const counts = [];
+          for (let w = 1; w <= 4; w++) {
+            const start = Jalali.addDays(thisWeek, -7 * w);
+            const end = Jalali.addDays(start, 6);
+            let active = 0, logged = 0;
+            rows.forEach(function (r) {
+              if (Jalali.cmp(r.jdate, start) < 0 || Jalali.cmp(r.jdate, end) > 0) return;
+              logged++;
+              if (r.completed) active++;
+            });
+            if (logged > 0) counts.push(active);
+          }
+          if (!counts.length) return 3; // sensible default for a new user
+          const avg = counts.reduce(function (a, b) { return a + b; }, 0) / counts.length;
+          // Round to nearest, then keep it humane. No aggressive upward nudge:
+          // a target you keep missing is worse than one you keep hitting.
+          return Math.max(2, Math.min(5, Math.round(avg)));
+        }
+
+        function effectiveWeeklyTarget() {
+          const g = state.goals || {};
+          if (g.weeklyTargetMode === 'manual' && Number(g.weeklyTargetDays) > 0) {
+            return Math.max(1, Math.min(7, Math.round(Number(g.weeklyTargetDays))));
+          }
+          return autoWeeklyTarget(state.rows);
+        }
+
+        function weekProgress(rows) {
+          rows = Array.isArray(rows) ? rows : state.rows;
+          const today = Jalali.today();
+          const start = jWeekStart(today);
+          const target = effectiveWeeklyTarget();
+          let done = 0;
+          const days = [];
+          for (let i = 0; i < 7; i++) {
+            const d = Jalali.addDays(start, i);
+            const row = rows.find(function (r) { return r.jdate === d; });
+            const isFuture = Jalali.cmp(d, today) > 0;
+            const active = !!(row && row.completed);
+            if (active) done++;
+            days.push({ jdate: d, active: active, logged: !!row, future: isFuture, isToday: d === today });
+          }
+          const remainingDays = days.filter(function (d) { return d.future || d.isToday; })
+            .filter(function (d) { return !d.active; }).length;
+          const need = Math.max(0, target - done);
+          return {
+            start: start, target: target, done: done, need: need,
+            days: days, remainingDays: remainingDays,
+            onTrack: need === 0 || need <= remainingDays,
+            achieved: done >= target,
+            auto: (state.goals || {}).weeklyTargetMode !== 'manual',
+          };
+        }
+
+        function weeklyHistory(weeks) {
+          weeks = weeks || 8;
+          const rows = state.rows;
+          const thisWeek = jWeekStart(Jalali.today());
+          const target = effectiveWeeklyTarget();
+          const out = [];
+          for (let w = weeks - 1; w >= 0; w--) {
+            const start = Jalali.addDays(thisWeek, -7 * w);
+            const end = Jalali.addDays(start, 6);
+            let c = 0, logged = 0;
+            rows.forEach(function (r) {
+              if (Jalali.cmp(r.jdate, start) < 0 || Jalali.cmp(r.jdate, end) > 0) return;
+              logged++;
+              if (r.completed) c++;
+            });
+            // hasData distinguishes "a week you failed" from "a week before you
+            // started using the app". Only the former should count against you.
+            out.push({
+              start: start, count: c, logged: logged, hasData: logged > 0,
+              hit: c >= target, current: w === 0,
+            });
+          }
+          return { target: target, weeks: out };
+        }
+
+        function weeksHittingTarget(weeks) {
+          const h = weeklyHistory(weeks || 8);
+          const past = h.weeks.filter(function (w) { return !w.current && w.hasData; });
+          return {
+            hit: past.filter(function (w) { return w.hit; }).length,
+            total: past.length, target: h.target,
+          };
         }
 
         function currentStreak(rows) {
@@ -5717,6 +6033,16 @@
         window._app.statsLastN = statsLastN;
         window._app.rowsInLastDays = rowsInLastDays;
         window._app.currentStreak = currentStreak;
+        window._app.momentumScore = momentumScore;
+        window._app.momentumTrend = momentumTrend;
+        window._app.momentumLevel = momentumLevel;
+        window._app.dayEffort = dayEffort;
+        window._app.weekProgress = weekProgress;
+        window._app.weeklyHistory = weeklyHistory;
+        window._app.weeksHittingTarget = weeksHittingTarget;
+        window._app.effectiveWeeklyTarget = effectiveWeeklyTarget;
+        window._app.autoWeeklyTarget = autoWeeklyTarget;
+        window._app.jWeekStart = jWeekStart;
         window._app.dataFreshness = dataFreshness;
         window._app.weeklyBreakdown = weeklyBreakdown;
         window._app.toast = toast;
@@ -5898,133 +6224,170 @@
           return patterns;
         }
 
-        function getTimeBasedAdvice(currentHour, sleepGoal) {
-          const advices = [];
+        // ===== v6 PERSONAL COACH =====
+        // The old advice was generic ("don't train at noon") and ignored the fact
+        // that the user only trains in the morning. Everything below is derived
+        // from the user's own logged data plus their stated preferred window.
 
-          if (currentHour >= 5 && currentHour < 9) {
-            advices.push({
-              type: 'good',
-              emoji: '🌅',
-              title: 'صبح زود — بهترین زمان!',
-              content: 'بدنت آماده فعالیته. کورتیزول طبیعی صبحگاهی بالاست.',
+        const TIME_WINDOWS = {
+          morning:  { label: 'صبح',   emoji: '🌅', from: 5,  to: 11 },
+          noon:     { label: 'ظهر',   emoji: '🌞', from: 11, to: 15 },
+          evening:  { label: 'عصر',   emoji: '🌤️', from: 15, to: 20 },
+          night:    { label: 'شب',    emoji: '🌙', from: 20, to: 24 },
+          flexible: { label: 'منعطف', emoji: '🔄', from: 5,  to: 22 },
+        };
+
+        function preferredWindow() {
+          const g = state().goals || {};
+          return TIME_WINDOWS[g.preferredTime] || TIME_WINDOWS.morning;
+        }
+
+        function inWindow(hour, win) {
+          if (!win) return false;
+          if (win.from <= win.to) return hour >= win.from && hour < win.to;
+          return hour >= win.from || hour < win.to;
+        }
+
+        // Learn which window actually works best from logged sessions.
+        function bestObservedWindow() {
+          const buckets = {};
+          state().rows.forEach(function (r) {
+            if (!r.completed) return;
+            const h = Number(r.trainHour);
+            if (!Number.isFinite(h)) return;
+            let key = null;
+            Object.keys(TIME_WINDOWS).forEach(function (k) {
+              if (k !== 'flexible' && inWindow(h, TIME_WINDOWS[k])) key = k;
+            });
+            if (!key) return;
+            if (!buckets[key]) buckets[key] = { n: 0, energy: 0, act: 0 };
+            buckets[key].n++;
+            buckets[key].energy += Number(r.energy) || 0;
+            buckets[key].act += (Number(r.runMin) || 0) + (Number(r.walkMin) || 0);
+          });
+          const keys = Object.keys(buckets).filter(function (k) { return buckets[k].n >= 3; });
+          if (keys.length < 2) return null;
+          const scored = keys.map(function (k) {
+            return { key: k, n: buckets[k].n, avgEnergy: buckets[k].energy / buckets[k].n };
+          }).sort(function (a, b) { return b.avgEnergy - a.avgEnergy; });
+          if (scored[0].avgEnergy - scored[scored.length - 1].avgEnergy < 0.6) return null;
+          return scored[0];
+        }
+
+        // Which weekday does the user realistically manage to train on?
+        function weekdayStrength() {
+          const stats = {};
+          state().rows.forEach(function (r) {
+            const wd = Jalali.weekdayName(r.jdate);
+            if (!stats[wd]) stats[wd] = { n: 0, done: 0 };
+            stats[wd].n++;
+            if (r.completed) stats[wd].done++;
+          });
+          return Object.keys(stats).filter(function (wd) { return stats[wd].n >= 2; })
+            .map(function (wd) {
+              return { wd: wd, n: stats[wd].n, rate: stats[wd].done / stats[wd].n };
+            }).sort(function (a, b) { return b.rate - a.rate; });
+        }
+
+        function todayAlreadyLogged() {
+          const t = Jalali.today();
+          return state().rows.find(function (r) { return r.jdate === t; }) || null;
+        }
+
+        // Build a short, situation-aware plan instead of a wall of generic tips.
+        function getTimeBasedAdvice(currentHour, sleepGoal) {
+          const out = [];
+          const win = preferredWindow();
+          const wp = A.weekProgress(state().rows);
+          const todayRow = todayAlreadyLogged();
+          const doneToday = !!(todayRow && todayRow.completed);
+          const isWindowNow = inWindow(currentHour, win);
+          const beforeWindow = currentHour < win.from;
+          const hhmm = String(currentHour).padStart(2, '0') + ':00';
+
+          // 1) The headline card: what to do right now.
+          if (doneToday) {
+            const act = (Number(todayRow.runMin) || 0) + (Number(todayRow.walkMin) || 0);
+            out.push({
+              type: 'good', emoji: '✅',
+              title: 'امروز ثبت شده — کارت تمومه',
+              content: act > 0
+                ? 'امروز ' + formatMin(act) + ' فعالیت ثبت کردی. ' +
+                  (wp.achieved ? 'هدف هفته هم کامل شد.' : 'تا هدف هفته ' + wp.need + ' روز مونده.')
+                : 'امروز رو ثبت کردی. ' + (wp.achieved ? 'هدف هفته کامل شد.' : 'تا هدف هفته ' + wp.need + ' روز مونده.'),
               actions: [
-                '✅ ۵ دقیقه گرم‌کردن',
-                '✅ ورزش اصلی',
-                '✅ صبحانه پروتئین‌دار',
-                '💧 نیم لیتر آب',
+                '💧 آب کافی تا آخر شب',
+                '😴 هدف خواب امشب: ' + sleepGoal + ' ساعت',
               ],
             });
-          } else if (currentHour >= 9 && currentHour < 12) {
-            advices.push({
-              type: 'good',
-              emoji: '☀️',
-              title: 'صبح — زمان خوب',
-              content: 'اگه آماده‌ای، الان هوا مناسبه.',
-              actions: [
-                '✅ ورزش شدت متوسط تا زیاد',
-                '✅ ۱ ساعت بعد صبحانه',
-                '⚠️ اگه گرمه، آب همراهت',
-              ],
+          } else if (wp.achieved) {
+            out.push({
+              type: 'good', emoji: '🎯',
+              title: 'هدف هفته رسیده — امروز اختیاریه',
+              content: 'این هفته ' + wp.done + ' روز فعال بودی و به هدفت (' + wp.target + ' روز) رسیدی. ' +
+                'اگه حال داری ادامه بده، اگه نه استراحت کاملاً منطقیه.',
+              actions: ['🚶 پیاده‌روی سبک اگه دوست داشتی', '🛌 یا ریکاوری بدون احساس گناه'],
             });
-          } else if (currentHour >= 12 && currentHour < 15) {
-            advices.push({
-              type: 'warn',
-              emoji: '🌞',
-              title: 'ظهر — احتیاط',
-              content: 'گرما + خستگی طبیعی ظهر = بازدهی کم.',
-              actions: [
-                '⏸️ ورزش شدید نه',
-                '✅ پیاده‌روی ۱۵ دقیقه OK',
-                '💧 مراقب کم‌آبی',
-                '🍽️ ۲ ساعت بعد ناهار',
-              ],
+          } else if (isWindowNow) {
+            out.push({
+              type: 'good', emoji: win.emoji,
+              title: 'الان ' + hhmm + ' — توی بازه‌ی ' + win.label + ' خودتی',
+              content: 'این همون ساعتیه که معمولاً ورزش می‌کنی. تا هدف هفته ' + wp.need + ' روز مونده.',
+              actions: ['⏱️ ۵ دقیقه گرم‌کردن', '🏃 تمرین اصلی', '💧 آب همراهت'],
             });
-          } else if (currentHour >= 15 && currentHour < 18) {
-            advices.push({
-              type: 'good',
-              emoji: '🌤️',
-              title: 'عصر — معمولاً زمان مناسبی',
-              content: 'برای خیلی‌ها دمای بدن و عملکرد عصر بهتر است؛ حس بدنت و شرایط هوا مهم‌ترند.',
-              actions: [
-                '💪 ورزش شدید مجاز',
-                '🏃 بهترین زمان رکورد',
-                '✅ فوتسال یا تمرین سخت',
-                '🍎 یه میوه قبلش',
-              ],
+          } else if (beforeWindow) {
+            out.push({
+              type: 'info', emoji: '⏳',
+              title: 'بازه‌ی ' + win.label + ' هنوز نرسیده',
+              content: 'ساعت ' + win.from + ' تا ' + win.to + ' وقت معمول توئه. تا اون موقع بدنت رو آماده نگه دار.',
+              actions: ['💧 آب', '🥣 یه چیز سبک بخور', '🧘 کشش کوتاه'],
             });
-          } else if (currentHour >= 18 && currentHour < 21) {
-            advices.push({
-              type: 'info',
-              emoji: '🌆',
-              title: 'غروب — فعالیت سبک تا متوسط',
-              content: 'شدت زیاد نزدیک خواب ممکن است روی خواب اثر بگذارد.',
-              actions: [
-                '✅ پیاده‌روی یا دویدن سبک',
-                '⚠️ حداکثر ۱ ساعت',
-                '⚠️ ترجیحاً تمرین پرفشار نه',
-                '🥗 شام سبک',
-              ],
-            });
-          } else if (currentHour >= 21 && currentHour < 24) {
-            advices.push({
-              type: 'warn',
-              emoji: '🌙',
-              title: 'شب — آماده خواب شو',
-              content: 'تمرین پرفشار نزدیک خواب ممکن است خواب بعضی افراد را مختل کند.',
-              actions: [
-                '⚠️ ترجیحاً تمرین پرفشار نه',
-                '✅ استرچ ۱۰ دقیقه',
-                '📵 گوشی رو دور کن',
-                '🛏️ ۱ ساعت قبل خواب حمام گرم',
-              ],
-            });
-            const targetWake = 7;
-            const bedMin =
-              (((targetWake * 60 - sleepGoal * 60) % 1440) + 1440) % 1440;
-            advices.push({
-              type: 'info',
-              emoji: '🛏️',
-              title: 'زمان خواب امشب',
-              content: 'برای بیداری ۰۷:۰۰ و ' + sleepGoal + ' ساعت خواب:',
-              actions: ['🎯 حداکثر ساعت ' + minToTime(bedMin) + ' تو رختخواب'],
-            });
-          } else if (currentHour >= 0 && currentHour < 3) {
-            advices.push({
-              type: 'bad',
-              emoji: '🌃',
-              title:
-                'ساعت ' +
-                String(currentHour).padStart(2, '0') +
-                ' — خوابت نبرده؟',
-              content: 'نگرانی کمک نمی‌کنه. این‌ها کمک می‌کنن:',
-              actions: [
-                '💡 چراغ‌ها رو کم/خاموش',
-                '📱 گوشی رو کنار بذار',
-                '🫁 تنفس ۴-۷-۸: ۴ دم، ۷ نگه، ۸ بازدم × ۴ بار',
-                '🧘 تخیل هدایت‌شده',
-                '📖 اگه ۳۰ دقیقه نخوابیدی، کتاب سبک بخون',
-                '🚫 ورزش نکن',
-                '🍵 چای بابونه OK',
-                '🚫 چای/قهوه ممنوع',
-              ],
-            });
-          } else if (currentHour >= 3 && currentHour < 5) {
-            advices.push({
-              type: 'bad',
-              emoji: '🌌',
-              title:
-                'ساعت ' + String(currentHour).padStart(2, '0') + ' — خیلی دیره',
-              content: 'الان بخوابی فردا سخت، ولی هنوز فرصت هست:',
-              actions: [
-                '💤 همین الان بخواب',
-                '🚫 گوشی نه',
-                '🫁 تنفس شکمی',
-                '🌡️ اتاق خنک (۱۸-۲۰ درجه)',
-              ],
+          } else {
+            // Past the usual window and not logged yet: keep it low-pressure.
+            const late = currentHour >= 22 || currentHour < 5;
+            out.push({
+              type: late ? 'info' : 'warn',
+              emoji: late ? '🌙' : '🕗',
+              title: late ? 'وقت خوابه، نه تمرین' : 'از بازه‌ی معمولت گذشته',
+              content: late
+                ? 'الان تمرین به خواب و فردا ضربه می‌زنه. امروز رو همین‌طور ببند.'
+                : 'اگه هنوز انرژی داری یه نسخه‌ی کوتاه بزن، وگرنه فردا صبح جبران کن.',
+              actions: late
+                ? ['📵 صفحه‌نمایش کمتر', '🫁 تنفس ۴-۷-۸', '😴 هدف: ' + sleepGoal + ' ساعت خواب']
+                : ['🚶 ۱۰ تا ۱۵ دقیقه پیاده‌روی', '🧘 یا کشش ۵ دقیقه‌ای', '📅 فردا صبح برنامه‌ریزی کن'],
             });
           }
 
-          return advices;
+          // 2) Weekly pacing, only when it actually matters.
+          if (!wp.achieved && wp.need > 0) {
+            const tight = wp.need >= wp.remainingDays && wp.remainingDays > 0;
+            out.push({
+              type: tight ? 'warn' : 'info',
+              emoji: '📅',
+              title: 'هفته: ' + wp.done + ' از ' + wp.target + ' روز',
+              content: wp.remainingDays === 0
+                ? 'این هفته دیگه روزی نمونده. هفته‌ی بعد تازه شروع می‌شه — چیزی از دست نرفته.'
+                : (tight
+                    ? 'برای رسیدن به هدف باید هر ' + wp.remainingDays + ' روز باقی‌مونده رو فعال باشی.'
+                    : wp.remainingDays + ' روز فرصت داری و فقط ' + wp.need + ' روز لازمه. راحتی.'),
+              actions: [],
+            });
+          }
+
+          // 3) A single data-driven insight, if we have enough evidence.
+          const observed = bestObservedWindow();
+          if (observed && observed.key !== (state().goals || {}).preferredTime) {
+            const w = TIME_WINDOWS[observed.key];
+            out.push({
+              type: 'info', emoji: '🔎',
+              title: 'الگوی خودت: ' + w.label + ' بهتر جواب داده',
+              content: 'توی ' + observed.n + ' جلسه‌ای که ' + w.label + ' تمرین کردی، میانگین انرژی ' +
+                observed.avgEnergy.toFixed(1) + ' از ۱۰ بوده — بالاتر از بقیه‌ی ساعت‌ها.',
+              actions: ['⚙️ می‌تونی بازه‌ی پیش‌فرض رو تو تنظیمات عوض کنی'],
+            });
+          }
+
+          return out;
         }
 
         function generateRecommendation() {
@@ -6052,7 +6415,9 @@
           const sleep = sleepInfo(referenceRow.sleepBlocks);
           const sleepGoal = state().goals ? state().goals.sleepGoalHours || 7 : 7;
           const energy = Number(referenceRow.energy);
-          const consistencyScore = Math.min(100, (stats7.completedCount / 7) * 100);
+          // v6: consistency is momentum-based, so a single rest day no longer
+          // punishes the score the way a broken streak used to.
+          const consistencyScore = A.momentumScore(state().rows, state().goals);
           const sleepScore = sleep.totalH > 0 ? Math.min(100, (sleep.totalH / sleepGoal) * 100) : null;
           const energyScore = Number.isFinite(energy) ? Math.min(100, Math.max(0, energy * 10)) : null;
 
@@ -6090,7 +6455,10 @@
           details.push({ label: '🎯 اطمینان تحلیل', value: confidence + '/100 — بر اساس ' + rows7.length + ' ثبت در ۷ روز' });
           details.push({ label: '💤 خواب مرجع', value: sleep.totalH > 0 ? sleep.totalDisplay + ' (' + referenceRow.jdate + ')' : 'ثبت نشده' });
           details.push({ label: '⚡ انرژی مرجع', value: Number.isFinite(energy) ? energy + '/10' : 'ثبت نشده' });
-          details.push({ label: '🔥 ثبات فعلی', value: currentStreak(state().rows) + ' روز متوالی' });
+          const mo = A.momentumTrend(state().rows, state().goals);
+          const wpDet = A.weekProgress(state().rows);
+          details.push({ label: mo.emoji + ' مومنتوم', value: mo.score + '/100 — ' + mo.label });
+          details.push({ label: '📅 این هفته', value: wpDet.done + ' از ' + wpDet.target + ' روز' + (wpDet.achieved ? ' ✅' : '') });
           details.push({ label: '🏃 رکورد ۱۴ روز', value: formatMin(stats14.runBest) });
 
           return {
@@ -6370,6 +6738,37 @@
           const action = todayRow
             ? '<button type="button" class="btn btn-primary btn-sm" data-app-action="edit-day" data-id="' + todayRow.id + '">✏️ ویرایش امروز</button>'
             : '<button type="button" class="btn btn-primary btn-sm" data-app-action="open-day">＋ ثبت امروز</button>';
+
+          // v6: flexible weekly progress replaces the all-or-nothing streak.
+          const heroMo = A.momentumTrend(state().rows, state().goals);
+          const wp = A.weekProgress(state().rows);
+          const dayLetters = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+          const dots = wp.days.map(function (d, i) {
+            let cls = 'wk-dot';
+            if (d.active) cls += ' done';
+            else if (d.future) cls += ' future';
+            else if (d.logged) cls += ' logged';
+            else cls += ' missed';
+            if (d.isToday) cls += ' today';
+            return '<span class="' + cls + '" title="' + escapeHTML(d.jdate) + '">' +
+              dayLetters[i] + '</span>';
+          }).join('');
+          const wkMsg = wp.achieved
+            ? 'هدف این هفته کامل شد 🎉'
+            : (wp.onTrack
+                ? wp.need + ' روز دیگه تا هدف — در مسیری'
+                : wp.remainingDays === 0
+                  ? 'این هفته تموم شد؛ هفته‌ی بعد از نو'
+                  : wp.need + ' روز مونده و ' + wp.remainingDays + ' روز فرصت');
+          const weekStrip =
+            '<div class="week-strip' + (wp.achieved ? ' achieved' : '') + '">' +
+              '<div class="week-strip-head">' +
+                '<span class="week-strip-title">📅 هفته: <b>' + wp.done + '</b> از <b>' + wp.target + '</b> روز' +
+                  (wp.auto ? ' <span class="wk-auto">خودکار</span>' : '') + '</span>' +
+                '<span class="week-strip-msg">' + escapeHTML(wkMsg) + '</span>' +
+              '</div>' +
+              '<div class="week-dots">' + dots + '</div>' +
+            '</div>';
           el.innerHTML =
             '<div class="today-hero-grid">' +
               '<div class="readiness-ring" style="--score:' + (rec.stale ? 0 : rec.readiness) + '">' +
@@ -6378,11 +6777,12 @@
               '<div><div class="today-hero-title">' + rec.mainEmoji + ' ' + escapeHTML(rec.mainText) + '</div>' +
               '<div class="today-hero-sub">امتیاز تخمینی است، نه تشخیص پزشکی. ثبت منظم، تحلیل را دقیق‌تر می‌کند.</div>' +
               '<div class="today-hero-meta">' +
+                '<span class="hero-chip">' + heroMo.emoji + ' مومنتوم: ' + heroMo.score + '</span>' +
                 '<span class="hero-chip">🧭 آخرین داده: ' + escapeHTML(fresh.label) + '</span>' +
                 '<span class="hero-chip">🎯 اطمینان: ' + rec.confidence + '%</span>' +
-                '<span class="hero-chip">🗓️ پوشش ۷ روز: ' + rows7.length + '/7</span>' +
               '</div></div>' +
             '</div>' +
+            weekStrip +
             '<div class="hero-actions">' + action +
               '<button type="button" class="btn btn-ghost btn-sm" data-tab="ai">🧠 تحلیل کامل</button>' +
             '</div>';
@@ -6393,10 +6793,15 @@
           renderTodayHero();
           const stats = computeStats(state().rows);
           stats.streak = currentStreak(state().rows);
+          const moKpi = A.momentumTrend(state().rows, state().goals);
+          const wpKpi = A.weekProgress(state().rows);
           const grid = document.getElementById('kpiGrid');
           if (grid) {
             grid.innerHTML =
-              '<div class="kpi"><div class="kpi-value" id="kpiStreak">0</div><div class="kpi-label">🔥 استریک</div><div class="kpi-sub">روز متوالی</div></div>' +
+              '<div class="kpi"><div class="kpi-value" id="kpiStreak">0</div><div class="kpi-label">' +
+                moKpi.emoji + ' مومنتوم</div><div class="kpi-sub">' +
+                escapeHTML(moKpi.label) + ' • هفته ' + wpKpi.done + '/' + wpKpi.target +
+              '</div></div>' +
               '<div class="kpi"><div class="kpi-value" id="kpiSleep">' +
               stats.avgSleepDisplay +
               '</div><div class="kpi-label">😴 میانگین خواب</div><div class="kpi-sub">ساعت:دقیقه</div></div>' +
@@ -6406,7 +6811,7 @@
               animateValue(
                 document.getElementById('kpiStreak'),
                 0,
-                stats.streak,
+                moKpi.score,
                 800,
                 false,
               );
@@ -6443,8 +6848,31 @@
             gs.value = state().goals ? state().goals.sleepGoalHours || 7 : 7;
           if (ga)
             ga.value = state().goals ? state().goals.activityGoalMin || 20 : 20;
+          syncWeeklyGoalUI();
           renderGoalProgress();
         }
+        // v6: keep the weekly-goal controls in sync with stored settings and
+        // explain what "auto" currently resolves to.
+        function syncWeeklyGoalUI() {
+          const g = state().goals || {};
+          const mode = g.weeklyTargetMode === 'manual' ? 'manual' : 'auto';
+          const modeEl = document.getElementById('goalWeeklyMode');
+          const daysEl = document.getElementById('goalWeeklyDays');
+          const wrapEl = document.getElementById('goalWeeklyDaysWrap');
+          const hintEl = document.getElementById('goalWeeklyHint');
+          const prefEl = document.getElementById('goalPreferredTime');
+          if (modeEl) modeEl.value = mode;
+          if (daysEl) daysEl.value = g.weeklyTargetDays || 3;
+          if (wrapEl) wrapEl.style.display = mode === 'manual' ? '' : 'none';
+          if (prefEl) prefEl.value = g.preferredTime || 'morning';
+          if (hintEl) {
+            hintEl.textContent = mode === 'manual'
+              ? 'هدف ثابت می‌ماند تا خودت تغییرش دهی.'
+              : 'الان روی ' + A.autoWeeklyTarget(state().rows) +
+                ' روز در هفته تنظیم شده — از میانگین چند هفته‌ی اخیرت.';
+          }
+        }
+
         // === PROGRAM GOAL EDITOR ===
         const GOAL_PRESETS = {
           1: 'هدف: تقویت اراده و ساخت روتین ورزشی روزانه (دویدن + پیاده‌روی) و خواب منظم. این روتین قراره پایه‌ای باشه برای اراده قوی‌تر در آینده — مخصوصاً برای درس خوندن ارشد. تمرکز اصلی: ثبات (Consistency) بیشتر از شدت (Intensity).',
@@ -7594,9 +8022,69 @@
           const active = document.querySelector('.chart-panel.active');
           if (!active) return;
           const key = active.id.replace('chartPanel-','');
-          setTimeout(function () { if (chartInstances[key] && chartInstances[key].resize) chartInstances[key].resize(); }, 80);
+          setTimeout(function () {
+            const inst = chartInstances[key];
+            if (!inst || !inst.resize) return;
+            // Chart.js caches the canvas box. Inside a rotated wrapper the cached
+            // value is the pre-rotation one, so we hand it explicit dimensions
+            // measured from the real container.
+            const canvas = active.querySelector('canvas');
+            const holder = canvas && canvas.parentElement;
+            if (canvas && holder) {
+              const r = holder.getBoundingClientRect();
+              const w = Math.round(r.width);
+              const h = Math.round(canvas.getBoundingClientRect().height) ||
+                Math.round(r.height);
+              if (w > 40 && h > 40) { try { inst.resize(w, h); return; } catch (e) {} }
+            }
+            try { inst.resize(); } catch (e) {}
+          }, 80);
         }
-        function setChartFocus(open) {
+        function isPortraitPhone() {
+          return window.matchMedia('(max-width: 820px)').matches &&
+            window.innerHeight > window.innerWidth;
+        }
+        async function lockLandscape() {
+          // Real landscape needs fullscreen first; orientation.lock only resolves
+          // while a fullscreen element is active, and it is unsupported on iOS.
+          // Some browsers resolve the promise without actually rotating, so we
+          // verify the viewport really became landscape before trusting it.
+          try {
+            if (screen.orientation && typeof screen.orientation.lock === 'function') {
+              await screen.orientation.lock('landscape');
+              await new Promise(function (r) { setTimeout(r, 220); });
+              return window.innerWidth > window.innerHeight;
+            }
+          } catch (e) { /* unsupported or rejected: fall back to CSS rotation */ }
+          return false;
+        }
+        function unlockOrientation() {
+          try {
+            if (screen.orientation && typeof screen.orientation.unlock === 'function') {
+              screen.orientation.unlock();
+            }
+          } catch (e) {}
+        }
+        // Move the view's children into (or out of) a rotatable wrapper. The
+        // fullscreen element itself cannot be transformed, so we rotate this.
+        function setRotor(view, on) {
+          const existing = view.querySelector(':scope > .chart-rotor');
+          if (on) {
+            if (existing) return existing;
+            const rotor = document.createElement('div');
+            rotor.className = 'chart-rotor';
+            while (view.firstChild) rotor.appendChild(view.firstChild);
+            view.appendChild(rotor);
+            return rotor;
+          }
+          if (existing) {
+            while (existing.firstChild) view.insertBefore(existing.firstChild, existing);
+            existing.remove();
+          }
+          return null;
+        }
+
+        async function setChartFocus(open) {
           chartFocusOpen = !!open;
           const view = document.getElementById('view-charts');
           const btn = document.getElementById('chartFocusBtn');
@@ -7605,9 +8093,36 @@
           document.body.classList.toggle('chart-focus-open', chartFocusOpen);
           btn.setAttribute('aria-expanded', String(chartFocusOpen));
           btn.textContent = chartFocusOpen ? '✕ بستن' : '⛶ نمایش بزرگ';
-          if (chartFocusOpen && view.requestFullscreen) view.requestFullscreen().catch(function(){});
-          if (!chartFocusOpen && document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function(){});
-          resizeActiveChart();
+
+          if (chartFocusOpen) {
+            const needRotate = isPortraitPhone();
+            let locked = false;
+            try {
+              if (view.requestFullscreen) await view.requestFullscreen({ navigationUI: 'hide' });
+              else if (view.webkitRequestFullscreen) view.webkitRequestFullscreen();
+            } catch (e) { /* user gesture lost or unsupported */ }
+            if (needRotate) locked = await lockLandscape();
+            // If the device refused to rotate, rotate the content ourselves so the
+            // chart still fills the long edge of the screen.
+            const useRotor = needRotate && !locked;
+            view.classList.toggle('chart-force-rotate', useRotor);
+            document.body.classList.toggle('chart-rotated', useRotor);
+            setRotor(view, useRotor);
+            if (!locked && needRotate) {
+              toast('گوشی را افقی بگیر یا همین‌طور بچرخان', 'default', 2600);
+            }
+          } else {
+            setRotor(view, false);
+            view.classList.remove('chart-force-rotate');
+            document.body.classList.remove('chart-rotated');
+            unlockOrientation();
+            try {
+              if (document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
+              else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+            } catch (e) {}
+          }
+          setTimeout(resizeActiveChart, 60);
+          setTimeout(resizeActiveChart, 320);
         }
         function downloadActiveChart() {
           const panel = document.querySelector('.chart-panel.active');
@@ -8390,14 +8905,22 @@
           }, 50);
         };
         A.setChartFocus = setChartFocus;
+        A.resizeActiveChart = resizeActiveChart;
+        A.setChartRotor = setRotor;
         A.downloadActiveChart = downloadActiveChart;
         A.setChartRange = function (value) { chartRangeValue=value; safeStorage.setItem('sport_chart_range_v1',value); renderAllCharts(); };
         A.getChartRange = function () { return chartRangeValue; };
         A.renderGoalProgress = renderGoalProgress;
+        A.syncWeeklyGoalUI = syncWeeklyGoalUI;
         A.checkBackupReminder = checkBackupReminder;
         A.generateInsights = generateInsights;
         A.analyzePatterns = analyzePatterns;
         A.generateRecommendation = generateRecommendation;
+        A.pearsonCorrelation = pearsonCorrelation;
+        A.preferredWindow = preferredWindow;
+        A.bestObservedWindow = bestObservedWindow;
+        A.weekdayStrength = weekdayStrength;
+        A.TIME_WINDOWS = TIME_WINDOWS;
         A.generateTrends = generateTrends;
         A.generateTips = generateTips;
       })();
@@ -8503,6 +9026,13 @@
         const DEFAULT_DATA = A.DEFAULT_DATA;
         const RatingSlider = A.RatingSlider;
         const escapeHTML = A.escapeHTML;
+        // v6: analysis helpers live in the render script; the AI export needs them.
+        const pearsonCorrelation = A.pearsonCorrelation;
+        const preferredWindow = A.preferredWindow;
+        const bestObservedWindow = A.bestObservedWindow;
+        const weekdayStrength = A.weekdayStrength;
+        const analyzePatterns = A.analyzePatterns;
+        const TIME_WINDOWS = A.TIME_WINDOWS;
 
         function state() {
           return A.state();
@@ -8722,6 +9252,7 @@
               longestRun: Number(document.getElementById('mdLongest').value) || 0,
               activity: document.getElementById('mdActivity').value,
               note: document.getElementById('mdNote').value,
+              trainHour: (document.getElementById('mdTrainHour') || {}).value || '',
               officialWake: document.getElementById('mdOfficialWake').value,
               sleepBlocks: deepClone(sleepBlocksData),
             };
@@ -8756,6 +9287,7 @@
           loadMmssField('mdLongestMm', 'mdLongestSs', 'mdLongest', Number(draft.longestRun) || 0);
           document.getElementById('mdActivity').value = String(draft.activity || '').slice(0, 500);
           document.getElementById('mdNote').value = String(draft.note || '').slice(0, 5000);
+          setTrainHourValue(draft.trainHour === '' || draft.trainHour == null ? null : draft.trainHour);
           document.getElementById('mdOfficialWake').value = draft.officialWake || '';
           renderSleepBlocks(Array.isArray(draft.sleepBlocks) ? draft.sleepBlocks : []);
           currentStep = Math.max(0, Math.min(TOTAL_STEPS - 1, Number(draft.currentStep) || 0));
@@ -8770,6 +9302,30 @@
         const TOTAL_STEPS = 5;
         let sleepBlocksData = [];
 
+        // v6: training-hour picker. Options are built once, lazily.
+        function ensureTrainHourOptions() {
+          const el = document.getElementById('mdTrainHour');
+          if (!el || el.dataset.filled === '1') return el;
+          const frag = document.createDocumentFragment();
+          for (let h = 0; h < 24; h++) {
+            const o = document.createElement('option');
+            o.value = String(h);
+            const band = h >= 5 && h < 11 ? '🌅' : h >= 11 && h < 15 ? '🌞'
+              : h >= 15 && h < 20 ? '🌤️' : h >= 20 && h < 24 ? '🌙' : '🌃';
+            o.textContent = band + ' ' + String(h).padStart(2, '0') + ':00';
+            frag.appendChild(o);
+          }
+          el.appendChild(frag);
+          el.dataset.filled = '1';
+          return el;
+        }
+        function setTrainHourValue(v) {
+          const el = ensureTrainHourOptions();
+          if (!el) return;
+          el.value = Number.isFinite(Number(v)) && v !== null && v !== ''
+            ? String(Math.floor(Number(v))) : '';
+        }
+
         function openDayModal(id) {
           editingDayId = id || null;
           currentStep = 0;
@@ -8777,6 +9333,7 @@
           const modal = document.getElementById('modalDay');
           if (!modal) return;
           RatingSlider.init();
+          ensureTrainHourOptions();
           if (id) {
             const row = state().rows.find(function (r) {
               return r.id === id;
@@ -8825,6 +9382,7 @@
             );
             document.getElementById('mdActivity').value = row.activity || '';
             document.getElementById('mdNote').value = row.note || '';
+            setTrainHourValue(row.trainHour);
             document.getElementById('mdOfficialWake').value =
               row.officialWake || '';
             renderSleepBlocks(
@@ -8845,6 +9403,7 @@
             loadMmssField('mdLongestMm', 'mdLongestSs', 'mdLongest', 0);
             document.getElementById('mdActivity').value = '';
             document.getElementById('mdNote').value = '';
+            setTrainHourValue(null);
             document.getElementById('mdOfficialWake').value = '07:00';
             renderSleepBlocks([
               { label: 'خواب شب', start: '00:30', end: '07:00' },
@@ -9035,6 +9594,11 @@
             longestRun: longestValue,
             activity: document.getElementById('mdActivity').value.trim(),
             note: document.getElementById('mdNote').value.trim(),
+            trainHour: (function () {
+              const el = document.getElementById('mdTrainHour');
+              const v = el ? el.value : '';
+              return v === '' ? null : Number(v);
+            })(),
             sleepBlocks: valid,
             officialWake:
               document.getElementById('mdOfficialWake').value || null,
@@ -9325,122 +9889,182 @@
           return rows;
         }
 
-        function exportAI(rows, opts) {
-          if (!rows.length) return 'داده‌ای نیست';
+        // ===== v6 AI EXPORT =====
+        // Goals: (1) far fewer tokens, (2) the model must remember the user's
+        // program across chats, (3) give the model computed facts instead of raw
+        // rows so it spends its budget on reasoning rather than arithmetic.
+        function compactNum(n) {
+          const v = Math.round(Number(n) * 10) / 10;
+          return Number.isFinite(v) ? String(v) : '0';
+        }
+
+        function buildAIProfile() {
+          const st = state();
+          const g = st.goals || {};
+          const mo = A.momentumTrend(st.rows, g);
+          const wp = A.weekProgress(st.rows);
+          const wh = A.weeksHittingTarget(8);
+          const win = preferredWindow();
+          const observed = bestObservedWindow();
+          const wd = weekdayStrength();
+          const best = wd.length ? wd[0] : null;
+          const worst = wd.length > 1 ? wd[wd.length - 1] : null;
+
+          const lines = [];
+          lines.push('## پروفایل ثابت (این را به خاطر بسپار)');
+          lines.push('- برنامه/هدف: ' + (st.programGoal || 'ثبت منظم ورزش، خواب و انرژی'));
+          lines.push('- زمان تمرین: ' + win.label + ' (' + win.from + '–' + win.to + ')' +
+            (observed && observed.key !== g.preferredTime
+              ? ' | داده می‌گوید ' + TIME_WINDOWS[observed.key].label + ' بهتر جواب داده'
+              : ''));
+          lines.push('- ظرفیت واقعی: ' + wp.target + ' روز در هفته' +
+            (wp.auto ? ' (خودکار از روند)' : ' (دستی)'));
+          lines.push('- هدف خواب: ' + (g.sleepGoalHours || 7) + 'h | هدف فعالیت: ' +
+            (g.activityGoalMin || 20) + 'min');
+          if (best && best.n >= 2) {
+            lines.push('- قوی‌ترین روز: ' + best.wd + ' (' + Math.round(best.rate * 100) + '%)' +
+              (worst && worst.wd !== best.wd
+                ? ' | ضعیف‌ترین: ' + worst.wd + ' (' + Math.round(worst.rate * 100) + '%)' : ''));
+          }
+          lines.push('');
+          lines.push('## وضعیت فعلی');
+          lines.push('- مومنتوم: ' + mo.score + '/100 (' + mo.label +
+            ', هفته‌ی قبل ' + mo.prev + ')');
+          lines.push('- این هفته: ' + wp.done + '/' + wp.target + ' روز' +
+            (wp.achieved ? ' ✅' : ' | ' + wp.need + ' مانده، ' + wp.remainingDays + ' روز فرصت'));
+          if (wh.total >= 2) {
+            lines.push('- پایداری: ' + wh.hit + ' از ' + wh.total + ' هفته‌ی کامل اخیر به هدف رسیده');
+          }
+          return lines.join('\n');
+        }
+
+        function buildAIFacts(rows) {
           const s = computeStats(rows);
           const st = state();
-          let t = '';
-          if (opts.incGoal) {
-            t +=
-              '# 🎯 هدف برنامه\n' +
-              (st.programGoal || 'ثبت روزانه ورزش، خواب و انرژی') +
-              '\n\n';
+          const g = st.goals || {};
+          const days = rows.length;
+          const active = s.completedCount;
+
+          // Sleep -> next-day energy correlation, computed here so the model does
+          // not have to (and cannot get it wrong).
+          const sorted = rows.slice().sort(function (a, b) { return Jalali.cmp(a.jdate, b.jdate); });
+          const pairs = [];
+          for (let i = 0; i < sorted.length - 1; i++) {
+            if (Jalali.diffDays(sorted[i + 1].jdate, sorted[i].jdate) !== 1) continue;
+            const sh = sleepInfo(sorted[i].sleepBlocks).totalH;
+            const ne = Number(sorted[i + 1].energy);
+            if (sh > 0 && Number.isFinite(ne)) pairs.push([sh, ne]);
           }
-          t +=
-            '# 📊 گزارش (' +
-            rows[0].jdate +
-            ' تا ' +
-            rows[rows.length - 1].jdate +
-            ' — ' +
-            rows.length +
-            ' روز)\n\n';
-          if (opts.incStats) {
-            t += '## آمار کلی\n';
-            t += '- میانگین خواب: ' + s.avgSleepDisplay + '\n';
-            t += '- میانگین انرژی: ' + s.avgEnergy + '/10\n';
-            t += '- میانگین حال: ' + s.avgMood + '/10\n';
-            t += '- مجموع دویدن: ' + formatMin(s.totalRun) + '\n';
-            t += '- مجموع پیاده‌روی: ' + formatMin(s.totalWalk) + '\n';
-            t += '- رکورد دویدن پیوسته: ' + formatMin(s.runBest) + '\n';
-            t +=
-              '- روزهای فعال: ' +
-              s.completedCount +
-              '/' +
-              s.totalDays +
-              ' (' +
-              Math.round((s.completedCount / s.totalDays) * 100) +
-              '%)\n';
-            t += '- استریک فعلی: ' + s.streak + ' روز\n\n';
+          let corrLine = '';
+          if (pairs.length >= 5) {
+            const xs = pairs.map(function (p) { return p[0]; });
+            const ys = pairs.map(function (p) { return p[1]; });
+            // A flat series has no variance, so Pearson is undefined rather than 0.
+            const varies = function (arr) {
+              return arr.some(function (v) { return Math.abs(v - arr[0]) > 1e-9; });
+            };
+            if (varies(xs) && varies(ys)) {
+              const c = pearsonCorrelation(xs, ys);
+              corrLine = '- همبستگی خواب←انرژی فردا: r=' + c.toFixed(2) + ' (n=' + pairs.length + ')';
+            } else {
+              corrLine = '- همبستگی خواب←انرژی: قابل محاسبه نیست (تغییرات ناکافی)';
+            }
           }
-          if (opts.incDays) {
-            t += '## روزها\n';
-            rows.forEach(function (r) {
-              const si = sleepInfo(r.sleepBlocks);
-              let l =
-                r.jdate +
-                ' ' +
-                Jalali.weekdayName(r.jdate) +
-                ' | ' +
-                (r.completed ? '✅' : '❌') +
-                ' | E' +
-                r.energy +
-                ' M' +
-                r.mood +
-                ' R' +
-                formatMin(r.runMin) +
-                ' W' +
-                formatMin(r.walkMin) +
-                ' S' +
-                si.totalDisplay;
-              const act = (r.activity || '').slice(0, 80).replace(/\n/g, ' ');
-              if (act) l += '\n  فعالیت: ' + act;
-              if (opts.notes !== 'no' && r.note) {
-                const n = r.note
-                  .slice(0, opts.notes === 'short' ? 100 : 9999)
-                  .replace(/\n/g, ' ');
-                l += '\n  یادداشت: ' + n;
-              }
-              t += l + '\n';
+
+          const lines = [];
+          lines.push('## آمار بازه (' + rows[0].jdate + ' تا ' + rows[days - 1].jdate +
+            '، ' + days + ' روز)');
+          lines.push('- فعال: ' + active + '/' + days +
+            ' (' + Math.round((active / Math.max(1, days)) * 100) + '%)');
+          lines.push('- خواب: میانگین ' + s.avgSleepDisplay + ' | هدف ' + (g.sleepGoalHours || 7) + 'h' +
+            ' | شب‌های ثبت‌شده ' + s.sleepDays);
+          lines.push('- انرژی ' + compactNum(s.avgEnergy) + '/10 | حال ' + compactNum(s.avgMood) + '/10');
+          lines.push('- دویدن کل ' + formatMin(s.totalRun) + ' | پیاده‌روی کل ' + formatMin(s.totalWalk) +
+            ' | رکورد پیوسته ' + formatMin(s.runBest));
+          if (corrLine) lines.push(corrLine);
+          return lines.join('\n');
+        }
+
+        // Dense one-line-per-day table. Roughly 60% fewer tokens than the old
+        // multi-line format while staying human-readable.
+        // Unambiguous single-letter weekday codes (Persian week: Sat..Fri).
+        const AI_DAY_CODES = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+
+        function buildAIDays(rows, opts) {
+          const lines = [];
+          lines.push('## روزها');
+          lines.push('قالب: `تاریخ|روز|فعال|انرژی|حال|دویدن|پیاده‌روی|خواب|ساعت‌تمرین`' +
+            ' — روز: ش=شنبه ی=یکشنبه د=دوشنبه س=سه‌شنبه چ=چهارشنبه پ=پنجشنبه ج=جمعه');
+          rows.forEach(function (r) {
+            const si = sleepInfo(r.sleepBlocks);
+            const th = r.trainHour;
+            const cells = [
+              r.jdate.slice(5),
+              AI_DAY_CODES[Jalali.weekday(r.jdate)] || '?',
+              r.completed ? '✓' : '·',
+              String(r.energy),
+              String(r.mood),
+              formatMin(r.runMin),
+              formatMin(r.walkMin),
+              si.totalH > 0 ? si.totalDisplay : '—',
+              th !== null && th !== undefined && Number.isFinite(Number(th))
+                ? String(th) + 'h' : '—',
+            ];
+            let line = cells.join('|');
+            const extra = [];
+            const act = (r.activity || '').replace(/\s+/g, ' ').trim();
+            if (act) extra.push(act.slice(0, 60));
+            if (opts.notes !== 'no' && r.note) {
+              const n = r.note.replace(/\s+/g, ' ').trim();
+              if (n) extra.push('یادداشت: ' + n.slice(0, opts.notes === 'short' ? 70 : 400));
+            }
+            if (extra.length) line += ' — ' + extra.join(' / ');
+            lines.push(line);
+          });
+          return lines.join('\n');
+        }
+
+        function exportAI(rows, opts) {
+          if (!rows.length) return 'داده‌ای نیست';
+          const st = state();
+          const parts = [];
+
+          parts.push('# گزارش ورزش و خواب — Sport Report');
+          parts.push(
+            'تو مربی شخصی من هستی. داده‌های زیر واقعی و از اپ من است.\n' +
+            'قواعد: ۱) پروفایل ثابت را در کل گفتگو به خاطر بسپار و در هر پاسخ رعایت کن. ' +
+            '۲) خارج از بازه‌ی تمرین من برنامه نده. ' +
+            '۳) ظرفیت هفتگی‌ام را جدی بگیر؛ برنامه‌ی غیرقابل‌اجرا نده. ' +
+            '۴) کوتاه، مشخص و قابل‌اجرا بنویس؛ کلی‌گویی نکن.');
+          parts.push(buildAIProfile());
+          if (opts.incStats) parts.push(buildAIFacts(rows));
+          if (opts.incDays) parts.push(buildAIDays(rows, opts));
+
+          if (opts.incFutsal && st.futsal && st.futsal.length) {
+            const fl = ['## فوتسال (' + st.futsal.length + ' جلسه)'];
+            st.futsal.slice(-10).forEach(function (f) {
+              fl.push('- ' + f.jdate + ': ' + f.durationActual + '′ شدت ' + f.intensity +
+                '/10 | انرژی ' + f.energyBefore + '→' + f.energyAfter);
             });
-            t += '\n';
+            parts.push(fl.join('\n'));
           }
-          if (opts.incFutsal && st.futsal.length) {
-            t += '## ⚽ فوتسال (' + st.futsal.length + ' جلسه)\n';
-            st.futsal.forEach(function (f) {
-              t +=
-                '- ' +
-                f.jdate +
-                ': مدت ' +
-                f.durationActual +
-                '′ | شدت ' +
-                f.intensity +
-                '/10\n';
-              t +=
-                '  انرژی: ' +
-                f.energyBefore +
-                ' → ' +
-                f.energyAfter +
-                ' | خستگی: ' +
-                f.fatigueBefore +
-                ' → ' +
-                f.fatigueAfter +
-                '\n';
-              if (f.comparedToExpected) t += '  ' + f.comparedToExpected + '\n';
-            });
-            t += '\n';
-          }
+
           if (opts.incPatterns) {
-            const patterns = A.analyzePatterns();
-            if (patterns.length) {
-              t += '## 🔬 الگوها\n';
-              patterns.forEach(function (p) {
-                t += '- ' + p.text + '\n';
-              });
-              t += '\n';
+            const pats = analyzePatterns();
+            if (pats.length) {
+              parts.push('## الگوهای شناسایی‌شده\n' +
+                pats.slice(0, 6).map(function (p) { return '- ' + p.text; }).join('\n'));
             }
           }
-          if (opts.incTips) {
-            const tips = A.generateTips();
-            if (tips.length) {
-              t += '## 💡 پیشنهادات فعلی\n';
-              tips.forEach(function (tp) {
-                t += '- ' + tp.text + '\n';
-              });
-              t += '\n';
-            }
-          }
-          t += '\n---\nلطفاً تحلیل جامع + برنامه ۷ روز آینده بده\n';
-          return t;
+
+          parts.push(
+            '## از تو می‌خواهم\n' +
+            '۱. سه نکته‌ی مهم که در داده می‌بینی (با عدد).\n' +
+            '۲. برنامه‌ی هفته‌ی آینده، دقیقاً برای ظرفیت و بازه‌ی زمانی بالا.\n' +
+            '۳. یک چیز مشخص که این هفته اصلاح کنم.\n' +
+            'اگر داده کم است، صادقانه بگو و حدس نزن.');
+
+          return parts.join('\n\n');
         }
 
         function exportMD(rows, opts) {
@@ -9712,6 +10336,7 @@
         const LOCAL_PRE_MIGRATION_FILE = 'sport-local-before-v56-' + cloudDeviceId + '.json';
         let cloudSyncTimer = null;
         let cloudSyncPendingTimer = null;
+        let cloudRetryTimer = null;
         let cloudSyncInFlight = null;
         let cloudSyncQueued = false;
         let cloudSyncQueuedReason = '';
@@ -9806,13 +10431,47 @@
             (!cloudConfig.rateReset || Date.now() < cloudConfig.rateReset);
         }
 
+        // v6: mobile radios often stall a request for many seconds after the screen
+        // wakes. A short timeout aborted the fetch and surfaced the browser's raw
+        // "signal is aborted without reason" text. We now use a longer budget, tag
+        // the abort with a readable reason, and translate it for the user.
+        function isTransientNetworkError(e) {
+          if (!e) return false;
+          const name = e.name || '';
+          const msg = String(e.message || e);
+          return name === 'AbortError' || name === 'TimeoutError' || e.__timeout === true ||
+            /aborted|timed? ?out|network|failed to fetch|load failed|connection/i.test(msg);
+        }
+        function describeSyncError(e) {
+          if (!e) return 'خطای نامعلوم';
+          if (e.__timeout === true || e.name === 'AbortError' || e.name === 'TimeoutError') {
+            return 'شبکه کند بود و درخواست به نتیجه نرسید';
+          }
+          const msg = String(e.message || e);
+          if (/failed to fetch|load failed|networkerror/i.test(msg)) return 'اتصال به GitHub برقرار نشد';
+          if (/aborted/i.test(msg)) return 'شبکه کند بود و درخواست به نتیجه نرسید';
+          return msg;
+        }
         async function fetchWithTimeout(url, options, timeoutMs) {
           const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
-          const timer = controller ? setTimeout(function () { controller.abort(); }, timeoutMs || 20000) : null;
+          let timedOut = false;
+          const budget = timeoutMs || 45000;
+          const timer = controller ? setTimeout(function () {
+            timedOut = true;
+            try { controller.abort(new DOMException('sync timeout', 'TimeoutError')); }
+            catch (e) { controller.abort(); }
+          }, budget) : null;
           try {
             options = Object.assign({ cache: 'no-store' }, options || {});
             if (controller) options.signal = controller.signal;
             return await fetch(url, options);
+          } catch (e) {
+            if (timedOut) {
+              const err = new Error('شبکه کند بود و درخواست به نتیجه نرسید');
+              err.__timeout = true;
+              throw err;
+            }
+            throw e;
           } finally { if (timer) clearTimeout(timer); }
         }
         function gistUrl() {
@@ -9828,7 +10487,7 @@
           return 'GitHub HTTP ' + res.status + (detail ? ': ' + detail : '');
         }
         async function fetchGistDocument() {
-          const res = await fetchWithTimeout(gistUrl() + '?_t=' + Date.now(), { headers: cloudHeaders() }, 20000);
+          const res = await fetchWithTimeout(gistUrl() + '?_t=' + Date.now(), { headers: cloudHeaders() }, 45000);
           captureRateInfo(res);
           if (!res.ok) throw new Error(await parseGithubError(res));
           return await res.json();
@@ -9837,7 +10496,7 @@
           let content = file && file.content;
           if (file && file.truncated && file.raw_url) {
             const separator = file.raw_url.indexOf('?') === -1 ? '?' : '&';
-            const rawRes = await fetchWithTimeout(file.raw_url + separator + '_t=' + Date.now(), { headers: cloudHeaders() }, 20000);
+            const rawRes = await fetchWithTimeout(file.raw_url + separator + '_t=' + Date.now(), { headers: cloudHeaders() }, 45000);
             if (!rawRes.ok) throw new Error('دانلود فایل کامل Gist ناموفق بود');
             content = await rawRes.text();
           }
@@ -9856,7 +10515,7 @@
             method: 'PATCH',
             headers: Object.assign({ 'Content-Type': 'application/json' }, cloudHeaders()),
             body: JSON.stringify({ files: files }),
-          }, 30000);
+          }, 60000);
           captureRateInfo(res);
           if (!res.ok) throw new Error(await parseGithubError(res));
           return await res.json();
@@ -9899,7 +10558,7 @@
           }).sort();
           const snapshot = {
             format: 'sport-report-gist-snapshot-v1',
-            appVersion: '5.6',
+            appVersion: '6.0',
             createdAt: new Date().toISOString(),
             reason: mode === 'all' ? 'automatic-before-v56-first-write' : 'manual-snapshot',
             files: {},
@@ -9990,7 +10649,8 @@
           const started = Date.now();
           const requestsBefore = cloudRequestCounter;
           let lastError = null;
-          for (let attempt = 1; attempt <= 3; attempt++) {
+          const MAX_ATTEMPTS = 4; // v6: mobile networks need a little more patience
+          for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
             try {
               if (cloudConfig.migrationVersion !== 56) await ensureMigrationBackups();
               const remote = preferRemoteLegacy(await fetchRemoteState());
@@ -10039,15 +10699,42 @@
               return true;
             } catch (e) {
               lastError = e;
-              console.warn('cloud sync attempt ' + attempt + '/3:', e);
-              if (attempt < 3) await new Promise(function (resolve) { setTimeout(resolve, attempt * 1500); });
+              console.warn('cloud sync attempt ' + attempt + '/' + MAX_ATTEMPTS + ':', e);
+              // Auth/permission problems will never fix themselves: stop early.
+              const fatal = /Token نامعتبر|دسترسی رد شد|Gist پیدا نشد|Gist ID نامعتبر/.test(String(e && e.message));
+              if (fatal) break;
+              if (attempt < MAX_ATTEMPTS) {
+                // Longer backoff for flaky-network errors than for logic errors.
+                const base = isTransientNetworkError(e) ? 2500 : 1500;
+                await new Promise(function (resolve) { setTimeout(resolve, attempt * base); });
+              }
             }
           }
-          cloudConfig.lastError = lastError ? (lastError.message || String(lastError)) : 'خطای نامعلوم';
+          // A silent background sync that only hit a network hiccup should not
+          // scare the user or drop the pending flag: it will retry on its own.
+          if (silent && isTransientNetworkError(lastError)) {
+            cloudPendingLocalChange = true;
+            cloudConfig.lastError = describeSyncError(lastError);
+            cloudConfig.lastSyncRequests = cloudRequestCounter - requestsBefore;
+            cloudConfig.lastSyncReason = reason;
+            cloudConfig.lastSyncDuration = Date.now() - started;
+            saveCloudConfig();
+            const tEl = document.getElementById('cloudStatusText');
+            setCloudVisual('syncing', '☁️ ↻');
+            if (tEl) tEl.textContent = 'شبکه کند بود؛ تلاش دوباره به‌زودی';
+            if (cloudRetryTimer) clearTimeout(cloudRetryTimer);
+            cloudRetryTimer = setTimeout(function () {
+              cloudRetryTimer = null;
+              if (cloudPendingLocalChange) cloudUpload(true, 'retry-after-network');
+            }, 30000);
+            return false;
+          }
+          cloudConfig.lastError = describeSyncError(lastError);
           cloudConfig.lastSyncRequests = cloudRequestCounter - requestsBefore;
           cloudConfig.lastSyncReason = reason;
           cloudConfig.lastSyncDuration = Date.now() - started;
           saveCloudConfig();
+          updateCloudStatus();
           if (!silent) toast('Sync متوقف شد: ' + cloudConfig.lastError, 'error', 7000);
           return false;
         }
@@ -10091,10 +10778,36 @@
             cloudUpload(true, reason);
           }, delay);
         }
+        function cloudReady() {
+          return !!(cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token);
+        }
+        let cloudRecoveryBound = false;
+        function bindCloudRecovery() {
+          // v6: a failed background sync must heal itself. Whenever the network
+          // returns or the user comes back to the tab, flush any pending change.
+          if (cloudRecoveryBound) return;
+          cloudRecoveryBound = true;
+          window.addEventListener('online', function () {
+            if (!cloudReady()) return;
+            const tEl = document.getElementById('cloudStatusText');
+            if (tEl && cloudPendingLocalChange) tEl.textContent = 'اینترنت وصل شد؛ در حال Sync…';
+            setTimeout(function () { cloudUpload(true, 'network-back'); }, 800);
+          });
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState !== 'visible' || !cloudReady()) return;
+            const stale = Date.now() - (cloudConfig.lastSync || 0) > 5 * 60 * 1000;
+            if (cloudPendingLocalChange || stale) {
+              setTimeout(function () {
+                cloudUpload(true, cloudPendingLocalChange ? 'resume-pending' : 'resume-refresh');
+              }, 500);
+            }
+          });
+        }
         function startAutoSync() {
           if (cloudSyncTimer) clearInterval(cloudSyncTimer);
           cloudSyncTimer = null;
-          if (cloudConfig.autoSync && cloudConfig.gistId && cloudConfig.token) {
+          bindCloudRecovery();
+          if (cloudReady()) {
             setTimeout(function () { cloudUpload(true, 'startup'); }, 1000);
             // No-change sync normally performs one GET. 15 minutes protects quota and still receives other-device changes.
             cloudSyncTimer = setInterval(function () { cloudUpload(true, 'periodic-15m'); }, 15 * 60 * 1000);
@@ -10122,7 +10835,7 @@
               'روزهای ابری: ' + remote.rows.length + '\n' +
               'فوتسال: ' + remote.futsal.length + '\n' +
               'فایل دستگاه‌ها: ' + shards + '\n' +
-              'بکاپ محافظ v5.6: ' + (backup ? 'موجود ✅' : 'هنوز ساخته نشده ⚠️') + '\n' +
+              'بکاپ محافظ: ' + (backup ? 'موجود ✅' : 'هنوز ساخته نشده ⚠️') + '\n' +
               'روزهای محلی: ' + state().rows.length,
               false
             );
@@ -10231,6 +10944,9 @@
 
         window.cloudUpload = cloudUpload;
         window.cloudDownload = cloudDownload;
+        A.exportAI = exportAI;
+        A.describeSyncError = describeSyncError;
+        A.isTransientNetworkError = isTransientNetworkError;
         A.cloudUpload = cloudUpload;
         A.cloudDownload = cloudDownload;
         A.scheduleCloudSync = scheduleCloudSync;
@@ -10338,7 +11054,7 @@
             ' خط)\n';
           msg += '- **زبان:** فارسی (RTL)\n';
           msg += '- **تقویم:** جلالی (jalaali-js از CDN)\n';
-          msg += '- **نمودار:** Chart.js 4.4.7 از CDN\n';
+          msg += '- **نمودار:** Chart.js 4.4.7 (داخل فایل)\n';
           msg += '- **فونت:** Vazirmatn (اصلی) + Sahel + Samim\n';
           msg += '- **Cloud Sync:** GitHub Gist API\n';
           msg += '- **Login:** SHA-256 hash + salt (localStorage)\n';
@@ -10777,7 +11493,7 @@
             lines.push((hasCanonical ? '✅' : '⚠️') + ' فایل اصلی sport-data.json: ' + (hasCanonical ? 'موجود' : 'پیدا نشد'));
             lines.push('ℹ️ رکورد ابری: ' + remote.rows.length + ' روز • ' + remote.futsal.length + ' فوتسال');
             lines.push('ℹ️ فایل دستگاه‌ها: ' + shards.length);
-            lines.push((hasBackup ? '✅' : '⚠️') + ' بکاپ محافظ v5.6: ' + (hasBackup ? 'موجود' : 'هنوز ساخته نشده'));
+            lines.push((hasBackup ? '✅' : '⚠️') + ' بکاپ محافظ: ' + (hasBackup ? 'موجود' : 'هنوز ساخته نشده'));
             lines.push((localHasUnpushedChanges || cloudPendingLocalChange ? '⏳' : '✅') + ' وضعیت محلی: ' +
               (localHasUnpushedChanges || cloudPendingLocalChange ? 'تغییر در انتظار Sync' : 'با نسخه ابری سازگار'));
             if (cloudConfig.lastWriteAt) {
@@ -10826,7 +11542,7 @@
 
           // === VERSION ===
           results.push('<b style="color:#a78bfa;font-size:1rem">📦 نسخه</b>');
-          results.push(info + ' Version: v5.6 One-File');
+          results.push(info + ' Version: v6.0 One-File');
           results.push(
             info + ' تاریخ چک: ' + new Date().toLocaleString('fa-IR'),
           );
@@ -11599,6 +12315,21 @@
               A.renderLog(this.value);
             });
 
+          const goalWeeklyMode = document.getElementById('goalWeeklyMode');
+          if (goalWeeklyMode)
+            goalWeeklyMode.addEventListener('change', function () {
+              const wrap = document.getElementById('goalWeeklyDaysWrap');
+              const hint = document.getElementById('goalWeeklyHint');
+              const manual = this.value === 'manual';
+              if (wrap) wrap.style.display = manual ? '' : 'none';
+              if (hint) {
+                hint.textContent = manual
+                  ? 'هدف ثابت می‌ماند تا خودت تغییرش دهی.'
+                  : 'الان روی ' + A.autoWeeklyTarget(A.state().rows) +
+                    ' روز در هفته تنظیم شده — از میانگین چند هفته‌ی اخیرت.';
+              }
+            });
+
           const saveGoalsBtn = document.getElementById('saveGoals');
           if (saveGoalsBtn)
             saveGoalsBtn.addEventListener('click', function () {
@@ -11607,9 +12338,18 @@
                 parseFloat(document.getElementById('goalSleep').value) || 7;
               s.goals.activityGoalMin =
                 parseInt(document.getElementById('goalActivity').value) || 20;
+              const wmEl = document.getElementById('goalWeeklyMode');
+              const wdEl = document.getElementById('goalWeeklyDays');
+              const ptEl = document.getElementById('goalPreferredTime');
+              if (wmEl) s.goals.weeklyTargetMode = wmEl.value === 'manual' ? 'manual' : 'auto';
+              if (wdEl) s.goals.weeklyTargetDays =
+                Math.max(1, Math.min(7, parseInt(wdEl.value) || 3));
+              if (ptEl) s.goals.preferredTime = ptEl.value || 'morning';
               s._sync.fields.goals = A.nextRevision();
               if (!save()) { toast('ذخیره دائمی ناموفق بود', 'error', 5000); return; }
               A.renderGoalProgress();
+              A.syncWeeklyGoalUI();
+              A.renderDashboard();
               toast('🎯 ذخیره شد', 'success');
               if (
                 cloudConfig.autoSync &&
@@ -11792,6 +12532,33 @@
             const view = document.getElementById('view-charts');
             if (view && view.classList.contains('chart-focus-mode') && !document.fullscreenElement) A.setChartFocus(false);
           });
+          document.addEventListener('webkitfullscreenchange', function () {
+            const view = document.getElementById('view-charts');
+            if (view && view.classList.contains('chart-focus-mode') && !document.webkitFullscreenElement) A.setChartFocus(false);
+          });
+          // v6: keep the canvas crisp when the phone physically rotates, and let
+          // the hardware/back key or ESC leave focus mode cleanly.
+          let chartResizeTimer = null;
+          function refreshFocusedChart() {
+            const view = document.getElementById('view-charts');
+            if (!view || !view.classList.contains('chart-focus-mode')) return;
+            if (window.matchMedia('(orientation: landscape)').matches &&
+                view.classList.contains('chart-force-rotate')) {
+              // The user physically rotated the phone: drop the CSS fallback.
+              if (A.setChartRotor) A.setChartRotor(view, false);
+              view.classList.remove('chart-force-rotate');
+              document.body.classList.remove('chart-rotated');
+            }
+            if (chartResizeTimer) clearTimeout(chartResizeTimer);
+            chartResizeTimer = setTimeout(function () { A.resizeActiveChart(); }, 180);
+          }
+          window.addEventListener('orientationchange', refreshFocusedChart);
+          window.addEventListener('resize', refreshFocusedChart);
+          document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            const view = document.getElementById('view-charts');
+            if (view && view.classList.contains('chart-focus-mode')) A.setChartFocus(false);
+          });
 
           // Charts tabs
           document.addEventListener('click', function (e) {
@@ -11946,7 +12713,7 @@
               }
             });
             console.log(
-              '🏃 Sport Report v5.6 Sync & Chart Vault Ready:',
+              '🏃 Sport Report v6.0 Momentum & Coach Ready:',
               state().rows.length,
               'rows',
             );
@@ -11968,7 +12735,7 @@
         }
       })();
     </script>
-  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a23dc8d409411f00',t:'MTc4NTUxMzI5Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24461ae0d6c7f0d',t:'MTc4NTU4MjQ3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 <!-- ============================================================ -->
 <!-- ██████ PART 5/5 - JS FINAL - END ██████ -->
