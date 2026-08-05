@@ -16,7 +16,7 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-/HjADRCdm1sKuZSNdXosU+d2mh3L1HhU/p/fqH3wrbQ=' 'sha256-wtx/wwXpJf8TN+ZflOpRJJZT5/NmYuHgzQvHpojY+gU=' 'sha256-JzEcvGZCyCLDfAUMuL5I/ejtfuI96hf6jnCd+jN1fbM='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-g1lexkss7olRXJF6bpEmXf5kP97horL4CYlMKkGGuhw=' 'sha256-VwdB57IpRuIld5Q1sgnOrHHEh/otW+ilUeOfbpb7tNw=' 'sha256-lFg/RaBgY7fhr48SdZFGVUm0BMp9yaZ0Fqg8nPcARpI='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -854,22 +854,24 @@
         box-shadow: 0 0 0 2px var(--green);
       }
 
-      /* ۵ سطح رنگ */
+      /* ۵ سطح رنگ — v6.2: follows the active theme instead of GitHub green,
+         so the whole app stays on one palette. */
       .sm-l0 {
         background: var(--border);
         opacity: 0.6;
       }
       .sm-l1 {
-        background: #0e4429;
+        background: rgba(var(--accent-rgb), 0.28);
       }
       .sm-l2 {
-        background: #006d32;
+        background: rgba(var(--accent-rgb), 0.5);
       }
       .sm-l3 {
-        background: #26a641;
+        background: rgba(var(--accent-rgb), 0.72);
       }
       .sm-l4 {
-        background: #39d353;
+        background: rgba(var(--accent-rgb), 0.95);
+        box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.4);
       }
 
       /* فوتسال */
@@ -1177,7 +1179,8 @@
         transform: scaleY(1.6);
       }
       .stepper-dot.done {
-        background: var(--green);
+        /* v6.3: follow the active theme rather than a fixed green. */
+        background: rgba(var(--accent-rgb), 0.55);
       }
       .step-page {
         display: none;
@@ -1569,6 +1572,70 @@
       }
       body.chart-rotated { overflow:hidden !important; }
 
+      /* === v6.1 QUICK REVIEW TABLE === */
+      .review-rule {
+        border: 1px solid rgba(var(--accent-rgb), .35); border-radius: 12px;
+        padding: 11px 13px; margin-bottom: 12px;
+        background: linear-gradient(135deg, rgba(var(--accent-rgb), .11), rgba(var(--accent-rgb), .03));
+      }
+      .review-rule-title { font-weight: 800; font-size: .84rem; color: var(--accent2); margin-bottom: 5px; }
+      .review-head {
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 8px; margin-bottom: 8px; color: var(--muted); font-size: .76rem;
+      }
+      .review-legend {
+        display: grid; grid-template-columns: 1fr 56px 62px 62px; gap: 6px;
+        font-size: .6rem; color: var(--muted); padding: 0 4px 6px; text-align: center;
+      }
+      .review-legend span:first-child { text-align: right; }
+      .review-row {
+        display: grid; grid-template-columns: 1fr 56px 62px 62px; gap: 6px;
+        align-items: center; padding: 6px 4px;
+        border-bottom: 1px solid var(--border);
+      }
+      .review-row.changed { background: rgba(var(--accent-rgb), .09); border-radius: 8px; }
+      .review-date {
+        display: flex; align-items: center; gap: 6px;
+        font-size: .76rem; font-weight: 600; color: var(--text); min-width: 0;
+      }
+      .review-date small { color: var(--muted); font-size: .62rem; font-weight: 400; }
+      .rv-badge {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 20px; height: 20px; border-radius: 6px; font-size: .66rem; flex: 0 0 auto;
+      }
+      .rv-badge.on { background: var(--accent); color: #fff; }
+      .rv-badge.off { background: var(--card2); color: var(--muted); border: 1px solid var(--border); }
+      .review-run { font-size: .72rem; color: var(--muted); text-align: center; }
+      .review-inp {
+        width: 100%; min-height: 40px; font-size: 16px; text-align: center;
+        padding: 6px 4px; border-radius: 9px; background: var(--card2);
+        border: 1px solid var(--border); color: var(--text); font-family: var(--font-family);
+      }
+      .review-inp.daily { border-style: dashed; color: var(--muted); }
+      .review-inp:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+      /* === v6.1 CHART EXPLAIN / VERDICT === */
+      .chart-explain {
+        font-size: .72rem; line-height: 1.85; color: var(--muted);
+        background: var(--card2); border: 1px solid var(--border);
+        border-radius: 11px; padding: 10px 12px; margin-bottom: 10px;
+      }
+      .chart-explain b { color: var(--text); font-weight: 700; }
+      .chart-verdict {
+        font-size: .76rem; line-height: 1.9; color: var(--text);
+        background: linear-gradient(135deg, rgba(var(--accent-rgb), .13), rgba(var(--accent-rgb), .04));
+        border: 1px solid rgba(var(--accent-rgb), .34);
+        border-radius: 11px; padding: 11px 13px; margin-top: 10px;
+      }
+      .chart-verdict b { color: var(--accent2); font-weight: 800; }
+      .chart-verdict:empty, .chart-explain:empty { display: none; }
+      /* In landscape focus mode the chart matters most: keep prose out of the way. */
+      #view-charts.chart-focus-mode .chart-explain { display: none; }
+      #view-charts.chart-focus-mode.chart-force-rotate .chart-verdict { display: none; }
+      @media (orientation: landscape) and (max-height: 600px) {
+        #view-charts.chart-focus-mode .chart-verdict { display: none; }
+      }
+
       /* === HEATMAP === */
       .heatmap-container {
         padding: 16px 8px;
@@ -1630,23 +1697,29 @@
         color: transparent;
         cursor: default;
       }
+      /* v6.1: one continuous accent ramp so the map reads as a single scale and
+         follows the active theme. Severe short sleep keeps a warning tint. */
       .heatmap-cell.hm-0 {
-        background: rgba(239, 68, 68, 0.6);
+        background: rgba(239, 68, 68, 0.55);
+        box-shadow: inset 0 0 0 1px rgba(239, 68, 68, 0.75);
       }
       .heatmap-cell.hm-1 {
-        background: rgba(245, 158, 11, 0.55);
+        background: rgba(var(--accent-rgb), 0.18);
       }
       .heatmap-cell.hm-2 {
-        background: rgba(var(--accent-rgb), 0.4);
+        background: rgba(var(--accent-rgb), 0.36);
       }
       .heatmap-cell.hm-3 {
-        background: rgba(var(--accent-rgb), 0.6);
+        background: rgba(var(--accent-rgb), 0.56);
       }
       .heatmap-cell.hm-4 {
-        background: rgba(16, 185, 129, 0.65);
+        background: rgba(var(--accent-rgb), 0.78);
+        color: #fff;
       }
       .heatmap-cell.hm-5 {
-        background: rgba(16, 185, 129, 0.85);
+        background: rgba(var(--accent-rgb), 0.95);
+        color: #fff;
+        box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 1);
       }
       .heatmap-legend {
         display: flex;
@@ -2425,6 +2498,48 @@
         left:-55px; bottom:-75px; border:24px solid rgba(var(--accent-rgb),.09); pointer-events:none;
       }
       .today-hero-grid { display:grid; grid-template-columns: 88px 1fr; align-items:center; gap:14px; position:relative; z-index:1; }
+      /* === v6.1 SECTION HEADERS IN THE DAY FORM === */
+      .sect-head {
+        display: flex; align-items: baseline; justify-content: space-between;
+        gap: 8px; flex-wrap: wrap;
+        margin: 18px 0 12px; padding: 9px 12px; border-radius: 11px;
+        border: 1px solid var(--border);
+      }
+      .sect-head:first-child { margin-top: 2px; }
+      .sect-head-primary {
+        background: linear-gradient(135deg, rgba(var(--accent-rgb), .16), rgba(var(--accent-rgb), .04));
+        border-color: rgba(var(--accent-rgb), .40);
+      }
+      .sect-head-soft { background: var(--card2); }
+      .sect-title { font-weight: 800; font-size: .88rem; color: var(--text); }
+      .sect-head-primary .sect-title { color: var(--accent2); }
+      .sect-note { font-size: .66rem; color: var(--muted); }
+
+      /* quick-pick chips: approximate values in one tap */
+      .quick-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 9px; }
+      .quick-chips .chip {
+        flex: 1 1 auto; min-width: 62px; min-height: 40px;
+        padding: 8px 10px; border-radius: 10px; cursor: pointer;
+        border: 1px solid var(--border); background: var(--card2);
+        color: var(--text); font-family: var(--font-family);
+        font-size: .78rem; font-weight: 600;
+        transition: background .15s ease, border-color .15s ease;
+      }
+      .quick-chips .chip:active { transform: scale(.97); }
+      .quick-chips .chip.active {
+        background: linear-gradient(160deg, var(--accent), var(--accent3));
+        border-color: var(--accent); color: #fff;
+        box-shadow: 0 2px 10px rgba(var(--accent-rgb), .32);
+      }
+      .daily-manual { display: flex; align-items: center; gap: 8px; }
+      .daily-manual input {
+        flex: 1; min-height: 44px; font-size: 16px;
+        padding: 10px 12px; border-radius: 10px;
+        border: 1px solid var(--border); background: var(--card2);
+        color: var(--text); font-family: var(--font-family); text-align: center;
+      }
+      .daily-manual .unit { color: var(--muted); font-size: .75rem; }
+
       /* === v6 FORM HELPERS === */
       .lbl-opt { color: var(--muted); font-weight: 400; font-size: .72rem; }
       .field-hint { color: var(--muted); font-size: .68rem; margin-top: 5px; line-height: 1.6; }
@@ -2470,6 +2585,165 @@
       @media (max-width: 400px) {
         .wk-dot { height: 28px; font-size: .64rem; }
         .week-strip-msg { font-size: .65rem; }
+      }
+
+
+      /* === v6.3 STUDY TREND (dependency-free) === */
+      .trend-bars {
+        position: relative; display: flex; align-items: flex-end; gap: 4px;
+        height: 132px; padding: 6px 2px 0; margin-bottom: 10px;
+      }
+      .tb { flex: 1; min-width: 0; display: flex; flex-direction: column;
+        align-items: center; height: 100%; }
+      .tb-track { flex: 1; width: 100%; display: flex; align-items: flex-end;
+        background: rgba(var(--accent-rgb), .06); border-radius: 6px; overflow: hidden; }
+      .tb-fill { width: 100%; border-radius: 6px;
+        background: linear-gradient(180deg, var(--accent2), var(--accent));
+        transition: height .35s ease; }
+      .tb-fill.hit { box-shadow: 0 0 8px rgba(var(--accent-rgb), .55); }
+      .tb-fill.zero { background: var(--border); }
+      .tb-lab { font-size: .58rem; color: var(--muted); margin-top: 4px; }
+      .tb.today .tb-lab { color: var(--accent2); font-weight: 800; }
+      .tb.today .tb-track { outline: 1px solid rgba(var(--accent-rgb), .45); }
+      .tb-goal { position: absolute; left: 2px; right: 2px; height: 0;
+        border-top: 1px dashed rgba(var(--accent-rgb), .65); pointer-events: none; }
+      .tb-goal span { position: absolute; right: 0; top: -14px; font-size: .55rem;
+        color: var(--accent2); background: var(--card); padding: 0 4px; border-radius: 4px; }
+      .trend-verdict {
+        font-size: .76rem; color: var(--text); text-align: center;
+        background: linear-gradient(135deg, rgba(var(--accent-rgb), .12), rgba(var(--accent-rgb), .04));
+        border: 1px solid rgba(var(--accent-rgb), .3);
+        border-radius: 10px; padding: 9px 11px; margin-bottom: 12px;
+      }
+      .trend-block { margin-top: 12px; }
+      .trend-h { font-size: .74rem; font-weight: 700; color: var(--accent2); margin-bottom: 7px; }
+      .wk-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+      .wk-name { flex: 0 0 auto; width: 66px; font-size: .7rem; color: var(--muted);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .wk-track { flex: 1; height: 16px; background: rgba(var(--accent-rgb), .08);
+        border-radius: 8px; overflow: hidden; }
+      .wk-fill { display: block; height: 100%; border-radius: 8px;
+        background: linear-gradient(90deg, var(--accent3), var(--accent)); }
+      .wk-fill.cur { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+      .wk-fill.prev { opacity: .5; }
+      .wk-val { flex: 0 0 auto; width: 46px; text-align: left; font-size: .7rem;
+        font-weight: 700; color: var(--accent2); }
+      @media (max-width: 380px) {
+        .trend-bars { height: 112px; gap: 3px; }
+        .wk-name { width: 56px; font-size: .64rem; }
+      }
+
+      /* === v6.3 STUDY MODULE === */
+      /* `display:flex` on nav buttons beats the plain `hidden` attribute, so the
+         hidden state has to be asserted explicitly. */
+      [hidden] { display: none !important; }
+
+      .opt-block {
+        border: 1px solid var(--border); border-radius: 12px;
+        margin-bottom: 10px; background: var(--card2); overflow: hidden;
+      }
+      .opt-block > summary {
+        cursor: pointer; padding: 11px 13px; font-size: .82rem; font-weight: 700;
+        color: var(--text); list-style: none; display: flex;
+        align-items: center; justify-content: space-between; gap: 8px;
+        min-height: 44px;
+      }
+      .opt-block > summary::-webkit-details-marker { display: none; }
+      .opt-block > summary::after {
+        content: '+'; color: var(--accent2); font-size: 1.1rem; font-weight: 800;
+      }
+      .opt-block[open] > summary::after { content: '−'; }
+      .opt-block[open] > summary {
+        border-bottom: 1px solid var(--border);
+        background: rgba(var(--accent-rgb), .08);
+      }
+      .opt-tag {
+        font-size: .6rem; font-weight: 400; color: var(--muted);
+        border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px;
+      }
+      .opt-body { padding: 12px 13px; }
+      .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+      @media (max-width: 380px) { .two-col { grid-template-columns: 1fr; } }
+      .range-ends {
+        display: flex; justify-content: space-between;
+        font-size: .62rem; color: var(--muted); margin-top: 3px;
+      }
+      .opt-body input[type=range] {
+        width: 100%; accent-color: var(--accent); height: 34px;
+      }
+
+      .study-row {
+        display: flex; align-items: flex-start; gap: 10px;
+        padding: 11px 4px; border-bottom: 1px solid var(--border); cursor: pointer;
+      }
+      .study-row:last-child { border-bottom: 0; }
+      .study-row:active { background: rgba(var(--accent-rgb), .07); }
+      .study-dur {
+        flex: 0 0 auto; min-width: 54px; text-align: center;
+        font-weight: 800; color: var(--accent2); font-size: .9rem; line-height: 1.3;
+      }
+      .study-dur small { display: block; font-size: .55rem; color: var(--muted); font-weight: 400; }
+      .study-main { flex: 1; min-width: 0; }
+      .study-title { font-size: .84rem; font-weight: 700; color: var(--text); }
+      .study-meta {
+        display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px;
+        font-size: .64rem; color: var(--muted);
+      }
+      .study-chip {
+        border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px;
+        background: var(--card2);
+      }
+      .study-chip.good { border-color: rgba(var(--accent-rgb), .5); color: var(--accent2); }
+      .study-daygroup {
+        margin-top: 12px; font-size: .72rem; font-weight: 700; color: var(--accent2);
+        padding: 6px 4px; border-bottom: 1px dashed var(--border);
+      }
+      .study-daygroup span { color: var(--muted); font-weight: 400; float: left; }
+
+      /* === v6.2 NUDGE + WEEK-OVER-WEEK === */
+      .wow-line {
+        margin-top: 9px; font-size: .72rem; color: var(--muted);
+        text-align: center;
+      }
+      .nudge {
+        display: flex; align-items: center; gap: 9px;
+        margin-top: 9px; padding: 10px 12px; border-radius: 12px;
+        border: 1px solid rgba(var(--accent-rgb), .38);
+        background: linear-gradient(135deg, rgba(var(--accent-rgb), .14), rgba(var(--accent-rgb), .04));
+      }
+      .nudge.optional {
+        border-color: var(--border);
+        background: var(--card2);
+      }
+      .nudge-ico { font-size: 1.15rem; flex: 0 0 auto; }
+      .nudge b { display: block; font-size: .8rem; color: var(--text); font-weight: 700; }
+      .nudge small { display: block; font-size: .66rem; color: var(--muted); margin-top: 2px; line-height: 1.7; }
+
+      /* === v6.1 THREE-WAY METRIC SPLIT === */
+      .split-metrics {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 7px; margin-top: 10px;
+      }
+      .split-metric {
+        padding: 10px 8px; border-radius: 12px; text-align: center;
+        border: 1px solid var(--border); background: var(--card2); min-width: 0;
+      }
+      .split-metric.primary {
+        border-color: rgba(var(--accent-rgb), .45);
+        background: linear-gradient(160deg, rgba(var(--accent-rgb), .16), rgba(var(--accent-rgb), .05));
+      }
+      .split-value {
+        font-size: 1.25rem; font-weight: 900; line-height: 1; color: var(--text);
+        white-space: nowrap;
+      }
+      .split-metric.primary .split-value { color: var(--accent2); }
+      .split-value small { font-size: .7rem; font-weight: 700; color: var(--muted); }
+      .split-label { font-size: .7rem; font-weight: 700; margin-top: 5px; color: var(--text); }
+      .split-sub { font-size: .58rem; color: var(--muted); margin-top: 2px; }
+      @media (max-width: 380px) {
+        .split-value { font-size: 1.05rem; }
+        .split-label { font-size: .64rem; }
+        .split-sub { font-size: .54rem; }
       }
 
       .readiness-ring {
@@ -2645,6 +2919,7 @@
       <button type="button" data-tab="charts">📊 نمودارها</button>
       <button type="button" data-tab="calc">🧮 محاسبه‌گر</button>
       <button type="button" data-tab="ai">🧠 تحلیل</button>
+      <button type="button" data-tab="study" class="study-only" hidden>📚 مطالعه</button>
       <button type="button" data-tab="export">📤 خروجی</button>
     </nav>
 
@@ -2713,6 +2988,46 @@
           </button>
         </div>
         <div class="card">
+          <div class="card-title"><span class="emoji">📚</span> ماژول مطالعه</div>
+          <label class="checkbox-item">
+            <input type="checkbox" id="studyEnabled" /> فعال کردن بخش مطالعه
+          </label>
+          <div class="field-hint">
+            یک بخش کاملاً جدا برای ثبت مطالعه با گزارش مخصوص خودش. اگر خاموش
+            باشد، هیچ‌جای برنامه دیده نمی‌شود و روی آمار ورزش هم اثری ندارد.
+          </div>
+          <div id="studySettingsBody" style="display: none">
+            <div class="form-group" style="margin-top: 12px">
+              <label for="studyStudentName">نام روی گزارش <span class="lbl-opt">(اختیاری)</span></label>
+              <input type="text" class="form-input" id="studyStudentName"
+                placeholder="مثلاً: نام و نام خانوادگی" maxlength="60" />
+            </div>
+            <div class="form-group">
+              <label>هدف روزانه مطالعه</label>
+              <div class="num-stepper">
+                <button type="button" data-target="studyDailyGoal" data-step="-30">−</button>
+                <input type="number" id="studyDailyGoal" value="0" min="0" max="1440" step="30" />
+                <button type="button" data-target="studyDailyGoal" data-step="30">+</button>
+              </div>
+              <div class="field-hint">به دقیقه. صفر یعنی بدون هدف — فقط ثبت و تحلیل.</div>
+            </div>
+            <div class="form-group">
+              <label for="studySubjectsInput">عنوان‌های پرتکرار <span class="lbl-opt">(اختیاری)</span></label>
+              <input type="text" class="form-input" id="studySubjectsInput"
+                placeholder="با ویرگول جدا کن" maxlength="600" />
+              <div class="field-hint">
+                برای پیشنهاد سریع موقع ثبت. لازم نیست پر کنی؛ هرچه بنویسی خودش یاد می‌گیرد.
+              </div>
+            </div>
+            <label class="checkbox-item">
+              <input type="checkbox" id="studySleepInReport" /> 😴 ساعت خواب و بیداری در گزارش بیاید
+            </label>
+            <button type="button" class="btn btn-primary btn-block mt-2" id="saveStudySettings">
+              💾 ذخیره تنظیمات مطالعه
+            </button>
+          </div>
+        </div>
+        <div class="card">
           <div class="card-title"><span class="emoji">🎯</span> اهداف</div>
           <div class="form-group">
             <label>هدف خواب (ساعت)</label>
@@ -2734,7 +3049,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label>هدف فعالیت (دقیقه)</label>
+            <label>هدف هر جلسه ورزش (دقیقه)</label>
             <div class="num-stepper">
               <button type="button" data-target="goalActivity" data-step="-5">
                 −
@@ -2751,9 +3066,13 @@
                 +
               </button>
             </div>
+            <div class="field-hint">
+              طول یک جلسه‌ی ورزش برنامه‌ریزی‌شده — نه مجموع حرکت روزانه.
+              پیاده‌روی رفت‌وآمد جداگانه ثبت می‌شود و در این هدف حساب نمی‌شود.
+            </div>
           </div>
           <div class="form-group">
-            <label for="goalWeeklyMode">📅 هدف هفتگی</label>
+            <label for="goalWeeklyMode">📅 هدف هفتگی (روز ورزش)</label>
             <select class="form-input" id="goalWeeklyMode">
               <option value="auto">خودکار — از روی روند خودم</option>
               <option value="manual">دستی — خودم تعیین می‌کنم</option>
@@ -2894,6 +3213,9 @@
           <h2 style="font-size: 1.05rem">📋 ثبت روزانه</h2>
           <div class="flex gap-2 items-center">
             <span class="pill pill-info" id="logCount">0</span>
+            <button type="button" class="btn btn-ghost btn-sm" id="quickReviewBtn">
+              ⚡ بازبینی سریع
+            </button>
             <button type="button" class="btn btn-primary btn-sm" id="addDayBtn">
               + روز جدید
             </button>
@@ -3005,15 +3327,21 @@
           </button>
         </div>
         <div class="chart-panel active" id="chartPanel-sleep">
+          <div class="chart-explain" id="explain-sleep"></div>
           <div class="card chart-card"><canvas id="chartSleep"></canvas></div>
+          <div class="chart-verdict" id="verdict-sleep"></div>
         </div>
         <div class="chart-panel" id="chartPanel-energy">
+          <div class="chart-explain" id="explain-energy"></div>
           <div class="card chart-card"><canvas id="chartEnergy"></canvas></div>
+          <div class="chart-verdict" id="verdict-energy"></div>
         </div>
         <div class="chart-panel" id="chartPanel-activity">
+          <div class="chart-explain" id="explain-activity"></div>
           <div class="card chart-card">
             <canvas id="chartActivity"></canvas>
           </div>
+          <div class="chart-verdict" id="verdict-activity"></div>
         </div>
         <div class="chart-panel" id="chartPanel-heatmap">
           <div class="card chart-card">
@@ -3021,16 +3349,24 @@
           </div>
         </div>
         <div class="chart-panel" id="chartPanel-bedtime">
+          <div class="chart-explain" id="explain-bedtime"></div>
           <div class="card chart-card"><canvas id="chartBedtime"></canvas></div>
+          <div class="chart-verdict" id="verdict-bedtime"></div>
         </div>
         <div class="chart-panel" id="chartPanel-weekly">
+          <div class="chart-explain" id="explain-weekly"></div>
           <div class="card chart-card"><canvas id="chartWeekly"></canvas></div>
+          <div class="chart-verdict" id="verdict-weekly"></div>
         </div>
         <div class="chart-panel" id="chartPanel-radar">
+          <div class="chart-explain" id="explain-radar"></div>
           <div class="card chart-card"><canvas id="chartRadar"></canvas></div>
+          <div class="chart-verdict" id="verdict-radar"></div>
         </div>
         <div class="chart-panel" id="chartPanel-scatter">
+          <div class="chart-explain" id="explain-scatter"></div>
           <div class="card chart-card"><canvas id="chartScatter"></canvas></div>
+          <div class="chart-verdict" id="verdict-scatter"></div>
         </div>
       </div>
 
@@ -3362,6 +3698,81 @@
       </div>
 
       <!-- === VIEW: EXPORT === -->
+      <!-- === VIEW: STUDY (v6.3, opt-in) === -->
+      <div class="view" id="view-study">
+        <div class="flex items-center justify-between mb-3">
+          <h2 style="font-size: 1.05rem">📚 مطالعه</h2>
+          <div class="flex gap-2 items-center">
+            <span class="pill pill-info" id="studyTodayPill">امروز ۰</span>
+            <button type="button" class="btn btn-primary btn-sm" id="addStudyBtn">
+              + جلسه جدید
+            </button>
+          </div>
+        </div>
+
+        <section class="today-hero" id="studyHero" aria-live="polite"></section>
+
+        <div class="card">
+          <div class="card-title"><span class="emoji">📊</span> نگاه کلی</div>
+          <div class="kpi-grid" id="studyKpis"></div>
+        </div>
+
+        <div class="card">
+          <div class="flex items-center justify-between mb-2">
+            <div class="card-title" style="margin: 0">
+              <span class="emoji">🗂️</span> جلسه‌ها
+            </div>
+            <select class="form-input" id="studyRange" style="width: auto; min-height: 38px">
+              <option value="7">۷ روز</option>
+              <option value="14" selected>۱۴ روز</option>
+              <option value="30">۳۰ روز</option>
+              <option value="all">همه</option>
+            </select>
+          </div>
+          <div id="studyList"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="emoji">📈</span> روند مطالعه</div>
+          <div class="chart-explain" id="studyChartExplain"></div>
+          <div id="studyTrend"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="emoji">🧠</span> تحلیل مطالعه</div>
+          <div id="studyInsights"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span class="emoji">📄</span> گزارش</div>
+          <div class="field-hint" style="margin-bottom: 10px">
+            یک گزارش مرتب و قابل چاپ می‌سازد که می‌توانی برای مشاورت بفرستی.
+            داخلش دکمه‌ی چاپ هست و از همان‌جا PDF ذخیره می‌شود.
+          </div>
+          <div class="form-group">
+            <label for="studyReportRange">بازه‌ی گزارش</label>
+            <select class="form-input" id="studyReportRange">
+              <option value="7">۷ روز اخیر</option>
+              <option value="14" selected>۱۴ روز اخیر</option>
+              <option value="30">۳۰ روز اخیر</option>
+              <option value="all">همه‌ی روزها</option>
+            </select>
+          </div>
+          <label class="checkbox-item">
+            <input type="checkbox" id="studyReportSleep" /> 😴 ساعت خواب و بیداری
+            هم در گزارش بیاید
+          </label>
+          <div class="flex flex-wrap gap-2 mt-2">
+            <button type="button" class="btn btn-primary" id="studyOpenReport">
+              🖨️ باز کردن گزارش
+            </button>
+            <button type="button" class="btn btn-ghost btn-sm" id="studyDownloadReport">
+              💾 دانلود HTML
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="view" id="view-export">
         <h2 style="font-size: 1.05rem; margin-bottom: 10px">
           📤 خروجی و انتقال
@@ -3430,6 +3841,7 @@
                 <label>📄 فرمت</label>
                 <select class="form-input" id="exFormat">
                   <option value="ai_text">AI Compact (توصیه)</option>
+                  <option value="report_html">📄 گزارش قابل چاپ / PDF</option>
                   <option value="markdown">Markdown</option>
                   <option value="json_min">JSON</option>
                   <option value="csv">CSV</option>
@@ -3452,6 +3864,13 @@
                 <button type="button" class="btn btn-ghost btn-sm" id="exShare">
                   📤 ارسال
                 </button>
+                <button type="button" class="btn btn-ghost btn-sm" id="exOpenReport">
+                  🖨️ گزارش چاپی
+                </button>
+              </div>
+              <div class="field-hint" id="exReportHint">
+                «گزارش چاپی» یک صفحه‌ی مرتب باز می‌کند؛ داخلش دکمه‌ی چاپ هست و از
+                همان‌جا می‌توانی PDF ذخیره کنی یا فایل HTML را ویرایش کنی.
               </div>
               <div class="export-stats mt-2" id="exStats"></div>
               <pre
@@ -3565,10 +3984,205 @@
       <button type="button" data-tab="ai">
         <span class="nav-icon">🧠</span>تحلیل
       </button>
+      <button type="button" data-tab="study" class="study-only" hidden>
+        <span class="nav-icon">📚</span>مطالعه
+      </button>
       <button type="button" data-tab="export">
         <span class="nav-icon">📤</span>خروجی
       </button>
     </nav>
+
+    <!-- === MODAL: STUDY SESSION (v6.3) === -->
+    <div class="modal-overlay" id="modalStudy">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 id="modalStudyTitle">ثبت جلسه مطالعه</h2>
+          <button type="button" class="modal-close" aria-label="بستن" id="modalStudyClose">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="field-hint" style="margin-bottom: 12px">
+            فقط «تاریخ» و «مدت» لازم است. بقیه هرچه دوست داشتی پر کن — خالی
+            گذاشتن هیچ مشکلی ندارد.
+          </div>
+
+          <div class="form-group">
+            <label for="stDate">📅 تاریخ</label>
+            <input type="text" class="form-input jalali-date" id="stDate" placeholder="1405-05-14" />
+          </div>
+
+          <div class="form-group">
+            <label>⏱️ مدت مطالعه</label>
+            <div class="quick-chips" id="stMinChips">
+              <button type="button" class="chip" data-min="30">۳۰ دقیقه</button>
+              <button type="button" class="chip" data-min="45">۴۵ دقیقه</button>
+              <button type="button" class="chip" data-min="60">۱ ساعت</button>
+              <button type="button" class="chip" data-min="90">۱.۵ ساعت</button>
+              <button type="button" class="chip" data-min="120">۲ ساعت</button>
+              <button type="button" class="chip" data-min="180">۳ ساعت</button>
+            </div>
+            <div class="daily-manual">
+              <input type="number" id="stMinutes" value="0" min="0" max="1440" step="5"
+                inputmode="numeric" aria-label="دقیقه مطالعه" />
+              <span class="unit">دقیقه</span>
+            </div>
+          </div>
+
+          <details class="opt-block" id="stOptTime">
+            <summary>🕐 ساعت شروع و پایان <span class="opt-tag">اختیاری</span></summary>
+            <div class="opt-body">
+              <div class="two-col">
+                <div class="form-group">
+                  <label for="stStart">از ساعت</label>
+                  <input type="time" class="form-input" id="stStart" />
+                </div>
+                <div class="form-group">
+                  <label for="stEnd">تا ساعت</label>
+                  <input type="time" class="form-input" id="stEnd" />
+                </div>
+              </div>
+              <div class="field-hint">
+                اگر این دو را پر کنی و مدت را خالی بگذاری، خودش حساب می‌کند.
+              </div>
+            </div>
+          </details>
+
+          <details class="opt-block" id="stOptWhat">
+            <summary>📖 چه چیزی خواندی؟ <span class="opt-tag">اختیاری</span></summary>
+            <div class="opt-body">
+              <div class="form-group">
+                <label for="stSubject">عنوان / درس</label>
+                <div class="quick-chips" id="stSubjectChips" style="display: none"></div>
+                <input type="text" class="form-input" id="stSubject"
+                  list="stSubjectList" placeholder="بنویس یا از بالا انتخاب کن" maxlength="60" />
+                <datalist id="stSubjectList"></datalist>
+              </div>
+              <div class="form-group">
+                <label for="stTopic">مبحث</label>
+                <input type="text" class="form-input" id="stTopic"
+                  placeholder="مثلاً: مشتق" maxlength="120" />
+              </div>
+              <div class="form-group">
+                <label>روش مطالعه</label>
+                <div class="quick-chips" id="stMethodChips"></div>
+                <input type="hidden" id="stMethod" value="" />
+              </div>
+            </div>
+          </details>
+
+          <details class="opt-block" id="stOptQuality">
+            <summary>⭐ کیفیت جلسه <span class="opt-tag">اختیاری</span></summary>
+            <div class="opt-body">
+              <div class="form-group">
+                <label for="stFocus">🎯 تمرکز: <b id="stFocusVal">—</b></label>
+                <input type="range" id="stFocus" min="0" max="10" step="1" value="0" />
+                <div class="range-ends"><span>حواس‌پرت</span><span>کاملاً غرق</span></div>
+              </div>
+              <div class="form-group">
+                <label for="stDifficulty">🧗 سختی: <b id="stDifficultyVal">—</b></label>
+                <input type="range" id="stDifficulty" min="0" max="10" step="1" value="0" />
+                <div class="range-ends"><span>راحت</span><span>خیلی سخت</span></div>
+              </div>
+              <div class="form-group">
+                <label for="stSatisfaction">😊 رضایت: <b id="stSatisfactionVal">—</b></label>
+                <input type="range" id="stSatisfaction" min="0" max="10" step="1" value="0" />
+                <div class="range-ends"><span>ناراضی</span><span>عالی</span></div>
+              </div>
+              <div class="form-group">
+                <label for="stDistractions">📵 چند بار حواست پرت شد؟</label>
+                <input type="number" class="form-input" id="stDistractions" value="0"
+                  min="0" max="200" step="1" inputmode="numeric" />
+              </div>
+            </div>
+          </details>
+
+          <details class="opt-block" id="stOptTest">
+            <summary>✏️ تست زدی؟ <span class="opt-tag">اختیاری</span></summary>
+            <div class="opt-body">
+              <div class="two-col">
+                <div class="form-group">
+                  <label for="stQuestions">تعداد تست</label>
+                  <input type="number" class="form-input" id="stQuestions" value="0"
+                    min="0" max="10000" step="1" inputmode="numeric" />
+                </div>
+                <div class="form-group">
+                  <label for="stCorrect">درست</label>
+                  <input type="number" class="form-input" id="stCorrect" value="0"
+                    min="0" max="10000" step="1" inputmode="numeric" />
+                </div>
+              </div>
+              <div class="field-hint" id="stPercentHint"></div>
+            </div>
+          </details>
+
+          <div class="form-group">
+            <label for="stNote">📝 یادداشت <span class="lbl-opt">(اختیاری)</span></label>
+            <textarea class="form-input" id="stNote" rows="2"
+              placeholder="هرچی دوست داری بنویس..." maxlength="2000"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="stDelete" style="display: none">
+            🗑️ حذف
+          </button>
+          <button type="button" class="btn btn-ghost" id="stCancel">انصراف</button>
+          <button type="button" class="btn btn-primary" id="stSave">💾 ذخیره</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- === MODAL: QUICK REVIEW (v6.1 backfill tool) === -->
+    <div class="modal-overlay" id="modalReview">
+      <div class="modal">
+        <div class="modal-header">
+          <h2>⚡ بازبینی سریع</h2>
+          <button type="button" class="modal-close" aria-label="بستن" id="modalReviewClose">
+            ✕
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="chart-explain">
+            <b>این صفحه برای چیست؟</b> از این به بعد پیاده‌روی «ورزشی» و
+            «رفت‌وآمد» جدا شمرده می‌شوند. روزهای قبلی همه ورزشی ثبت شده‌اند.
+            اینجا می‌توانی سریع اصلاحشان کنی — بدون باز کردن فرم کامل.
+          </div>
+          <div class="review-rule">
+            <div class="review-rule-title">🪄 اصلاح خودکار</div>
+            <div class="field-hint" style="margin: 0 0 9px">
+              پیاده‌روی‌های کوتاه‌تر از حد زیر را رفت‌وآمد در نظر می‌گیرد.
+              روزهایی که دویدن داری دست‌نخورده می‌مانند.
+            </div>
+            <div class="daily-manual" style="margin-bottom: 9px">
+              <span class="unit">کمتر از</span>
+              <input type="number" id="reviewThreshold" value="15" min="1" max="60" step="1"
+                inputmode="numeric" aria-label="آستانه دقیقه" />
+              <span class="unit">دقیقه = رفت‌وآمد</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm btn-block" id="reviewApplyRule">
+              اعمال روی روزهای زیر
+            </button>
+          </div>
+          <div class="review-head">
+            <span id="reviewCount">—</span>
+            <select class="form-input" id="reviewRange" style="width: auto; min-height: 38px">
+              <option value="14">۱۴ روز اخیر</option>
+              <option value="30" selected>۳۰ روز اخیر</option>
+              <option value="60">۶۰ روز اخیر</option>
+              <option value="all">همه</option>
+            </select>
+          </div>
+          <div class="review-legend">
+            <span>تاریخ</span><span>🏃 دویدن</span><span>🚶 ورزشی</span><span>🚶‍♂️ روزمره</span>
+          </div>
+          <div id="reviewList"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="reviewCancel">انصراف</button>
+          <button type="button" class="btn btn-primary" id="reviewSave">💾 ذخیره تغییرات</button>
+        </div>
+      </div>
+    </div>
 
     <!-- === MODAL: DAY === -->
     <div class="modal-overlay" id="modalDay">
@@ -3705,6 +4319,10 @@
           </div>
 
           <div class="step-page" id="step-2">
+            <div class="sect-head sect-head-primary">
+              <span class="sect-title">🎯 ورزش برنامه‌ریزی‌شده</span>
+              <span class="sect-note">این بخش هدف هفتگی را می‌سازد</span>
+            </div>
             <div class="form-group">
               <label>🏃 دویدن</label>
               <div class="mmss-row">
@@ -3733,7 +4351,7 @@
             </div>
 
             <div class="form-group">
-              <label>🚶 پیاده‌روی</label>
+              <label>🚶 پیاده‌روی ورزشی</label>
               <div class="mmss-row">
                 <div class="mmss-input">
                   <input
@@ -3785,6 +4403,43 @@
               </div>
               <input type="hidden" id="mdLongest" value="0" />
             </div>
+
+            <div class="sect-head sect-head-soft">
+              <span class="sect-title">🚶‍♂️ فعالیت روزمره</span>
+              <span class="sect-note">تقریبی — روی هدف اثری ندارد</span>
+            </div>
+            <div class="form-group">
+              <label for="mdWalkDaily">
+                رفت‌وآمد و راه‌رفتن روزمره
+                <span class="lbl-opt">(اختیاری)</span>
+              </label>
+              <div class="quick-chips" id="mdWalkDailyChips">
+                <button type="button" class="chip" data-daily="0">هیچ</button>
+                <button type="button" class="chip" data-daily="10">۱۰ دقیقه</button>
+                <button type="button" class="chip" data-daily="20">۲۰ دقیقه</button>
+                <button type="button" class="chip" data-daily="30">۳۰ دقیقه</button>
+                <button type="button" class="chip" data-daily="45">۴۵ دقیقه</button>
+                <button type="button" class="chip" data-daily="60">۶۰ دقیقه</button>
+              </div>
+              <div class="daily-manual">
+                <input
+                  type="number"
+                  id="mdWalkDaily"
+                  value="0"
+                  min="0"
+                  max="600"
+                  step="5"
+                  inputmode="numeric"
+                  aria-label="دقیقه فعالیت روزمره"
+                />
+                <span class="unit">دقیقه</span>
+              </div>
+              <div class="field-hint">
+                مثل پیاده‌روی تا محل کار یا خرید. لازم نیست دقیق باشد — همین که
+                تقریبی بزنی، تحلیل انرژی دقیق‌تر می‌شود.
+              </div>
+            </div>
+
             <div class="form-group">
               <label for="mdActivity">📝 شرح فعالیت</label>
               <input
@@ -5049,11 +5704,22 @@
           _sync: {
             rowsDeleted: {},
             futsalDeleted: {},
-            fields: { goals: 0, programGoal: 0 },
+            studyDeleted: {},
+            fields: { goals: 0, programGoal: 0, study: 0 },
           },
           rows: [],
           futsal: [],
           notes: [],
+          // v6.3: optional study module. Entirely separate from the sport data
+          // and hidden unless the user switches it on.
+          study: [],
+          studyConfig: {
+            enabled: false,
+            dailyGoalMin: 0,
+            subjects: [],
+            showSleepInReport: false,
+            studentName: '',
+          },
           goals: {
             sleepGoalHours: 7, activityGoalMin: 20,
             weeklyTargetMode: 'auto', weeklyTargetDays: 3, preferredTime: 'morning',
@@ -5167,6 +5833,10 @@
             mood: finiteNumber(r.mood, 5, 0, 10),
             runMin: finiteNumber(r.runMin, 0, 0, 10000),
             walkMin: finiteNumber(r.walkMin, 0, 0, 10000),
+            // v6.1: everyday movement (commute, errands, walking around campus).
+            // Deliberately separate from walkMin: it is an APPROXIMATE number and
+            // must never decide whether a day counts as a training day.
+            walkDailyMin: finiteNumber(r.walkDailyMin, 0, 0, 10000),
             longestRun: finiteNumber(r.longestRun, 0, 0, 10000),
             activity: cleanText(r.activity, 500),
             note: cleanText(r.note, 5000),
@@ -5193,6 +5863,63 @@
           'kneePain', 'chestPain', 'comparedToExpected', 'continuousRun',
           'hardestPart', 'bestPart', 'extra'
         ];
+
+        // ===== v6.3 STUDY MODULE (opt-in, fully separate from sport) =====
+        // Every field is optional by design: the user should be able to log
+        // "2 hours, done" in three seconds, or fill in subject/method/focus/
+        // notes when they feel like it. Nothing here touches sport metrics.
+        const STUDY_METHODS = ['مطالعه', 'تست', 'مرور', 'حل تمرین', 'خلاصه‌نویسی', 'کلاس', 'رفع اشکال'];
+
+        function normalizeStudy(x, index) {
+          if (!x || typeof x !== 'object') return null;
+          const jdate = cleanText(x.jdate, 10);
+          if (!Jalali.isValidDate(jdate)) return null;
+          // Duration is the only semi-required value; it can also be derived
+          // from a start/end pair when the user prefers logging times.
+          let minutes = finiteNumber(x.minutes, 0, 0, 1440);
+          const start = validTime(x.start) ? x.start : '';
+          const end = validTime(x.end) ? x.end : '';
+          if (!minutes && start && end) {
+            let d = timeToMin(end) - timeToMin(start);
+            if (d < 0) d += 1440;
+            minutes = Math.max(0, Math.min(1440, d));
+          }
+          const methodRaw = cleanText(x.method, 40);
+          return {
+            id: normalizeId(x.id, 'study:' + jdate + ':' + index),
+            jdate: jdate,
+            subject: cleanText(x.subject, 60),
+            topic: cleanText(x.topic, 120),
+            minutes: Math.round(minutes),
+            start: start,
+            end: end,
+            method: methodRaw,
+            // Quality signals — all optional, 0 means "not recorded".
+            focus: finiteNumber(x.focus, 0, 0, 10),
+            difficulty: finiteNumber(x.difficulty, 0, 0, 10),
+            satisfaction: finiteNumber(x.satisfaction, 0, 0, 10),
+            distractions: finiteNumber(x.distractions, 0, 0, 200),
+            questions: finiteNumber(x.questions, 0, 0, 10000),
+            correct: finiteNumber(x.correct, 0, 0, 10000),
+            note: cleanText(x.note, 2000),
+            _updatedAt: normalizeRevision(x._updatedAt),
+          };
+        }
+
+        function normalizeStudyConfig(c) {
+          c = c && typeof c === 'object' ? c : {};
+          const subjects = (Array.isArray(c.subjects) ? c.subjects : [])
+            .slice(0, 40)
+            .map(function (s) { return cleanText(s, 60); })
+            .filter(function (s) { return !!s; });
+          return {
+            enabled: c.enabled === true || c.enabled === 'true' || c.enabled === 1,
+            dailyGoalMin: Math.round(finiteNumber(c.dailyGoalMin, 0, 0, 1440)),
+            subjects: subjects,
+            showSleepInReport: c.showSleepInReport === true || c.showSleepInReport === 'true',
+            studentName: cleanText(c.studentName, 60),
+          };
+        }
 
         function normalizeFutsal(f, index) {
           if (!f || typeof f !== 'object') return null;
@@ -5245,6 +5972,19 @@
           };
           out.programGoal = cleanText(input.programGoal || DEFAULT_DATA.programGoal, 5000);
           out.notes = Array.isArray(input.notes) ? input.notes.slice(0, 1000) : [];
+          out.studyConfig = normalizeStudyConfig(input.studyConfig);
+          const studyMap = {};
+          (Array.isArray(input.study) ? input.study : []).slice(0, 20000)
+            .forEach(function (x, i) {
+              const ns = normalizeStudy(x, i);
+              if (!ns) return;
+              const key = String(ns.id);
+              // Same id twice: keep the newer revision.
+              if (!studyMap[key] || normalizeRevision(ns._updatedAt) >=
+                  normalizeRevision(studyMap[key]._updatedAt)) studyMap[key] = ns;
+            });
+          out.study = Object.keys(studyMap).map(function (k) { return studyMap[k]; })
+            .sort(function (a, b) { return Jalali.cmp(a.jdate, b.jdate); });
 
           const rowMap = {};
           (Array.isArray(input.rows) ? input.rows : []).slice(0, 20000).forEach(function (r, i) {
@@ -5269,9 +6009,11 @@
           out._sync = {
             rowsDeleted: normalizeMap(sync.rowsDeleted),
             futsalDeleted: normalizeMap(sync.futsalDeleted),
+            studyDeleted: normalizeMap(sync.studyDeleted),
             fields: {
               goals: normalizeRevision(sync.fields && sync.fields.goals),
               programGoal: normalizeRevision(sync.fields && sync.fields.programGoal),
+              study: normalizeRevision(sync.fields && sync.fields.study),
             },
           };
           return out;
@@ -5288,6 +6030,13 @@
           });
           Object.keys(local._sync.rowsDeleted).forEach(function (k) {
             merged._sync.rowsDeleted[k] = Math.max(merged._sync.rowsDeleted[k] || 0, local._sync.rowsDeleted[k]);
+          });
+          merged._sync.studyDeleted = normalizeMap(Object.assign({}, remote._sync.studyDeleted, local._sync.studyDeleted));
+          Object.keys(remote._sync.studyDeleted).forEach(function (k) {
+            merged._sync.studyDeleted[k] = Math.max(merged._sync.studyDeleted[k] || 0, remote._sync.studyDeleted[k]);
+          });
+          Object.keys(local._sync.studyDeleted).forEach(function (k) {
+            merged._sync.studyDeleted[k] = Math.max(merged._sync.studyDeleted[k] || 0, local._sync.studyDeleted[k]);
           });
           merged._sync.futsalDeleted = normalizeMap(Object.assign({}, remote._sync.futsalDeleted, local._sync.futsalDeleted));
           Object.keys(remote._sync.futsalDeleted).forEach(function (k) {
@@ -5313,15 +6062,29 @@
             return deletedAt === 0 || deletedAt < normalizeRevision(futsal[key]._updatedAt);
           }).map(function (key) { return futsal[key]; });
 
+          // Study sessions merge by id (multiple entries per day are normal),
+          // mirroring how futsal rows are handled.
+          const study = {};
+          local.study.forEach(function (x) { study[String(x.id)] = chooseNewer(study[String(x.id)], x); });
+          remote.study.forEach(function (x) { study[String(x.id)] = chooseNewer(study[String(x.id)], x); });
+          merged.study = Object.keys(study).filter(function (key) {
+            const deletedAt = merged._sync.studyDeleted[key] || 0;
+            return deletedAt === 0 || deletedAt < normalizeRevision(study[key]._updatedAt);
+          }).map(function (key) { return study[key]; })
+            .sort(function (a, b) { return Jalali.cmp(a.jdate, b.jdate); });
+
           const lf = local._sync.fields;
           const rf = remote._sync.fields;
           if (lf.goals !== rf.goals) merged.goals = deepClone(lf.goals > rf.goals ? local.goals : remote.goals);
           else merged.goals = JSON.stringify(local.goals) >= JSON.stringify(remote.goals) ? deepClone(local.goals) : deepClone(remote.goals);
           if (lf.programGoal !== rf.programGoal) merged.programGoal = lf.programGoal > rf.programGoal ? local.programGoal : remote.programGoal;
           else merged.programGoal = local.programGoal >= remote.programGoal ? local.programGoal : remote.programGoal;
+          if (lf.study !== rf.study) merged.studyConfig = deepClone(lf.study > rf.study ? local.studyConfig : remote.studyConfig);
+          else merged.studyConfig = deepClone(local.studyConfig.enabled || !remote.studyConfig.enabled ? local.studyConfig : remote.studyConfig);
           merged._sync.fields = {
             goals: Math.max(lf.goals, rf.goals),
             programGoal: Math.max(lf.programGoal, rf.programGoal),
+            study: Math.max(lf.study, rf.study),
           };
           merged.notes = local.notes.length >= remote.notes.length ? local.notes : remote.notes;
           return normalizeState(merged);
@@ -5463,7 +6226,9 @@
           let runBest = 0,
             totalRun = 0,
             totalWalk = 0,
-            completedCount = 0;
+            completedCount = 0,
+            totalDaily = 0,
+            dailyLoggedDays = 0;
 
           sorted.forEach(function (r) {
             const si = sleepInfo(r.sleepBlocks);
@@ -5476,7 +6241,9 @@
             if ((r.longestRun || 0) > runBest) runBest = r.longestRun;
             totalRun += r.runMin || 0;
             totalWalk += r.walkMin || 0;
-            if (r.completed) completedCount++;
+            totalDaily += r.walkDailyMin || 0;
+            if ((r.walkDailyMin || 0) > 0) dailyLoggedDays++;
+            if (isTrainingDay(r)) completedCount++;
           });
 
           const n = sorted.length;
@@ -5491,6 +6258,13 @@
             runBest: runBest,
             totalRun: +totalRun.toFixed(2),
             totalWalk: +totalWalk.toFixed(2),
+            // v6.1: everyday movement is reported separately and never mixed
+            // into the planned-training totals above.
+            totalDaily: +totalDaily.toFixed(2),
+            dailyLoggedDays: dailyLoggedDays,
+            avgDailyPerLoggedDay: dailyLoggedDays
+              ? +(totalDaily / dailyLoggedDays).toFixed(1) : 0,
+            totalPlanned: +(totalRun + totalWalk).toFixed(2),
             sleepDays: sleepCount,
             completedCount: completedCount,
             totalDays: n,
@@ -5523,15 +6297,48 @@
         const MOMENTUM_WINDOW = 14;
         const MOMENTUM_HALFLIFE = 7; // days for a day's contribution to halve
 
+        // ===== v6.1 PLANNED vs EVERYDAY MOVEMENT =====
+        // The single most important distinction in the app: deliberate training
+        // (running / sport walking) is what builds the routine and drives every
+        // goal. Commuting on foot is real movement worth seeing, but it is an
+        // estimate and must never make a lazy day look like a training day.
+        const TRAINING_WALK_MIN = 15; // sport-walk minutes that qualify a day
+        const TRAINING_RUN_MIN = 1;   // any real run counts
+
+        function plannedMin(r) {
+          if (!r) return 0;
+          return (Number(r.runMin) || 0) + (Number(r.walkMin) || 0);
+        }
+        function dailyMin(r) {
+          if (!r) return 0;
+          return Number(r.walkDailyMin) || 0;
+        }
+        // Auto-detect: did this day contain real, deliberate training?
+        function qualifiesAsTraining(r) {
+          if (!r) return false;
+          return (Number(r.runMin) || 0) >= TRAINING_RUN_MIN ||
+            (Number(r.walkMin) || 0) >= TRAINING_WALK_MIN;
+        }
+        // `completed` stays the user's explicit answer, but a day also counts
+        // when the logged training clearly qualifies. This is what feeds the
+        // weekly target and momentum.
+        function isTrainingDay(r) {
+          if (!r) return false;
+          return r.completed === true || qualifiesAsTraining(r);
+        }
+
         function dayEffort(r, goals) {
           // 0..1 quality of a single day, tolerant of partial logging.
+          // v6.1: only PLANNED training contributes. Commute walking is ignored
+          // here on purpose, otherwise a day of errands would inflate momentum
+          // and the routine metric would stop meaning anything.
           if (!r) return 0;
-          const actGoal = (goals && goals.activityGoalMin) || 20;
-          const act = (Number(r.runMin) || 0) + (Number(r.walkMin) || 0);
+          const sessionGoal = (goals && goals.activityGoalMin) || 20;
+          const planned = plannedMin(r);
           let v = 0;
-          if (r.completed) v += 0.6;
-          if (act > 0) v += 0.4 * Math.min(1, act / Math.max(1, actGoal));
-          if (!r.completed && act === 0 && Number(r.energy) > 0) v += 0.05; // logged, but rested
+          if (isTrainingDay(r)) v += 0.6;
+          if (planned > 0) v += 0.4 * Math.min(1, planned / Math.max(1, sessionGoal));
+          if (!isTrainingDay(r) && planned === 0 && Number(r.energy) > 0) v += 0.05; // logged rest day
           return Math.max(0, Math.min(1, v));
         }
 
@@ -5600,7 +6407,7 @@
             rows.forEach(function (r) {
               if (Jalali.cmp(r.jdate, start) < 0 || Jalali.cmp(r.jdate, end) > 0) return;
               logged++;
-              if (r.completed) active++;
+              if (isTrainingDay(r)) active++;
             });
             if (logged > 0) counts.push(active);
           }
@@ -5630,7 +6437,7 @@
             const d = Jalali.addDays(start, i);
             const row = rows.find(function (r) { return r.jdate === d; });
             const isFuture = Jalali.cmp(d, today) > 0;
-            const active = !!(row && row.completed);
+            const active = isTrainingDay(row);
             if (active) done++;
             days.push({ jdate: d, active: active, logged: !!row, future: isFuture, isToday: d === today });
           }
@@ -5659,7 +6466,7 @@
             rows.forEach(function (r) {
               if (Jalali.cmp(r.jdate, start) < 0 || Jalali.cmp(r.jdate, end) > 0) return;
               logged++;
-              if (r.completed) c++;
+              if (isTrainingDay(r)) c++;
             });
             // hasData distinguishes "a week you failed" from "a week before you
             // started using the app". Only the former should count against you.
@@ -5680,10 +6487,334 @@
           };
         }
 
+        // ===== v6.2 MOTIVATION ENGINE =====
+        // Three ideas, deliberately small:
+        //  1) personal records — competing with your own past beats abstract goals
+        //  2) minimum viable step — protects the routine on low-energy days
+        //  3) week-over-week comparison — progress you can feel
+        const MIN_STEP_MIN = 10; // the "this still counts" floor
+
+        // formatMin lives in a later script tag. These helpers are only invoked
+        // at runtime (well after load), but resolving it lazily removes any
+        // dependency on script order.
+        function fmtMin(v) {
+          if (typeof formatMin === 'function') return formatMin(v);
+          const total = Math.round((Number(v) || 0) * 60);
+          return Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0');
+        }
+
+        // Best continuous run before a given date (null when there is no history).
+        function previousBestRun(beforeDate) {
+          let best = 0;
+          state.rows.forEach(function (r) {
+            if (beforeDate && Jalali.cmp(r.jdate, beforeDate) >= 0) return;
+            const v = Number(r.longestRun) || 0;
+            if (v > best) best = v;
+          });
+          return best > 0 ? best : null;
+        }
+
+        // Detect records set by a specific row. Returns a list of plain messages.
+        function detectRecords(row) {
+          if (!row) return [];
+          const out = [];
+          const prevRun = previousBestRun(row.jdate);
+          const run = Number(row.longestRun) || 0;
+          if (run > 0 && (prevRun === null || run > prevRun)) {
+            out.push({
+              kind: 'run',
+              text: prevRun === null
+                ? 'اولین رکورد دویدن پیوسته‌ات ثبت شد: ' + fmtMin(run)
+                : 'رکورد جدید دویدن پیوسته: ' + fmtMin(run) + ' (قبلی ' + fmtMin(prevRun) + ')',
+            });
+          }
+          // Longest planned session so far
+          let prevSession = 0;
+          state.rows.forEach(function (r) {
+            if (Jalali.cmp(r.jdate, row.jdate) >= 0) return;
+            const v = plannedMin(r);
+            if (v > prevSession) prevSession = v;
+          });
+          const thisSession = plannedMin(row);
+          if (thisSession > 0 && prevSession > 0 && thisSession > prevSession) {
+            out.push({
+              kind: 'session',
+              text: 'طولانی‌ترین جلسه‌ات تا امروز: ' + fmtMin(thisSession) +
+                ' (قبلی ' + fmtMin(prevSession) + ')',
+            });
+          }
+          return out;
+        }
+
+        // Week-over-week comparison, phrased as progress rather than judgement.
+        function weekOverWeek() {
+          const rows = state.rows;
+          const thisStart = jWeekStart(Jalali.today());
+          const prevStart = Jalali.addDays(thisStart, -7);
+          const prevEnd = Jalali.addDays(thisStart, -1);
+          function tally(from, to) {
+            let days = 0, planned = 0, daily = 0;
+            rows.forEach(function (r) {
+              if (Jalali.cmp(r.jdate, from) < 0 || Jalali.cmp(r.jdate, to) > 0) return;
+              if (isTrainingDay(r)) days++;
+              planned += plannedMin(r);
+              daily += dailyMin(r);
+            });
+            return { days: days, planned: planned, daily: daily };
+          }
+          const cur = tally(thisStart, Jalali.today());
+          const prev = tally(prevStart, prevEnd);
+          const hasPrev = prev.days > 0 || prev.planned > 0;
+          return {
+            cur: cur, prev: prev, hasPrev: hasPrev,
+            dayDelta: cur.days - prev.days,
+            minDelta: cur.planned - prev.planned,
+          };
+        }
+
+        // The single most useful nudge for right now.
+        function minimumStepSuggestion() {
+          const today = Jalali.today();
+          const row = state.rows.find(function (r) { return r.jdate === today; });
+          const wp = weekProgress(state.rows);
+          if (row && isTrainingDay(row)) {
+            return { done: true, text: 'امروز انجام شد ✅', sub: '' };
+          }
+          if (wp.achieved) {
+            return {
+              done: false, optional: true,
+              text: 'هدف هفته رسیده — امروز اختیاری است',
+              sub: 'اگر حال داشتی ' + MIN_STEP_MIN + ' دقیقه پیاده‌روی، وگرنه استراحت.',
+            };
+          }
+          return {
+            done: false, optional: false,
+            text: 'کوچک‌ترین قدم امروز: ' + MIN_STEP_MIN + ' دقیقه',
+            sub: 'لازم نیست تمرین کامل باشد؛ همین مقدار روتین را زنده نگه می‌دارد.',
+          };
+        }
+
+        // v6.2: month-in-review. Long-horizon feedback so progress is visible
+        // even when individual weeks feel flat.
+        function monthReview(offset) {
+          offset = Number(offset) || 0;
+          const today = Jalali.today();
+          const parts = Jalali.parseKey(today);
+          let y = parts.jy, m = parts.jm - offset;
+          while (m < 1) { m += 12; y -= 1; }
+          const days = Jalali.monthDays(y, m);
+          const first = Jalali.formatKey(y, m, 1);
+          const last = Jalali.formatKey(y, m, days);
+          const rows = state.rows.filter(function (r) {
+            return Jalali.cmp(r.jdate, first) >= 0 && Jalali.cmp(r.jdate, last) <= 0;
+          });
+          if (!rows.length) return null;
+          let trainDays = 0, planned = 0, daily = 0, best = 0, sleepSum = 0, sleepN = 0, eSum = 0, eN = 0;
+          rows.forEach(function (r) {
+            if (isTrainingDay(r)) trainDays++;
+            planned += plannedMin(r);
+            daily += dailyMin(r);
+            if ((Number(r.longestRun) || 0) > best) best = Number(r.longestRun) || 0;
+            const si = sleepInfo(r.sleepBlocks);
+            if (si.totalMin > 0) { sleepSum += si.totalMin; sleepN++; }
+            const e = Number(r.energy);
+            if (Number.isFinite(e)) { eSum += e; eN++; }
+          });
+          return {
+            year: y, month: m, name: Jalali.monthName(m),
+            first: first, last: last, daysInMonth: days,
+            logged: rows.length, trainDays: trainDays,
+            planned: planned, daily: daily, bestRun: best,
+            avgSleepMin: sleepN ? sleepSum / sleepN : 0,
+            avgEnergy: eN ? +(eSum / eN).toFixed(1) : 0,
+          };
+        }
+
+        // ===== v6.3 STUDY ANALYTICS =====
+        // Kept deliberately independent from the sport metrics: no shared score,
+        // no shared goal. The two worlds only ever meet inside the report.
+        function studyEnabled() {
+          const c = state.studyConfig;
+          return !!(c && c.enabled);
+        }
+        function studySessions(days, endDate) {
+          const all = state.study || [];
+          if (!days || days === 'all') {
+            return all.slice().sort(function (a, b) { return Jalali.cmp(a.jdate, b.jdate); });
+          }
+          const end = endDate || Jalali.today();
+          return all.filter(function (x) {
+            const age = Jalali.diffDays(end, x.jdate);
+            return age >= 0 && age < Number(days);
+          }).sort(function (a, b) { return Jalali.cmp(a.jdate, b.jdate); });
+        }
+        function studyMinutesOn(jdate) {
+          return (state.study || []).reduce(function (a, x) {
+            return x.jdate === jdate ? a + (Number(x.minutes) || 0) : a;
+          }, 0);
+        }
+        function studyStats(sessions) {
+          sessions = sessions || [];
+          const byDate = {};
+          let total = 0, focusSum = 0, focusN = 0, satSum = 0, satN = 0;
+          let q = 0, c = 0, distract = 0, distractN = 0;
+          const subjects = {};
+          const methods = {};
+          sessions.forEach(function (x) {
+            const m = Number(x.minutes) || 0;
+            total += m;
+            byDate[x.jdate] = (byDate[x.jdate] || 0) + m;
+            if (x.focus > 0) { focusSum += x.focus; focusN++; }
+            if (x.satisfaction > 0) { satSum += x.satisfaction; satN++; }
+            if (x.distractions > 0) { distract += x.distractions; distractN++; }
+            q += Number(x.questions) || 0;
+            c += Number(x.correct) || 0;
+            if (x.subject) {
+              if (!subjects[x.subject]) subjects[x.subject] = { min: 0, n: 0, focus: 0, fN: 0 };
+              subjects[x.subject].min += m;
+              subjects[x.subject].n++;
+              if (x.focus > 0) { subjects[x.subject].focus += x.focus; subjects[x.subject].fN++; }
+            }
+            if (x.method) methods[x.method] = (methods[x.method] || 0) + m;
+          });
+          const dayKeys = Object.keys(byDate);
+          const activeDays = dayKeys.length;
+          const best = dayKeys.reduce(function (acc, k) {
+            return !acc || byDate[k] > byDate[acc] ? k : acc;
+          }, null);
+          return {
+            total: total, sessions: sessions.length, activeDays: activeDays,
+            byDate: byDate,
+            avgPerActiveDay: activeDays ? Math.round(total / activeDays) : 0,
+            avgFocus: focusN ? +(focusSum / focusN).toFixed(1) : 0, focusN: focusN,
+            avgSatisfaction: satN ? +(satSum / satN).toFixed(1) : 0, satN: satN,
+            avgDistractions: distractN ? +(distract / distractN).toFixed(1) : 0,
+            questions: q, correct: c,
+            accuracy: q > 0 ? Math.round((c / q) * 100) : null,
+            subjects: Object.keys(subjects).map(function (k) {
+              return {
+                name: k, min: subjects[k].min, n: subjects[k].n,
+                avgFocus: subjects[k].fN ? +(subjects[k].focus / subjects[k].fN).toFixed(1) : 0,
+              };
+            }).sort(function (a, b) { return b.min - a.min; }),
+            methods: Object.keys(methods).map(function (k) {
+              return { name: k, min: methods[k] };
+            }).sort(function (a, b) { return b.min - a.min; }),
+            bestDay: best ? { jdate: best, min: byDate[best] } : null,
+          };
+        }
+
+        // Study consistency over a rolling window: same philosophy as sport
+        // momentum — a missed day should dent, not destroy.
+        function studyMomentum(days) {
+          days = days || 14;
+          const goal = (state.studyConfig && state.studyConfig.dailyGoalMin) || 0;
+          const today = Jalali.today();
+          let weighted = 0, maxW = 0;
+          for (let i = 0; i < days; i++) {
+            const d = Jalali.addDays(today, -i);
+            const w = Math.pow(0.5, i / 7);
+            maxW += w;
+            const m = studyMinutesOn(d);
+            // With no explicit goal, treat 60 minutes as a full day.
+            const ref = goal > 0 ? goal : 60;
+            weighted += w * Math.min(1, m / ref);
+          }
+          return Math.round((weighted / Math.max(0.0001, maxW)) * 100);
+        }
+
+        function studyInsights(sessions) {
+          const out = [];
+          const s = studyStats(sessions);
+          if (!sessions.length) {
+            return [{ type: 'info', emoji: '📭', text: 'هنوز جلسه‌ای ثبت نشده — اولین جلسه را ثبت کن.' }];
+          }
+          const goal = (state.studyConfig && state.studyConfig.dailyGoalMin) || 0;
+          out.push({
+            type: 'info', emoji: '📈',
+            text: 'در این بازه ' + fmtHM(s.total) + ' مطالعه در ' + s.activeDays +
+              ' روز (میانگین ' + fmtHM(s.avgPerActiveDay) + ' در روزهای فعال).',
+          });
+          if (goal > 0) {
+            const hit = Object.keys(s.byDate).filter(function (k) { return s.byDate[k] >= goal; }).length;
+            out.push({
+              type: hit >= s.activeDays / 2 ? 'good' : 'warn', emoji: '🎯',
+              text: hit + ' روز از ' + s.activeDays + ' روزِ فعال به هدف روزانه (' +
+                fmtHM(goal) + ') رسیدی.',
+            });
+          }
+          if (s.focusN >= 3) {
+            out.push({
+              type: s.avgFocus >= 7 ? 'good' : s.avgFocus >= 5 ? 'info' : 'warn',
+              emoji: '🎯',
+              text: 'میانگین تمرکز ' + s.avgFocus + ' از ۱۰ (در ' + s.focusN + ' جلسه‌ای که ثبت کردی).',
+            });
+          }
+          // Which subject gets the most / least attention?
+          if (s.subjects.length >= 2) {
+            const top = s.subjects[0], low = s.subjects[s.subjects.length - 1];
+            out.push({
+              type: 'info', emoji: '📚',
+              text: 'بیشترین وقت روی «' + top.name + '» (' + fmtHM(top.min) +
+                ') و کمترین روی «' + low.name + '» (' + fmtHM(low.min) + ').',
+            });
+            const focused = s.subjects.filter(function (x) { return x.avgFocus > 0; });
+            if (focused.length >= 2) {
+              const bestF = focused.reduce(function (a, b) { return b.avgFocus > a.avgFocus ? b : a; });
+              const worstF = focused.reduce(function (a, b) { return b.avgFocus < a.avgFocus ? b : a; });
+              if (bestF.name !== worstF.name && bestF.avgFocus - worstF.avgFocus >= 1.5) {
+                out.push({
+                  type: 'info', emoji: '🔎',
+                  text: 'تمرکزت روی «' + bestF.name + '» بیشتر است (' + bestF.avgFocus +
+                    ') و روی «' + worstF.name + '» کمتر (' + worstF.avgFocus +
+                    ') — شاید این یکی را در ساعت بهتری بگذاری.',
+                });
+              }
+            }
+          }
+          if (s.accuracy !== null && s.questions >= 20) {
+            out.push({
+              type: s.accuracy >= 70 ? 'good' : s.accuracy >= 50 ? 'info' : 'warn',
+              emoji: '✏️',
+              text: s.questions + ' تست زدی و ' + s.accuracy + '٪ درست بوده (' +
+                s.correct + ' از ' + s.questions + ').',
+            });
+          }
+          if (s.avgDistractions >= 4) {
+            out.push({
+              type: 'warn', emoji: '📵',
+              text: 'میانگین ' + s.avgDistractions + ' بار حواس‌پرتی در هر جلسه — ' +
+                'جلسه‌های کوتاه‌ترِ پشت‌سرهم معمولاً کمک می‌کند.',
+            });
+          }
+          if (s.bestDay) {
+            out.push({
+              type: 'good', emoji: '🏆',
+              text: 'پرکارترین روزت ' + s.bestDay.jdate + ' با ' + fmtHM(s.bestDay.min) + ' بود.',
+            });
+          }
+          return out;
+        }
+
+        function fmtHM(min) {
+          min = Math.max(0, Math.round(Number(min) || 0));
+          const h = Math.floor(min / 60), m = min % 60;
+          if (h && m) return h + ' ساعت و ' + m + ' دقیقه';
+          if (h) return h + ' ساعت';
+          return m + ' دقیقه';
+        }
+        function fmtHMShort(min) {
+          min = Math.max(0, Math.round(Number(min) || 0));
+          const h = Math.floor(min / 60), m = min % 60;
+          if (h && m) return h + ':' + String(m).padStart(2, '0');
+          if (h) return h + ':00';
+          return '0:' + String(m).padStart(2, '0');
+        }
+
         function currentStreak(rows) {
           rows = Array.isArray(rows) ? rows : state.rows;
           const byDate = {};
-          rows.forEach(function (r) { byDate[r.jdate] = !!r.completed; });
+          rows.forEach(function (r) { byDate[r.jdate] = isTrainingDay(r); });
           const today = Jalali.today();
           let cursor;
           if (Object.prototype.hasOwnProperty.call(byDate, today)) {
@@ -6037,6 +7168,27 @@
         window._app.momentumTrend = momentumTrend;
         window._app.momentumLevel = momentumLevel;
         window._app.dayEffort = dayEffort;
+        window._app.detectRecords = detectRecords;
+        window._app.previousBestRun = previousBestRun;
+        window._app.weekOverWeek = weekOverWeek;
+        window._app.minimumStepSuggestion = minimumStepSuggestion;
+        window._app.MIN_STEP_MIN = MIN_STEP_MIN;
+        window._app.monthReview = monthReview;
+        window._app.studyEnabled = studyEnabled;
+        window._app.studySessions = studySessions;
+        window._app.studyStats = studyStats;
+        window._app.studyMinutesOn = studyMinutesOn;
+        window._app.studyMomentum = studyMomentum;
+        window._app.studyInsights = studyInsights;
+        window._app.normalizeStudy = normalizeStudy;
+        window._app.STUDY_METHODS = STUDY_METHODS;
+        window._app.fmtHM = fmtHM;
+        window._app.fmtHMShort = fmtHMShort;
+        window._app.isTrainingDay = isTrainingDay;
+        window._app.qualifiesAsTraining = qualifiesAsTraining;
+        window._app.plannedMin = plannedMin;
+        window._app.dailyMin = dailyMin;
+        window._app.TRAINING_WALK_MIN = TRAINING_WALK_MIN;
         window._app.weekProgress = weekProgress;
         window._app.weeklyHistory = weeklyHistory;
         window._app.weeksHittingTarget = weeksHittingTarget;
@@ -6072,6 +7224,11 @@
         const statsLastN = A.statsLastN;
         const rowsInLastDays = A.rowsInLastDays;
         const currentStreak = A.currentStreak;
+        const isTrainingDay = A.isTrainingDay;
+        const plannedMin = A.plannedMin;
+        const dailyMin = A.dailyMin;
+        const MIN_STEP_MIN = A.MIN_STEP_MIN;
+        const studyEnabled = A.studyEnabled;
         const dataFreshness = A.dataFreshness;
         const weeklyBreakdown = A.weeklyBreakdown;
         const toast = A.toast;
@@ -6598,14 +7755,30 @@
           const statsAll = computeStats(sorted);
 
           const lastActive = sorted.filter(function (r) {
-            return r.completed && Jalali.cmp(r.jdate, Jalali.today()) <= 0;
+            return isTrainingDay(r) && Jalali.cmp(r.jdate, Jalali.today()) <= 0;
           }).pop();
           const inactiveDays = lastActive ? Jalali.diffDays(Jalali.today(), lastActive.jdate) : null;
-          const liveStreak = currentStreak(state().rows);
+          // v6.2: comeback framing instead of guilt. Someone who trains every
+          // other day should never be told off for a gap; the useful message is
+          // "the smallest step still counts", not "you failed for N days".
+          const wpIns = A.weekProgress(state().rows);
           if (inactiveDays !== null && inactiveDays >= 3) {
-            insights.push({ type: 'bad', emoji: '⚠️', text: inactiveDays + ' روز از آخرین فعالیت گذشته — آخرین: ' + lastActive.jdate });
-          } else if (liveStreak >= 3) {
-            insights.push({ type: 'good', emoji: '🔥', text: liveStreak + ' روز تقویمی پیاپی فعال!' });
+            insights.push({
+              type: 'info', emoji: '🌱',
+              text: inactiveDays + ' روز استراحت داشتی — امروز یک شروع سبک کافی است؛ ' +
+                'حتی ' + MIN_STEP_MIN + ' دقیقه هم حساب می‌شود.',
+            });
+          } else if (wpIns.achieved) {
+            insights.push({
+              type: 'good', emoji: '🎉',
+              text: 'هدف این هفته کامل شد (' + wpIns.done + ' از ' + wpIns.target + ' روز) — هرچه از این به بعد، اضافه است.',
+            });
+          } else if (wpIns.done > 0) {
+            insights.push({
+              type: 'good', emoji: '💪',
+              text: 'این هفته ' + wpIns.done + ' روز فعال بودی' +
+                (wpIns.need > 0 ? ' — ' + wpIns.need + ' روز تا هدف.' : '.'),
+            });
           }
 
           const sleepGoal = state().goals
@@ -6671,9 +7844,12 @@
             'charts',
             'calc',
             'ai',
+            'study',
             'export',
           ];
           if (valid.indexOf(view) === -1) return;
+          // The study tab only exists when the module is switched on.
+          if (view === 'study' && !studyEnabled()) return;
           const views = document.querySelectorAll('.view');
           views.forEach(function (v) {
             v.classList.remove('active');
@@ -6691,6 +7867,7 @@
           if (view === 'futsal') renderFutsal();
           if (view === 'charts') renderChartsIfReady();
           if (view === 'ai') renderAIView();
+          if (view === 'study') renderStudyAll();
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -6769,6 +7946,56 @@
               '</div>' +
               '<div class="week-dots">' + dots + '</div>' +
             '</div>';
+
+          // v6.1: three separate numbers so routine adherence is never confused
+          // with incidental movement.
+          const rows7hero = rowsInLastDays(7);
+          const s7 = computeStats(rows7hero);
+          const funMin = state().futsal.reduce(function (acc, f) {
+            const age = Jalali.diffDays(Jalali.today(), f.jdate);
+            return age >= 0 && age < 7 ? acc + (Number(f.durationActual) || 0) : acc;
+          }, 0);
+          // v6.2: the nudge + week-over-week line.
+          const step = A.minimumStepSuggestion();
+          const wow = A.weekOverWeek();
+          let nudge = '';
+          if (!step.done) {
+            nudge = '<div class="nudge' + (step.optional ? ' optional' : '') + '">' +
+              '<span class="nudge-ico">' + (step.optional ? '🌤️' : '👟') + '</span>' +
+              '<span><b>' + escapeHTML(step.text) + '</b>' +
+              (step.sub ? '<small>' + escapeHTML(step.sub) + '</small>' : '') + '</span>' +
+            '</div>';
+          }
+          let wowLine = '';
+          if (wow.hasPrev) {
+            const d = wow.dayDelta;
+            const ico = d > 0 ? '📈' : d < 0 ? '📉' : '➡️';
+            const msg = d > 0
+              ? 'این هفته ' + d + ' روز بیشتر از هفته‌ی قبل — رو به جلو'
+              : d < 0
+                ? 'هفته‌ی قبل ' + Math.abs(d) + ' روز بیشتر بود؛ هنوز وقت هست'
+                : 'هم‌سطح هفته‌ی قبل (' + wow.prev.days + ' روز)';
+            wowLine = '<div class="wow-line">' + ico + ' ' + escapeHTML(msg) + '</div>';
+          }
+
+          const splitRow =
+            '<div class="split-metrics">' +
+              '<div class="split-metric primary">' +
+                '<div class="split-value">' + wp.done + '<small>/' + wp.target + '</small></div>' +
+                '<div class="split-label">🎯 روتین</div>' +
+                '<div class="split-sub">روز ورزش هفته</div>' +
+              '</div>' +
+              '<div class="split-metric">' +
+                '<div class="split-value">' + Math.round(s7.totalDaily) + '<small>′</small></div>' +
+                '<div class="split-label">🚶 روزمره</div>' +
+                '<div class="split-sub">۷ روز • تقریبی</div>' +
+              '</div>' +
+              '<div class="split-metric">' +
+                '<div class="split-value">' + Math.round(funMin) + '<small>′</small></div>' +
+                '<div class="split-label">⚽ تفریحی</div>' +
+                '<div class="split-sub">۷ روز اخیر</div>' +
+              '</div>' +
+            '</div>';
           el.innerHTML =
             '<div class="today-hero-grid">' +
               '<div class="readiness-ring" style="--score:' + (rec.stale ? 0 : rec.readiness) + '">' +
@@ -6783,9 +8010,239 @@
               '</div></div>' +
             '</div>' +
             weekStrip +
+            splitRow +
+            wowLine +
+            nudge +
             '<div class="hero-actions">' + action +
               '<button type="button" class="btn btn-ghost btn-sm" data-tab="ai">🧠 تحلیل کامل</button>' +
             '</div>';
+        }
+
+        // ===== v6.3 STUDY UI =====
+        function renderStudyAll() {
+          if (!A.studyEnabled()) return;
+          // Keep the report toggle in step with the saved preference so the
+          // choice made in settings is actually honoured.
+          const sleepBox = document.getElementById('studyReportSleep');
+          if (sleepBox) sleepBox.checked = !!(state().studyConfig || {}).showSleepInReport;
+          renderStudyHero();
+          renderStudyKpis();
+          renderStudyList();
+          renderStudyTrend();
+          renderStudyInsights();
+        }
+
+        function renderStudyHero() {
+          const el = document.getElementById('studyHero');
+          if (!el) return;
+          const cfg = state().studyConfig || {};
+          const today = Jalali.today();
+          const todayMin = A.studyMinutesOn(today);
+          const goal = cfg.dailyGoalMin || 0;
+          const mom = A.studyMomentum(14);
+          const pct = goal > 0 ? Math.min(100, Math.round((todayMin / goal) * 100)) : null;
+          const pill = document.getElementById('studyTodayPill');
+          if (pill) pill.textContent = 'امروز ' + A.fmtHMShort(todayMin);
+
+          let msg, emoji;
+          if (todayMin === 0) {
+            emoji = '📖'; msg = 'امروز هنوز جلسه‌ای ثبت نشده — حتی ۲۵ دقیقه هم شروع خوبی است.';
+          } else if (goal > 0 && todayMin >= goal) {
+            emoji = '🎉'; msg = 'هدف امروز کامل شد! ' + A.fmtHM(todayMin) + ' مطالعه.';
+          } else if (goal > 0) {
+            emoji = '💪'; msg = A.fmtHM(todayMin) + ' مطالعه کردی — ' +
+              A.fmtHM(goal - todayMin) + ' تا هدف امروز.';
+          } else {
+            emoji = '✅'; msg = 'امروز ' + A.fmtHM(todayMin) + ' مطالعه ثبت شده.';
+          }
+
+          el.innerHTML =
+            '<div class="today-hero-grid">' +
+              '<div class="readiness-ring" style="--score:' + (pct === null ? Math.min(100, mom) : pct) + '">' +
+                '<div class="readiness-ring-value">' +
+                  (pct === null ? mom : pct) + '<small>' + (pct === null ? 'روند' : '٪ هدف') + '</small>' +
+                '</div>' +
+              '</div>' +
+              '<div><div class="today-hero-title">' + emoji + ' ' + escapeHTML(msg) + '</div>' +
+              '<div class="today-hero-meta">' +
+                '<span class="hero-chip">📈 روند ۱۴ روز: ' + mom + '</span>' +
+                (goal > 0 ? '<span class="hero-chip">🎯 هدف روزانه: ' + escapeHTML(A.fmtHMShort(goal)) + '</span>' : '') +
+              '</div></div>' +
+            '</div>' +
+            '<div class="hero-actions">' +
+              '<button type="button" class="btn btn-primary btn-sm" data-app-action="open-study">＋ ثبت جلسه</button>' +
+            '</div>';
+        }
+
+        function renderStudyKpis() {
+          const box = document.getElementById('studyKpis');
+          if (!box) return;
+          const s7 = A.studyStats(A.studySessions(7));
+          const s30 = A.studyStats(A.studySessions(30));
+          box.innerHTML =
+            '<div class="kpi"><div class="kpi-value">' + A.fmtHMShort(s7.total) + '</div>' +
+              '<div class="kpi-label">📅 ۷ روز</div><div class="kpi-sub">' + s7.activeDays + ' روز فعال</div></div>' +
+            '<div class="kpi"><div class="kpi-value">' + A.fmtHMShort(s30.total) + '</div>' +
+              '<div class="kpi-label">🗓️ ۳۰ روز</div><div class="kpi-sub">' + s30.sessions + ' جلسه</div></div>' +
+            '<div class="kpi"><div class="kpi-value">' + (s30.avgFocus || '—') + '</div>' +
+              '<div class="kpi-label">🎯 تمرکز</div><div class="kpi-sub">میانگین از ۱۰</div></div>' +
+            '<div class="kpi"><div class="kpi-value">' + (s30.accuracy === null ? '—' : s30.accuracy + '٪') + '</div>' +
+              '<div class="kpi-label">✏️ درصد تست</div><div class="kpi-sub">' +
+              (s30.questions ? s30.correct + ' از ' + s30.questions : 'ثبت نشده') + '</div></div>';
+        }
+
+        function renderStudyList() {
+          const box = document.getElementById('studyList');
+          if (!box) return;
+          const range = (document.getElementById('studyRange') || {}).value || '14';
+          const sessions = A.studySessions(range).slice().reverse();
+          if (!sessions.length) {
+            box.innerHTML = '<div class="empty-state"><span class="emoji">📭</span>' +
+              '<p>در این بازه جلسه‌ای ثبت نشده</p></div>';
+            return;
+          }
+          let html = '', lastDate = '';
+          sessions.forEach(function (x) {
+            if (x.jdate !== lastDate) {
+              lastDate = x.jdate;
+              const dayTotal = A.studyMinutesOn(x.jdate);
+              html += '<div class="study-daygroup">' +
+                escapeHTML(Jalali.weekdayName(x.jdate)) + ' ' + escapeHTML(x.jdate) +
+                '<span>' + escapeHTML(A.fmtHMShort(dayTotal)) + '</span></div>';
+            }
+            const chips = [];
+            if (x.method) chips.push('<span class="study-chip">' + escapeHTML(x.method) + '</span>');
+            if (x.start && x.end) chips.push('<span class="study-chip">' +
+              escapeHTML(x.start) + '–' + escapeHTML(x.end) + '</span>');
+            if (x.focus > 0) chips.push('<span class="study-chip' + (x.focus >= 7 ? ' good' : '') +
+              '">🎯 ' + x.focus + '</span>');
+            if (x.questions > 0) {
+              const acc = x.questions ? Math.round((x.correct / x.questions) * 100) : 0;
+              chips.push('<span class="study-chip">✏️ ' + x.questions + ' تست • ' + acc + '٪</span>');
+            }
+            if (x.note) chips.push('<span class="study-chip">📝</span>');
+            html += '<div class="study-row" data-app-action="edit-study" data-id="' +
+                escapeHTML(String(x.id)) + '">' +
+              '<div class="study-dur">' + escapeHTML(A.fmtHMShort(x.minutes)) + '<small>ساعت</small></div>' +
+              '<div class="study-main">' +
+                '<div class="study-title">' +
+                  escapeHTML(x.subject || 'جلسه مطالعه') +
+                  (x.topic ? ' <span style="color:var(--muted);font-weight:400">— ' +
+                    escapeHTML(x.topic) + '</span>' : '') +
+                '</div>' +
+                (chips.length ? '<div class="study-meta">' + chips.join('') + '</div>' : '') +
+              '</div>' +
+            '</div>';
+          });
+          box.innerHTML = html;
+        }
+
+        // v6.3: a light, dependency-free trend view. Deliberately not a Chart.js
+        // canvas — this must read as encouragement at a glance on a phone, and
+        // it also has to survive being screenshotted for a mentor.
+        function renderStudyTrend() {
+          const box = document.getElementById('studyTrend');
+          const exp = document.getElementById('studyChartExplain');
+          if (!box) return;
+          const goal = (state().studyConfig || {}).dailyGoalMin || 0;
+          const today = Jalali.today();
+
+          // --- last 14 days as vertical bars ---
+          const days = [];
+          for (let i = 13; i >= 0; i--) {
+            const d = Jalali.addDays(today, -i);
+            days.push({ jdate: d, min: A.studyMinutesOn(d) });
+          }
+          const maxMin = Math.max(goal, days.reduce(function (a, b) {
+            return Math.max(a, b.min); }, 0), 1);
+          const dayLetters = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+          const bars = days.map(function (d) {
+            const pct = Math.round((d.min / maxMin) * 100);
+            const hit = goal > 0 && d.min >= goal;
+            const isToday = d.jdate === today;
+            return '<div class="tb' + (isToday ? ' today' : '') + '" title="' +
+                escapeHTML(d.jdate + ' • ' + A.fmtHMShort(d.min)) + '">' +
+              '<div class="tb-track">' +
+                '<div class="tb-fill' + (hit ? ' hit' : '') + (d.min === 0 ? ' zero' : '') +
+                  '" style="height:' + Math.max(d.min > 0 ? 6 : 2, pct) + '%"></div>' +
+              '</div>' +
+              '<div class="tb-lab">' + dayLetters[Jalali.weekday(d.jdate)] + '</div>' +
+            '</div>';
+          }).join('');
+          const goalLine = goal > 0
+            ? '<div class="tb-goal" style="bottom:' +
+              Math.round((goal / maxMin) * 100) + '%"><span>هدف</span></div>' : '';
+
+          // --- this week vs last week ---
+          const wkStart = A.jWeekStart(today);
+          function sum(from, to) {
+            let t = 0;
+            for (let i = 0; i < 7; i++) {
+              const d = Jalali.addDays(from, i);
+              if (Jalali.cmp(d, to) > 0) break;
+              t += A.studyMinutesOn(d);
+            }
+            return t;
+          }
+          const curWeek = sum(wkStart, today);
+          const prevWeek = sum(Jalali.addDays(wkStart, -7), Jalali.addDays(wkStart, -1));
+          const wkMax = Math.max(curWeek, prevWeek, 1);
+          const delta = curWeek - prevWeek;
+          let verdict;
+          if (prevWeek === 0 && curWeek === 0) verdict = 'هنوز داده‌ای برای مقایسه نیست.';
+          else if (prevWeek === 0) verdict = 'اولین هفته‌ی ثبت‌شده‌ات — از هفته‌ی بعد مقایسه شروع می‌شود.';
+          else if (delta > 0) verdict = '📈 این هفته ' + A.fmtHM(delta) + ' بیشتر از هفته‌ی قبل — ادامه بده.';
+          else if (delta < 0) verdict = '📉 هفته‌ی قبل ' + A.fmtHM(-delta) + ' بیشتر بود؛ هنوز وقت داری.';
+          else verdict = '➡️ دقیقاً هم‌سطح هفته‌ی قبل.';
+
+          function wkBar(label, val, cls) {
+            return '<div class="wk-row">' +
+              '<span class="wk-name">' + label + '</span>' +
+              '<span class="wk-track"><span class="wk-fill ' + cls + '" style="width:' +
+                Math.max(val > 0 ? 4 : 0, Math.round((val / wkMax) * 100)) + '%"></span></span>' +
+              '<span class="wk-val">' + escapeHTML(A.fmtHMShort(val)) + '</span>' +
+            '</div>';
+          }
+
+          // --- top subjects ---
+          const s30 = A.studyStats(A.studySessions(30));
+          const subjMax = s30.subjects.length ? s30.subjects[0].min : 1;
+          const subjRows = s30.subjects.slice(0, 5).map(function (x) {
+            return '<div class="wk-row">' +
+              '<span class="wk-name">' + escapeHTML(x.name) + '</span>' +
+              '<span class="wk-track"><span class="wk-fill sub" style="width:' +
+                Math.max(4, Math.round((x.min / subjMax) * 100)) + '%"></span></span>' +
+              '<span class="wk-val">' + escapeHTML(A.fmtHMShort(x.min)) + '</span>' +
+            '</div>';
+          }).join('');
+
+          if (exp) {
+            exp.innerHTML = '<b>این نمودار چیست؟</b> هر ستون یک روز از ۱۴ روز گذشته است و ' +
+              'بلندی‌اش یعنی چقدر آن روز مطالعه کردی. ستون خالی یعنی آن روز ثبتی نبوده' +
+              (goal > 0 ? '، و خط‌چین جای هدف روزانه‌ات را نشان می‌دهد' : '') + '.';
+          }
+
+          box.innerHTML =
+            '<div class="trend-bars">' + goalLine + bars + '</div>' +
+            '<div class="trend-verdict">' + escapeHTML(verdict) + '</div>' +
+            '<div class="trend-block">' +
+              '<div class="trend-h">مقایسه‌ی هفتگی</div>' +
+              wkBar('این هفته', curWeek, 'cur') +
+              wkBar('هفته قبل', prevWeek, 'prev') +
+            '</div>' +
+            (subjRows ? '<div class="trend-block">' +
+              '<div class="trend-h">بیشترین وقت (۳۰ روز)</div>' + subjRows + '</div>' : '');
+        }
+
+        function renderStudyInsights() {
+          const box = document.getElementById('studyInsights');
+          if (!box) return;
+          const items = A.studyInsights(A.studySessions(30));
+          box.innerHTML = items.map(function (i) {
+            return '<div class="insight insight-' + escapeHTML(i.type) + '">' +
+              '<span class="emoji">' + i.emoji + '</span>' +
+              '<span>' + escapeHTML(i.text) + '</span></div>';
+          }).join('');
         }
 
         // ===== DASHBOARD =====
@@ -8153,6 +9610,173 @@
           renderAllCharts();
         }
 
+        // ===== v6.1 CHART EXPLAINERS =====
+        // Every chart gets two things: a plain "what am I looking at" line that
+        // a first-time viewer can follow, and a verdict computed from the data.
+        // Someone who has never seen the app should understand a screenshot.
+        const CHART_EXPLAIN = {
+          sleep: 'هر نقطه یک شب است و ارتفاعش یعنی چند ساعت خوابیدی. ' +
+            'خط نارنجی میانگین ۷ روزه است (روند کلی) و خط قرمز چین هدف خوابت. ' +
+            'هرجا خط زیر قرمز باشد، آن شب کم‌خوابی داشتی.',
+          energy: 'دو خط: انرژی و حالِ روحی، هرکدام از ۱۰. ' +
+            'بالا بهتر است. نقطه‌های خالی یعنی آن روز ثبت نشده.',
+          activity: 'ستون‌های هر روز نشان می‌دهد چقدر دویدی و چقدر پیاده‌روی ورزشی کردی. ' +
+            'ارتفاع کل ستون یعنی مجموع تمرین برنامه‌ریزی‌شده‌ی آن روز.',
+          bedtime: 'هر نقطه ساعتی است که خوابیدی یا بیدار شدی. ' +
+            'اگر نقطه‌ها پخش‌وپلا باشند یعنی ساعت خوابت نامنظم است؛ ' +
+            'هرچه در یک خط افقی جمع‌تر باشند، منظم‌تری.',
+          weekly: 'هر گروه ستون یک هفته است و پنج شاخص را کنار هم مقایسه می‌کند. ' +
+            'برای دیدن پیشرفت هفته‌به‌هفته مفید است، نه روزبه‌روز.',
+          radar: 'سه هفته‌ی آخر روی پنج محور. ' +
+            'هرچه شکل بزرگ‌تر و پرتر باشد، آن هفته بهتر بوده. ' +
+            'فرورفتگی هر ضلع یعنی نقطه‌ضعف همان بخش.',
+          scatter: 'هر نقطه یک جفت است: خواب دیشب (محور افقی) و انرژی فردا (محور عمودی). ' +
+            'اگر نقطه‌ها از پایین‌چپ به بالا‌راست شیب داشته باشند، ' +
+            'یعنی خواب بیشتر برای تو واقعاً انرژی بیشتر می‌آورد.',
+        };
+
+        function setChartText(id, text) {
+          const el = document.getElementById(id);
+          if (el) el.innerHTML = text;
+        }
+
+        function renderChartExplainers(rows) {
+          Object.keys(CHART_EXPLAIN).forEach(function (k) {
+            setChartText('explain-' + k, '<b>این نمودار چیست؟</b> ' + CHART_EXPLAIN[k]);
+          });
+
+          const few = '💡 برای تحلیل معنادار، چند روز دیگر ثبت کن.';
+          if (!rows || rows.length < 3) {
+            Object.keys(CHART_EXPLAIN).forEach(function (k) {
+              setChartText('verdict-' + k, few);
+            });
+            return;
+          }
+
+          const st = state();
+          const goals = st.goals || {};
+          const sleepGoal = goals.sleepGoalHours || 7;
+          const s = computeStats(rows);
+          const n = rows.length;
+
+          // --- sleep ---
+          const nights = rows.map(function (r) { return sleepInfo(r.sleepBlocks).totalH || 0; })
+            .filter(function (h) { return h > 0; });
+          if (nights.length >= 3) {
+            const hit = nights.filter(function (h) { return h >= sleepGoal; }).length;
+            const short = nights.filter(function (h) { return h < sleepGoal - 1; }).length;
+            let v = 'میانگین <b>' + s.avgSleepDisplay + '</b> در ' + nights.length + ' شب. ' +
+              '<b>' + hit + '</b> شب به هدف ' + sleepGoal + ' ساعت رسیدی';
+            v += short > 0 ? ' و <b>' + short + '</b> شب کم‌خوابی جدی داشتی.' : '.';
+            if (s.avgSleep >= sleepGoal) v += ' روند خوابت سالم است.';
+            else v += ' به‌طور میانگین ' + formatHour(sleepGoal - s.avgSleep) + ' از هدف عقبی.';
+            setChartText('verdict-sleep', '💡 ' + v);
+          } else setChartText('verdict-sleep', few);
+
+          // --- energy ---
+          const es = rows.map(function (r) { return Number(r.energy); })
+            .filter(function (x) { return Number.isFinite(x); });
+          if (es.length >= 3) {
+            const half = Math.floor(es.length / 2);
+            const first = es.slice(0, half).reduce(function (a, b) { return a + b; }, 0) / Math.max(1, half);
+            const last = es.slice(half).reduce(function (a, b) { return a + b; }, 0) / Math.max(1, es.length - half);
+            const d = last - first;
+            let v = 'میانگین انرژی <b>' + s.avgEnergy + '</b> و حال <b>' + s.avgMood + '</b> از ۱۰. ';
+            v += Math.abs(d) < 0.4 ? 'در این بازه تقریباً ثابت بوده.'
+              : d > 0 ? 'نیمه‌ی دوم بازه <b>' + d.toFixed(1) + '</b> نمره بهتر شده 📈'
+                      : 'نیمه‌ی دوم بازه <b>' + Math.abs(d).toFixed(1) + '</b> نمره افت کرده 📉';
+            setChartText('verdict-energy', '💡 ' + v);
+          } else setChartText('verdict-energy', few);
+
+          // --- activity (planned only) ---
+          const trainDays = rows.filter(isTrainingDay).length;
+          const totalPlanned = rows.reduce(function (a, r) { return a + plannedMin(r); }, 0);
+          const totalDaily = rows.reduce(function (a, r) { return a + dailyMin(r); }, 0);
+          let av = '<b>' + trainDays + '</b> روز از ' + n + ' روز ورزش برنامه‌ریزی‌شده داشتی ' +
+            '(مجموع <b>' + formatMin(totalPlanned) + '</b>).';
+          if (totalDaily > 0) {
+            av += ' جدا از آن، حدود <b>' + Math.round(totalDaily) +
+              ' دقیقه</b> فعالیت روزمره ثبت کردی که در این نمودار نیست.';
+          }
+          if (trainDays > 0) {
+            av += ' میانگین هر جلسه <b>' + formatMin(totalPlanned / trainDays) + '</b>.';
+          }
+          setChartText('verdict-activity', '💡 ' + av);
+
+          // --- bedtime regularity ---
+          const beds = [];
+          rows.forEach(function (r) {
+            const b = (r.sleepBlocks || [])[0];
+            if (!b || !b.start) return;
+            let m = timeToMin(b.start);
+            if (!Number.isFinite(m)) return;
+            if (m < 720) m += 1440; // treat after-midnight as late evening
+            beds.push(m);
+          });
+          if (beds.length >= 3) {
+            const mean = beds.reduce(function (a, b) { return a + b; }, 0) / beds.length;
+            const sd = Math.sqrt(beds.reduce(function (a, b) {
+              return a + Math.pow(b - mean, 2); }, 0) / beds.length);
+            const mm = Math.round(mean) % 1440;
+            let v = 'معمولاً حوالی <b>' + minToTime(mm) + '</b> می‌خوابی. ';
+            v += sd < 30 ? 'ساعت خوابت خیلی منظم است 👌'
+              : sd < 60 ? 'نوسان ساعت خوابت حدود نیم‌ساعت است — قابل قبول.'
+              : 'نوسان ساعت خوابت بیش از <b>' + Math.round(sd) + ' دقیقه</b> است؛ ' +
+                'ثابت‌کردنش بیشترین اثر را روی انرژی‌ات دارد.';
+            setChartText('verdict-bedtime', '💡 ' + v);
+          } else setChartText('verdict-bedtime', few);
+
+          // --- weekly ---
+          const wh = A.weeklyHistory(4);
+          const done = wh.weeks.filter(function (w) { return w.hasData && !w.current; });
+          if (done.length >= 1) {
+            const hits = done.filter(function (w) { return w.hit; }).length;
+            const cur = wh.weeks[wh.weeks.length - 1];
+            let v = 'از ' + done.length + ' هفته‌ی کامل اخیر، <b>' + hits +
+              '</b> هفته به هدف ' + wh.target + ' روز رسیدی. ' +
+              'این هفته تا الان <b>' + cur.count + '</b> روز.';
+            setChartText('verdict-weekly', '💡 ' + v);
+          } else setChartText('verdict-weekly', few);
+
+          // --- radar ---
+          setChartText('verdict-radar',
+            '💡 هرچه شکل هفته‌ی جدید بیرونی‌تر از هفته‌های قبل باشد، پیشرفت کرده‌ای. ' +
+            'ضلعی که تو رفته، همان چیزی است که این هفته کم گذاشتی.');
+
+          // --- correlation ---
+          const sorted2 = rows.slice().sort(function (a, b) { return Jalali.cmp(a.jdate, b.jdate); });
+          const pairs = [];
+          for (let i = 0; i < sorted2.length - 1; i++) {
+            if (Jalali.diffDays(sorted2[i + 1].jdate, sorted2[i].jdate) !== 1) continue;
+            const sh = sleepInfo(sorted2[i].sleepBlocks).totalH;
+            const ne = Number(sorted2[i + 1].energy);
+            if (sh > 0 && Number.isFinite(ne)) pairs.push([sh, ne]);
+          }
+          if (pairs.length >= 5) {
+            const xs = pairs.map(function (x) { return x[0]; });
+            const ys = pairs.map(function (x) { return x[1]; });
+            const varies = function (arr) {
+              return arr.some(function (v) { return Math.abs(v - arr[0]) > 1e-9; }); };
+            if (varies(xs) && varies(ys)) {
+              const c = pearsonCorrelation(xs, ys);
+              const ac = Math.abs(c);
+              let v = 'بر اساس <b>' + pairs.length + '</b> جفت روز، ';
+              if (ac < 0.2) v += 'رابطه‌ی روشنی بین خواب و انرژی فردا دیده نمی‌شود؛ ' +
+                'احتمالاً عوامل دیگری مثل استرس یا تغذیه مؤثرترند.';
+              else if (c > 0) v += 'خواب بیشتر با انرژی بهتر همراه بوده ' +
+                '(همبستگی ' + (ac > 0.6 ? 'قوی' : 'متوسط') + '، r=' + c.toFixed(2) + '). ' +
+                'یعنی خوابیدن برای تو واقعاً جواب می‌دهد.';
+              else v += 'به‌طور غیرمنتظره خواب بیشتر با انرژی کمتر همراه بوده ' +
+                '(r=' + c.toFixed(2) + ')؛ شاید خواب طولانی نشانه‌ی خستگی بوده نه علتش.';
+              setChartText('verdict-scatter', '💡 ' + v);
+            } else {
+              setChartText('verdict-scatter',
+                '💡 چون خواب یا انرژی در این بازه تقریباً ثابت بوده، همبستگی قابل محاسبه نیست.');
+            }
+          } else setChartText('verdict-scatter',
+            '💡 برای این تحلیل حداقل ۵ جفت روزِ پشت‌سرهم لازم است (الان ' + pairs.length + ').');
+        }
+
         function renderSleepHeatmap() {
           const container = document.getElementById('heatmapContainer');
           if (!container) return;
@@ -8203,35 +9827,56 @@
             }
             if (weeks.length > 15) weeks.splice(0, weeks.length - 15);
 
+            // v6.1: the heatmap used to be a wall of numbers with no explanation.
+            // It now states plainly what one square means, and computes a short
+            // verdict so a first-time viewer understands it instantly.
+            const hmVals = [];
+            let hmBest = null, hmWorst = null;
+            const hmByWeekday = {};
+            dataToShow.forEach(function (r) {
+              const h = sleepInfo(r.sleepBlocks).totalH || 0;
+              if (h <= 0) return;
+              hmVals.push(h);
+              if (!hmBest || h > hmBest.h) hmBest = { d: r.jdate, h: h };
+              if (!hmWorst || h < hmWorst.h) hmWorst = { d: r.jdate, h: h };
+              const wd = Jalali.weekdayName(r.jdate);
+              if (!hmByWeekday[wd]) hmByWeekday[wd] = { sum: 0, n: 0 };
+              hmByWeekday[wd].sum += h;
+              hmByWeekday[wd].n++;
+            });
+            const hmGoal = (state().goals && state().goals.sleepGoalHours) || 7;
+            const hmAvg = hmVals.length
+              ? hmVals.reduce(function (a, b) { return a + b; }, 0) / hmVals.length : 0;
+            const hmGoodNights = hmVals.filter(function (h) { return h >= hmGoal; }).length;
+
             let html = '<div class="heatmap-container">';
             html += '<div class="heatmap-title">🔥 نقشه حرارتی خواب</div>';
             html +=
+              '<div class="chart-explain">' +
+                '<b>این نمودار چیست؟</b> هر مربع یک شب است. ' +
+                'رنگ پررنگ‌تر یعنی خواب بیشتر و رنگ کم‌رنگ یعنی خواب کم. ' +
+                'خانه‌های خالی شب‌هایی هستند که ثبت نشده‌اند. ' +
+                'ستون‌ها روزهای هفته و هر ردیف یک هفته است — پس اگر یک ستون همیشه ' +
+                'کم‌رنگ باشد، یعنی آن روزِ هفته مشکل‌دار است.' +
+              '</div>';
+            html +=
               '<div class="heatmap-info">' +
-              dataToShow.length +
-              ' روز • ' +
-              weeks.length +
-              ' هفته</div>';
+              dataToShow.length + ' روز • ' + weeks.length + ' هفته • ' +
+              hmVals.length + ' شب ثبت‌شده</div>';
             html += '<div class="heatmap-grid">';
             html += '<div class="heatmap-label"></div>';
             Jalali.WEEK_DAYS.forEach(function (d) {
               html += '<div class="heatmap-label">' + d.slice(0, 1) + '</div>';
             });
             weeks.forEach(function (week) {
-              const firstCell = week.find(function (x) {
-                return x !== null;
-              });
+              const firstCell = week.find(function (x) { return x !== null; });
               const label = firstCell ? firstCell.jdate.slice(5) : '';
               html += '<div class="heatmap-row-label">' + label + '</div>';
               week.forEach(function (cell) {
-                if (!cell) {
-                  html += '<div class="heatmap-cell empty"></div>';
-                  return;
-                }
+                if (!cell) { html += '<div class="heatmap-cell empty"></div>'; return; }
                 if (!cell.row) {
-                  html +=
-                    '<div class="heatmap-cell empty" title="' +
-                    cell.jdate +
-                    '"></div>';
+                  html += '<div class="heatmap-cell empty" title="' + cell.jdate +
+                    ' • ثبت نشده"></div>';
                   return;
                 }
                 try {
@@ -8246,16 +9891,14 @@
                   else if (h < 9) level = '4';
                   else level = '5';
                   const displayText = h > 0 ? h.toFixed(1) : '';
-                  const tooltip =
-                    cell.jdate + ' • ' + (si.totalDisplay || '0:00');
+                  const wdName = Jalali.weekdayName(cell.jdate);
+                  const tooltip = h > 0
+                    ? wdName + ' ' + cell.jdate + ' • ' + (si.totalDisplay || '0:00') +
+                      ' • ' + (h >= hmGoal ? 'به هدف رسیده' : 'کمتر از هدف')
+                    : wdName + ' ' + cell.jdate + ' • ثبت نشده';
                   html +=
-                    '<div class="heatmap-cell hm-' +
-                    level +
-                    '" title="' +
-                    tooltip +
-                    '">' +
-                    displayText +
-                    '</div>';
+                    '<div class="heatmap-cell hm-' + level + '" title="' + tooltip + '">' +
+                    displayText + '</div>';
                 } catch (e) {
                   html += '<div class="heatmap-cell empty"></div>';
                 }
@@ -8264,13 +9907,40 @@
             html += '</div>';
             html +=
               '<div class="heatmap-legend">' +
+              '<span class="heatmap-legend-item">کم‌خواب</span>' +
               '<span class="heatmap-legend-item"><span class="heatmap-legend-box hm-0"></span>&lt;4h</span>' +
               '<span class="heatmap-legend-item"><span class="heatmap-legend-box hm-1"></span>4-5.5</span>' +
               '<span class="heatmap-legend-item"><span class="heatmap-legend-box hm-2"></span>5.5-6.5</span>' +
               '<span class="heatmap-legend-item"><span class="heatmap-legend-box hm-3"></span>6.5-7.5</span>' +
               '<span class="heatmap-legend-item"><span class="heatmap-legend-box hm-4"></span>7.5-9</span>' +
               '<span class="heatmap-legend-item"><span class="heatmap-legend-box hm-5"></span>9h+</span>' +
-              '</div></div>';
+              '<span class="heatmap-legend-item">پرخواب</span>' +
+              '</div>';
+
+            // Plain-language verdict under the grid.
+            if (hmVals.length >= 3) {
+              const wdList = Object.keys(hmByWeekday).filter(function (w) {
+                return hmByWeekday[w].n >= 2;
+              }).map(function (w) {
+                return { wd: w, avg: hmByWeekday[w].sum / hmByWeekday[w].n };
+              }).sort(function (x, y) { return x.avg - y.avg; });
+              const parts = [];
+              parts.push('میانگین خوابت <b>' + formatHour(hmAvg) + '</b> بوده و ' +
+                '<b>' + hmGoodNights + '</b> شب از ' + hmVals.length +
+                ' شب به هدف ' + hmGoal + ' ساعت رسیدی.');
+              if (wdList.length >= 2 && (wdList[wdList.length - 1].avg - wdList[0].avg) >= 0.8) {
+                parts.push('کم‌خواب‌ترین روزت معمولاً <b>' + escapeHTML(wdList[0].wd) +
+                  '</b> و پرخواب‌ترین <b>' + escapeHTML(wdList[wdList.length - 1].wd) + '</b> است.');
+              }
+              if (hmWorst && hmBest && hmBest.h - hmWorst.h >= 2) {
+                parts.push('نوسان خوابت زیاد است (از ' + formatHour(hmWorst.h) +
+                  ' تا ' + formatHour(hmBest.h) + ')؛ ثابت‌کردن ساعت خواب بیشترین اثر را دارد.');
+              }
+              html += '<div class="chart-verdict">💡 ' + parts.join(' ') + '</div>';
+            } else {
+              html += '<div class="chart-verdict">💡 برای تحلیل دقیق‌تر، چند شب دیگر خوابت را ثبت کن.</div>';
+            }
+            html += '</div>';
             container.innerHTML = html;
           } catch (e) {
             console.error('heatmap error:', e);
@@ -8290,6 +9960,7 @@
         function renderAllCharts() {
           const sorted = chartRowsForRange();
           renderChartSummary(sorted);
+          renderChartExplainers(sorted);
           const labels = sorted.map(function (r) {
             return r.jdate.slice(5);
           });
@@ -8911,6 +10582,8 @@
         A.setChartRange = function (value) { chartRangeValue=value; safeStorage.setItem('sport_chart_range_v1',value); renderAllCharts(); };
         A.getChartRange = function () { return chartRangeValue; };
         A.renderGoalProgress = renderGoalProgress;
+        A.renderStudyAll = renderStudyAll;
+        A.renderStudyList = renderStudyList;
         A.syncWeeklyGoalUI = syncWeeklyGoalUI;
         A.checkBackupReminder = checkBackupReminder;
         A.generateInsights = generateInsights;
@@ -9033,6 +10706,9 @@
         const weekdayStrength = A.weekdayStrength;
         const analyzePatterns = A.analyzePatterns;
         const TIME_WINDOWS = A.TIME_WINDOWS;
+        const isTrainingDay = A.isTrainingDay;
+        const plannedMin = A.plannedMin;
+        const dailyMin = A.dailyMin;
 
         function state() {
           return A.state();
@@ -9253,6 +10929,7 @@
               activity: document.getElementById('mdActivity').value,
               note: document.getElementById('mdNote').value,
               trainHour: (document.getElementById('mdTrainHour') || {}).value || '',
+              walkDailyMin: Number((document.getElementById('mdWalkDaily') || {}).value) || 0,
               officialWake: document.getElementById('mdOfficialWake').value,
               sleepBlocks: deepClone(sleepBlocksData),
             };
@@ -9287,6 +10964,7 @@
           loadMmssField('mdLongestMm', 'mdLongestSs', 'mdLongest', Number(draft.longestRun) || 0);
           document.getElementById('mdActivity').value = String(draft.activity || '').slice(0, 500);
           document.getElementById('mdNote').value = String(draft.note || '').slice(0, 5000);
+          setWalkDailyValue(Number(draft.walkDailyMin) || 0);
           setTrainHourValue(draft.trainHour === '' || draft.trainHour == null ? null : draft.trainHour);
           document.getElementById('mdOfficialWake').value = draft.officialWake || '';
           renderSleepBlocks(Array.isArray(draft.sleepBlocks) ? draft.sleepBlocks : []);
@@ -9319,6 +10997,160 @@
           el.dataset.filled = '1';
           return el;
         }
+        // ===== v6.1 QUICK REVIEW (backfill tool) =====
+        // Splitting planned training from everyday walking is only useful if the
+        // existing history can be reclassified without re-opening the 5-step form
+        // for every single day. This is a flat, one-line-per-day editor plus a
+        // one-tap rule. Nothing is written until the user presses save.
+        let reviewDraft = null;
+
+        function reviewRows() {
+          const range = (document.getElementById('reviewRange') || {}).value || '30';
+          const all = state().rows.slice().sort(function (a, b) {
+            return Jalali.cmp(b.jdate, a.jdate);
+          });
+          if (range === 'all') return all;
+          const days = Number(range) || 30;
+          const today = Jalali.today();
+          return all.filter(function (r) {
+            const age = Jalali.diffDays(today, r.jdate);
+            return age >= 0 && age < days;
+          });
+        }
+
+        function renderReviewList() {
+          const box = document.getElementById('reviewList');
+          const countEl = document.getElementById('reviewCount');
+          if (!box) return;
+          const rows = reviewRows();
+          if (countEl) countEl.textContent = rows.length + ' روز';
+          if (!rows.length) {
+            box.innerHTML = '<div class="empty-state"><span class="emoji">📭</span>' +
+              '<p>در این بازه روزی ثبت نشده</p></div>';
+            return;
+          }
+          const html = rows.map(function (r) {
+            const d = reviewDraft[r.id] || { walkMin: r.walkMin || 0, walkDailyMin: r.walkDailyMin || 0 };
+            const changed = (d.walkMin !== (r.walkMin || 0)) ||
+              (d.walkDailyMin !== (r.walkDailyMin || 0));
+            const train = (Number(r.runMin) || 0) >= 1 || d.walkMin >= A.TRAINING_WALK_MIN;
+            return '<div class="review-row' + (changed ? ' changed' : '') + '" data-id="' +
+                escapeHTML(String(r.id)) + '">' +
+              '<div class="review-date">' +
+                '<span class="rv-badge ' + (train ? 'on' : 'off') + '">' + (train ? '✓' : '·') + '</span>' +
+                escapeHTML(r.jdate.slice(5)) +
+                '<small>' + escapeHTML(Jalali.weekdayName(r.jdate).slice(0, 3)) + '</small>' +
+              '</div>' +
+              '<div class="review-run">' + formatMin(r.runMin || 0) + '</div>' +
+              '<input type="number" class="review-inp" data-field="walkMin" value="' +
+                Math.round(d.walkMin) + '" min="0" max="600" inputmode="numeric" aria-label="پیاده‌روی ورزشی" />' +
+              '<input type="number" class="review-inp daily" data-field="walkDailyMin" value="' +
+                Math.round(d.walkDailyMin) + '" min="0" max="600" inputmode="numeric" aria-label="فعالیت روزمره" />' +
+            '</div>';
+          }).join('');
+          box.innerHTML = html;
+        }
+
+        function openReviewModal() {
+          const modal = document.getElementById('modalReview');
+          if (!modal) return;
+          reviewDraft = {};
+          state().rows.forEach(function (r) {
+            reviewDraft[r.id] = {
+              walkMin: Math.round(Number(r.walkMin) || 0),
+              walkDailyMin: Math.round(Number(r.walkDailyMin) || 0),
+            };
+          });
+          renderReviewList();
+          modal.classList.add('open');
+        }
+
+        function closeReviewModal() {
+          const modal = document.getElementById('modalReview');
+          if (modal) modal.classList.remove('open');
+          reviewDraft = null;
+        }
+
+        function applyReviewRule() {
+          const thEl = document.getElementById('reviewThreshold');
+          const th = Math.max(1, Math.min(60, Math.round(Number(thEl && thEl.value) || 15)));
+          const rows = reviewRows();
+          let n = 0;
+          rows.forEach(function (r) {
+            // Days with a real run were deliberate training: never touch them.
+            if ((Number(r.runMin) || 0) >= 1) return;
+            const d = reviewDraft[r.id];
+            if (!d) return;
+            if (d.walkMin > 0 && d.walkMin < th) {
+              d.walkDailyMin = Math.round(d.walkDailyMin + d.walkMin);
+              d.walkMin = 0;
+              n++;
+            }
+          });
+          renderReviewList();
+          toast(n ? '🪄 ' + n + ' روز به رفت‌وآمد منتقل شد — هنوز ذخیره نشده'
+                  : 'روزی با این شرط پیدا نشد', n ? 'success' : 'default', 3200);
+        }
+
+        function saveReview() {
+          const s = state();
+          let changed = 0;
+          const rev = A.nextRevision();
+          s.rows.forEach(function (r) {
+            const d = reviewDraft && reviewDraft[r.id];
+            if (!d) return;
+            const nw = Math.max(0, Math.min(600, Math.round(d.walkMin)));
+            const nd = Math.max(0, Math.min(600, Math.round(d.walkDailyMin)));
+            if (nw === (r.walkMin || 0) && nd === (r.walkDailyMin || 0)) return;
+            r.walkMin = nw;
+            r.walkDailyMin = nd;
+            r._updatedAt = rev;
+            changed++;
+          });
+          if (!changed) { toast('تغییری برای ذخیره نبود', 'default', 2600); closeReviewModal(); return; }
+          if (!save()) { toast('ذخیره ناموفق بود', 'error', 5000); return; }
+          closeReviewModal();
+          A.renderLog();
+          A.renderDashboard();
+          toast('✅ ' + changed + ' روز به‌روزرسانی شد', 'success', 3000);
+          scheduleCloudSync('quick-review');
+        }
+
+        // v6.1: everyday-movement picker. Chips give a one-tap approximate
+        // value; the number input stays authoritative for anything custom.
+        function setWalkDailyValue(v) {
+          const el = document.getElementById('mdWalkDaily');
+          const n = Math.max(0, Math.min(600, Math.round(Number(v) || 0)));
+          if (el) el.value = String(n);
+          syncWalkDailyChips(n);
+        }
+        function syncWalkDailyChips(n) {
+          const wrap = document.getElementById('mdWalkDailyChips');
+          if (!wrap) return;
+          wrap.querySelectorAll('.chip').forEach(function (b) {
+            b.classList.toggle('active', Number(b.dataset.daily) === Number(n));
+          });
+        }
+        function bindWalkDailyControls() {
+          const wrap = document.getElementById('mdWalkDailyChips');
+          const input = document.getElementById('mdWalkDaily');
+          if (wrap && wrap.dataset.bound !== '1') {
+            wrap.dataset.bound = '1';
+            wrap.addEventListener('click', function (e) {
+              const btn = e.target.closest('.chip');
+              if (!btn) return;
+              setWalkDailyValue(btn.dataset.daily);
+              scheduleDayDraft();
+            });
+          }
+          if (input && input.dataset.bound !== '1') {
+            input.dataset.bound = '1';
+            input.addEventListener('input', function () {
+              syncWalkDailyChips(Math.round(Number(this.value) || 0));
+            });
+          }
+        }
+
         function setTrainHourValue(v) {
           const el = ensureTrainHourOptions();
           if (!el) return;
@@ -9334,6 +11166,7 @@
           if (!modal) return;
           RatingSlider.init();
           ensureTrainHourOptions();
+          bindWalkDailyControls();
           if (id) {
             const row = state().rows.find(function (r) {
               return r.id === id;
@@ -9382,6 +11215,7 @@
             );
             document.getElementById('mdActivity').value = row.activity || '';
             document.getElementById('mdNote').value = row.note || '';
+            setWalkDailyValue(row.walkDailyMin || 0);
             setTrainHourValue(row.trainHour);
             document.getElementById('mdOfficialWake').value =
               row.officialWake || '';
@@ -9403,6 +11237,7 @@
             loadMmssField('mdLongestMm', 'mdLongestSs', 'mdLongest', 0);
             document.getElementById('mdActivity').value = '';
             document.getElementById('mdNote').value = '';
+            setWalkDailyValue(0);
             setTrainHourValue(null);
             document.getElementById('mdOfficialWake').value = '07:00';
             renderSleepBlocks([
@@ -9591,6 +11426,11 @@
             futsalRef: document.getElementById('mdFutsalRef').checked,
             runMin: runValue,
             walkMin: walkValue,
+            walkDailyMin: (function () {
+              const el = document.getElementById('mdWalkDaily');
+              const v = el ? Math.round(Number(el.value) || 0) : 0;
+              return Math.max(0, Math.min(600, v));
+            })(),
             longestRun: longestValue,
             activity: document.getElementById('mdActivity').value.trim(),
             note: document.getElementById('mdNote').value.trim(),
@@ -9630,6 +11470,17 @@
           } else {
             toast('✅ روی دستگاه ذخیره شد', 'success');
           }
+          // v6.2: celebrate a personal record right after saving. Records are
+          // computed against days BEFORE this one, so re-saving the same day
+          // cannot trigger the same celebration twice.
+          try {
+            const recs = A.detectRecords(row);
+            if (recs.length) {
+              setTimeout(function () {
+                toast('🎉 ' + recs[0].text, 'success', 5200);
+              }, 900);
+            }
+          } catch (e) { console.warn('records:', e); }
         }
 
         A.editDay = function (id) {
@@ -9685,6 +11536,455 @@
           sleepBlocksData.splice(idx, 1);
           renderSleepBlocks(sleepBlocksData);
         };
+
+        // ===== v6.3 STUDY MODAL =====
+        let editingStudyId = null;
+
+        function stEl(id) { return document.getElementById(id); }
+
+        // Recently used titles, most-used first. Free text stays the primary
+        // input; these are just shortcuts so repeat entry is one tap.
+        function recentSubjects(limit) {
+          const count = {};
+          const lastSeen = {};
+          (state().study || []).forEach(function (x) {
+            if (!x.subject) return;
+            count[x.subject] = (count[x.subject] || 0) + 1;
+            if (!lastSeen[x.subject] || Jalali.cmp(x.jdate, lastSeen[x.subject]) > 0) {
+              lastSeen[x.subject] = x.jdate;
+            }
+          });
+          (state().studyConfig.subjects || []).forEach(function (s) {
+            if (!count[s]) count[s] = 0;
+          });
+          return Object.keys(count).sort(function (a, b) {
+            if (count[b] !== count[a]) return count[b] - count[a];
+            return Jalali.cmp(lastSeen[b] || '0000-00-00', lastSeen[a] || '0000-00-00');
+          }).slice(0, limit || 8);
+        }
+
+        function fillStudySubjects(selected) {
+          const dl = stEl('stSubjectList');
+          const list = recentSubjects(8);
+          if (dl) {
+            dl.innerHTML = list.map(function (s) {
+              return '<option value="' + escapeHTML(s) + '"></option>';
+            }).join('');
+          }
+          const box = stEl('stSubjectChips');
+          if (box) {
+            box.innerHTML = list.length
+              ? list.map(function (s) {
+                  return '<button type="button" class="chip' +
+                    (s === selected ? ' active' : '') + '" data-subject="' +
+                    escapeHTML(s) + '">' + escapeHTML(s) + '</button>';
+                }).join('')
+              : '';
+            box.style.display = list.length ? '' : 'none';
+          }
+        }
+
+        function syncSubjectChips(value) {
+          const box = stEl('stSubjectChips');
+          if (!box) return;
+          box.querySelectorAll('.chip').forEach(function (b) {
+            b.classList.toggle('active', b.dataset.subject === value);
+          });
+        }
+
+        function fillStudyMethods(selected) {
+          const box = stEl('stMethodChips');
+          if (!box) return;
+          box.innerHTML = A.STUDY_METHODS.map(function (m) {
+            return '<button type="button" class="chip' + (m === selected ? ' active' : '') +
+              '" data-method="' + escapeHTML(m) + '">' + escapeHTML(m) + '</button>';
+          }).join('');
+          const hid = stEl('stMethod');
+          if (hid) hid.value = selected || '';
+        }
+
+        function syncStudyChips(min) {
+          const box = stEl('stMinChips');
+          if (!box) return;
+          box.querySelectorAll('.chip').forEach(function (b) {
+            b.classList.toggle('active', Number(b.dataset.min) === Number(min));
+          });
+        }
+        function setStudyMinutes(v) {
+          const n = Math.max(0, Math.min(1440, Math.round(Number(v) || 0)));
+          const el = stEl('stMinutes');
+          if (el) el.value = String(n);
+          syncStudyChips(n);
+        }
+        function setRange(id, v) {
+          const el = stEl(id), lab = stEl(id + 'Val');
+          const n = Math.max(0, Math.min(10, Math.round(Number(v) || 0)));
+          if (el) el.value = String(n);
+          if (lab) lab.textContent = n === 0 ? '—' : String(n);
+        }
+        function updateStudyPercent() {
+          const q = Number((stEl('stQuestions') || {}).value) || 0;
+          const c = Number((stEl('stCorrect') || {}).value) || 0;
+          const hint = stEl('stPercentHint');
+          if (!hint) return;
+          if (q > 0) {
+            const pct = Math.round((Math.min(c, q) / q) * 100);
+            hint.textContent = 'درصد: ' + pct + '٪' + (c > q ? ' (تعداد درست از کل بیشتر است)' : '');
+          } else hint.textContent = '';
+        }
+
+        // ===== v6.3 STUDY REPORT (standalone, printable) =====
+        // Separate document from the sport report. Designed to be forwarded to a
+        // mentor: no judgemental language, no day-by-day nagging, just what was
+        // studied, for how long, and what the numbers suggest.
+        function buildStudyReport(range, includeSleep) {
+          const st = state();
+          const cfg = st.studyConfig || {};
+          const sessions = A.studySessions(range);
+          const s = A.studyStats(sessions);
+          const goal = cfg.dailyGoalMin || 0;
+          const accent = getComputedStyle(document.documentElement)
+            .getPropertyValue('--accent').trim() || '#8b5cf6';
+          const from = sessions.length ? sessions[0].jdate : Jalali.today();
+          const to = sessions.length ? sessions[sessions.length - 1].jdate : Jalali.today();
+
+          // Group by day, newest first.
+          const byDay = {};
+          sessions.forEach(function (x) {
+            (byDay[x.jdate] = byDay[x.jdate] || []).push(x);
+          });
+          const dayKeys = Object.keys(byDay).sort(function (a, b) { return Jalali.cmp(b, a); });
+
+          function kpi(v, l, sub) {
+            return '<div class="kpi"><div class="kpi-v">' + v + '</div>' +
+              '<div class="kpi-l">' + l + '</div>' +
+              (sub ? '<div class="kpi-s">' + sub + '</div>' : '') + '</div>';
+          }
+          const kpis = [
+            kpi(faNum(A.fmtHMShort(s.total)), 'مجموع مطالعه', faNum(s.sessions) + ' جلسه'),
+            kpi(faNum(s.activeDays), 'روزهای فعال',
+                'میانگین ' + faNum(A.fmtHMShort(s.avgPerActiveDay))),
+            kpi(s.avgFocus ? faNum(s.avgFocus) + '<small>/۱۰</small>' : '—', 'میانگین تمرکز',
+                s.focusN ? faNum(s.focusN) + ' جلسه ثبت‌شده' : 'ثبت نشده'),
+            kpi(s.accuracy === null ? '—' : faNum(s.accuracy) + '<small>٪</small>', 'درصد تست',
+                s.questions ? faNum(s.correct) + ' از ' + faNum(s.questions) : 'ثبت نشده'),
+          ].join('');
+
+          // Subject breakdown with a simple proportional bar.
+          const maxSub = s.subjects.length ? s.subjects[0].min : 0;
+          const subjectRows = s.subjects.map(function (x) {
+            const pct = maxSub ? Math.round((x.min / maxSub) * 100) : 0;
+            const share = s.total ? Math.round((x.min / s.total) * 100) : 0;
+            return '<tr>' +
+              '<td class="c-sub">' + reportEscape(x.name) + '</td>' +
+              '<td class="c-bar"><div class="bar-wrap"><div class="bar-fill" style="width:' + pct + '%"></div></div></td>' +
+              '<td class="c-mid">' + faNum(A.fmtHMShort(x.min)) + '</td>' +
+              '<td class="c-mid soft">' + faNum(share) + '٪</td>' +
+              '<td class="c-mid soft">' + (x.avgFocus ? faNum(x.avgFocus) : '—') + '</td>' +
+            '</tr>';
+          }).join('');
+
+          const dayBlocks = dayKeys.map(function (d) {
+            const items = byDay[d];
+            const dayTotal = items.reduce(function (a, x) { return a + x.minutes; }, 0);
+            const hitGoal = goal > 0 && dayTotal >= goal;
+            let sleepBit = '';
+            if (includeSleep) {
+              const row = st.rows.find(function (r) { return r.jdate === d; });
+              if (row) {
+                const si = sleepInfo(row.sleepBlocks);
+                const b = (row.sleepBlocks || [])[0];
+                if (si.totalH > 0 && b) {
+                  sleepBit = '<span class="tag sleep">😴 ' + faNum(b.start) + '–' +
+                    faNum(b.end || '') + ' (' + faNum(si.totalDisplay) + ')</span>';
+                }
+              }
+            }
+            const rows = items.map(function (x) {
+              const tags = [];
+              if (x.method) tags.push('<span class="tag">' + reportEscape(x.method) + '</span>');
+              if (x.start && x.end) tags.push('<span class="tag">' + faNum(x.start) + '–' + faNum(x.end) + '</span>');
+              if (x.focus > 0) tags.push('<span class="tag">تمرکز ' + faNum(x.focus) + '</span>');
+              if (x.difficulty > 0) tags.push('<span class="tag">سختی ' + faNum(x.difficulty) + '</span>');
+              if (x.questions > 0) {
+                const acc = Math.round((x.correct / x.questions) * 100);
+                tags.push('<span class="tag">' + faNum(x.questions) + ' تست • ' + faNum(acc) + '٪</span>');
+              }
+              return '<div class="sess">' +
+                '<div class="sess-dur">' + faNum(A.fmtHMShort(x.minutes)) + '</div>' +
+                '<div class="sess-body">' +
+                  '<div class="sess-title">' + reportEscape(x.subject || 'مطالعه') +
+                    (x.topic ? ' <span class="soft">— ' + reportEscape(x.topic) + '</span>' : '') + '</div>' +
+                  (tags.length ? '<div class="tags">' + tags.join('') + '</div>' : '') +
+                  (x.note ? '<div class="sess-note">' + reportEscape(x.note) + '</div>' : '') +
+                '</div></div>';
+            }).join('');
+            return '<div class="day">' +
+              '<div class="day-head">' +
+                '<span class="day-date">' + reportEscape(Jalali.weekdayName(d)) + ' ' + faNum(d) + '</span>' +
+                '<span class="day-total' + (hitGoal ? ' hit' : '') + '">' +
+                  faNum(A.fmtHMShort(dayTotal)) + (hitGoal ? ' ✓' : '') + '</span>' +
+              '</div>' +
+              (sleepBit ? '<div class="day-sleep">' + sleepBit + '</div>' : '') +
+              rows +
+            '</div>';
+          }).join('');
+
+          // Neutral, factual observations — safe to hand to a third party.
+          const obs = [];
+          if (goal > 0) {
+            const hit = dayKeys.filter(function (d) {
+              return byDay[d].reduce(function (a, x) { return a + x.minutes; }, 0) >= goal;
+            }).length;
+            obs.push('در ' + faNum(hit) + ' روز از ' + faNum(s.activeDays) +
+              ' روزِ فعال، مطالعه به هدف روزانه (' + faNum(A.fmtHMShort(goal)) + ') رسیده است.');
+          }
+          if (s.subjects.length >= 2) {
+            obs.push('بیشترین زمان روی «' + reportEscape(s.subjects[0].name) + '» (' +
+              faNum(A.fmtHMShort(s.subjects[0].min)) + ') و کمترین روی «' +
+              reportEscape(s.subjects[s.subjects.length - 1].name) + '» (' +
+              faNum(A.fmtHMShort(s.subjects[s.subjects.length - 1].min)) + ') بوده است.');
+          }
+          if (s.focusN >= 3) {
+            obs.push('میانگین تمرکز خوداظهار ' + faNum(s.avgFocus) + ' از ۱۰ در ' +
+              faNum(s.focusN) + ' جلسه ثبت شده است.');
+          }
+          if (s.accuracy !== null && s.questions >= 20) {
+            obs.push('از ' + faNum(s.questions) + ' تست، ' + faNum(s.correct) +
+              ' مورد درست بوده است (' + faNum(s.accuracy) + '٪).');
+          }
+          if (s.methods.length) {
+            obs.push('بیشترین روش استفاده‌شده: ' + reportEscape(s.methods[0].name) +
+              ' (' + faNum(A.fmtHMShort(s.methods[0].min)) + ').');
+          }
+          if (s.bestDay) {
+            obs.push('پرکارترین روز: ' + faNum(s.bestDay.jdate) + ' با ' +
+              faNum(A.fmtHMShort(s.bestDay.min)) + '.');
+          }
+          const obsHtml = obs.length
+            ? '<ul>' + obs.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>'
+            : '<p class="soft">برای نتیجه‌گیری، داده‌ی بیشتری لازم است.</p>';
+
+          const who = cfg.studentName ? reportEscape(cfg.studentName) : '';
+
+          return '<!DOCTYPE html>\n<html lang="fa" dir="rtl"><head><meta charset="utf-8">\n' +
+'<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+'<title>گزارش مطالعه — ' + faNum(from) + ' تا ' + faNum(to) + '</title>\n' +
+'<link rel="preconnect" href="https://fonts.googleapis.com">\n' +
+'<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">\n' +
+'<style>\n' +
+'  :root{--ac:' + accent + ';--ink:#1a1626;--soft:#6b6580;--line:#e4dff2;--bg:#faf9ff}\n' +
+'  *{box-sizing:border-box}\n' +
+'  body{margin:0;background:var(--bg);color:var(--ink);\n' +
+'    font-family:Vazirmatn,"Segoe UI",Tahoma,sans-serif;line-height:1.9;padding:22px 12px}\n' +
+'  .sheet{max-width:900px;margin:0 auto;background:#fff;border:1px solid var(--line);\n' +
+'    border-radius:16px;padding:clamp(18px,4vw,38px);box-shadow:0 8px 30px rgba(80,60,140,.07)}\n' +
+'  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;\n' +
+'    flex-wrap:wrap;border-bottom:3px solid var(--ac);padding-bottom:13px;margin-bottom:18px}\n' +
+'  h1{font-size:1.3rem;margin:0 0 3px;color:var(--ac)}\n' +
+'  .sub{font-size:.78rem;color:var(--soft)}\n' +
+'  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:18px}\n' +
+'  .kpi{border:1px solid var(--line);border-radius:12px;padding:11px 9px;text-align:center;\n' +
+'    background:linear-gradient(160deg,rgba(139,92,246,.08),rgba(139,92,246,.02))}\n' +
+'  .kpi-v{font-size:1.4rem;font-weight:800;color:var(--ac);line-height:1.2}\n' +
+'  .kpi-v small{font-size:.65rem;color:var(--soft)}\n' +
+'  .kpi-l{font-size:.73rem;font-weight:700;margin-top:2px}\n' +
+'  .kpi-s{font-size:.63rem;color:var(--soft)}\n' +
+'  h2{font-size:.98rem;margin:20px 0 9px;padding-right:9px;border-right:4px solid var(--ac)}\n' +
+'  table{width:100%;border-collapse:collapse;font-size:.78rem}\n' +
+'  th{background:var(--ac);color:#fff;padding:7px 6px;font-size:.71rem}\n' +
+'  td{border-bottom:1px solid var(--line);padding:6px}\n' +
+'  .c-sub{font-weight:600;white-space:nowrap}\n' +
+'  .c-mid{text-align:center;white-space:nowrap}\n' +
+'  .c-mid.soft,.soft{color:var(--soft)}\n' +
+'  .c-bar{width:38%}\n' +
+'  .bar-wrap{background:rgba(139,92,246,.12);border-radius:6px;height:9px;overflow:hidden}\n' +
+'  .bar-fill{background:var(--ac);height:100%;border-radius:6px}\n' +
+'  .day{border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:10px;\n' +
+'    break-inside:avoid}\n' +
+'  .day-head{display:flex;justify-content:space-between;align-items:baseline;\n' +
+'    border-bottom:1px dashed var(--line);padding-bottom:6px;margin-bottom:7px}\n' +
+'  .day-date{font-weight:700;font-size:.84rem}\n' +
+'  .day-total{font-weight:800;color:var(--ac);font-size:.84rem}\n' +
+'  .day-total.hit{background:rgba(139,92,246,.12);border-radius:6px;padding:1px 7px}\n' +
+'  .day-sleep{margin-bottom:6px}\n' +
+'  .sess{display:flex;gap:9px;padding:5px 0}\n' +
+'  .sess-dur{flex:0 0 auto;min-width:48px;font-weight:700;color:var(--ac);font-size:.8rem}\n' +
+'  .sess-body{flex:1;min-width:0}\n' +
+'  .sess-title{font-size:.8rem;font-weight:600}\n' +
+'  .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}\n' +
+'  .tag{font-size:.63rem;color:var(--soft);border:1px solid var(--line);\n' +
+'    border-radius:5px;padding:0 5px}\n' +
+'  .tag.sleep{color:var(--ac);border-color:rgba(139,92,246,.35)}\n' +
+'  .sess-note{font-size:.72rem;color:var(--soft);margin-top:3px}\n' +
+'  ul{margin:0;padding-right:17px;font-size:.82rem}li{margin:3px 0}\n' +
+'  .foot{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);\n' +
+'    font-size:.66rem;color:var(--soft);text-align:center}\n' +
+'  .bar{max-width:900px;margin:0 auto 12px;display:flex;gap:8px;justify-content:flex-end}\n' +
+'  .bar button{font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;\n' +
+'    padding:10px 18px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff}\n' +
+'  @media print{@page{size:A4;margin:12mm}body{background:#fff;padding:0}\n' +
+'    .bar{display:none}.sheet{border:0;box-shadow:none;border-radius:0;padding:0;max-width:none}\n' +
+'    thead{display:table-header-group}tr,.day{break-inside:avoid}h2{break-after:avoid}}\n' +
+'  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}\n' +
+'</style></head><body>\n' +
+'<div class="bar"><button id="btnPrint">🖨️ چاپ / ذخیره PDF</button></div>\n' +
+'<div class="sheet">\n' +
+'  <div class="head">\n' +
+'    <div><h1>📚 گزارش مطالعه</h1>\n' +
+'      <div class="sub">' + (who ? who + ' • ' : '') +
+        'بازه: ' + faNum(from) + ' تا ' + faNum(to) + ' • ' +
+        faNum(s.activeDays) + ' روز فعال</div></div>\n' +
+'    <div class="sub">تاریخ گزارش: ' + faNum(Jalali.today()) + '</div>\n' +
+'  </div>\n' +
+'  <div class="kpis">' + kpis + '</div>\n' +
+(s.subjects.length ? '  <h2>تقسیم زمان بین عنوان‌ها</h2>\n' +
+'  <table><thead><tr><th>عنوان</th><th>سهم</th><th>زمان</th><th>درصد</th><th>تمرکز</th></tr></thead>' +
+'<tbody>' + subjectRows + '</tbody></table>\n' : '') +
+'  <h2>مشاهده‌ها</h2>\n' + obsHtml + '\n' +
+'  <h2>جزئیات روزها</h2>\n' + (dayBlocks || '<p class="soft">جلسه‌ای ثبت نشده است.</p>') + '\n' +
+'  <div class="foot">این گزارش از داده‌های خوداظهار ساخته شده است' +
+  (includeSleep ? ' • ساعت خواب از بخش سلامت همان روز آمده است' : '') + '</div>\n' +
+'</div>\n' +
+'<script>document.getElementById("btnPrint").addEventListener("click",function(){window.print();});<\\/script>\n' +
+'</body></html>';
+        }
+
+        function openStudyReport(downloadOnly) {
+          const rangeEl = document.getElementById('studyReportRange');
+          const sleepEl = document.getElementById('studyReportSleep');
+          const range = (rangeEl && rangeEl.value) || '14';
+          const includeSleep = !!(sleepEl && sleepEl.checked);
+          if (!A.studySessions(range).length) {
+            toast('در این بازه جلسه‌ای ثبت نشده', 'error', 3500);
+            return;
+          }
+          const html = buildStudyReport(range, includeSleep);
+          const name = 'study-report-' + Jalali.today() + '.html';
+          if (downloadOnly) {
+            downloadFile(html, name, 'text/html;charset=utf-8');
+            toast('💾 گزارش دانلود شد', 'success', 3200);
+            return;
+          }
+          const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const win = window.open(url, '_blank');
+          if (!win) {
+            downloadFile(html, name, 'text/html;charset=utf-8');
+            toast('پاپ‌آپ مسدود بود؛ فایل دانلود شد', 'default', 4500);
+          } else {
+            toast('🖨️ گزارش باز شد — دکمه چاپ داخل صفحه', 'success', 4000);
+          }
+          setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+        }
+
+        function openStudyModal(id) {
+          const modal = stEl('modalStudy');
+          if (!modal) return;
+          editingStudyId = id || null;
+          const rec = id ? (state().study || []).find(function (x) { return String(x.id) === String(id); }) : null;
+
+          stEl('modalStudyTitle').textContent = rec ? 'ویرایش جلسه' : 'ثبت جلسه مطالعه';
+          stEl('stDate').value = rec ? rec.jdate : Jalali.today();
+          setStudyMinutes(rec ? rec.minutes : 0);
+          stEl('stStart').value = rec ? rec.start : '';
+          stEl('stEnd').value = rec ? rec.end : '';
+          stEl('stSubject').value = rec ? rec.subject : '';
+          fillStudySubjects(rec ? rec.subject : '');
+          stEl('stTopic').value = rec ? rec.topic : '';
+          fillStudyMethods(rec ? rec.method : '');
+          setRange('stFocus', rec ? rec.focus : 0);
+          setRange('stDifficulty', rec ? rec.difficulty : 0);
+          setRange('stSatisfaction', rec ? rec.satisfaction : 0);
+          stEl('stDistractions').value = rec ? rec.distractions : 0;
+          stEl('stQuestions').value = rec ? rec.questions : 0;
+          stEl('stCorrect').value = rec ? rec.correct : 0;
+          stEl('stNote').value = rec ? rec.note : '';
+          updateStudyPercent();
+
+          // Only expand optional blocks that already contain something.
+          stEl('stOptTime').open = !!(rec && (rec.start || rec.end));
+          stEl('stOptWhat').open = !!(rec && (rec.subject || rec.topic || rec.method));
+          stEl('stOptQuality').open = !!(rec && (rec.focus || rec.difficulty || rec.satisfaction || rec.distractions));
+          stEl('stOptTest').open = !!(rec && rec.questions);
+
+          stEl('stDelete').style.display = rec ? 'inline-flex' : 'none';
+          modal.classList.add('open');
+        }
+
+        function closeStudyModal() {
+          const modal = stEl('modalStudy');
+          if (modal) modal.classList.remove('open');
+          editingStudyId = null;
+        }
+
+        function saveStudySession() {
+          const jdate = (stEl('stDate').value || '').trim();
+          if (!Jalali.isValidDate(jdate)) { toast('تاریخ معتبر نیست', 'error', 3500); return; }
+          const minutes = Math.round(Number(stEl('stMinutes').value) || 0);
+          const start = stEl('stStart').value || '';
+          const end = stEl('stEnd').value || '';
+          if (minutes <= 0 && !(start && end)) {
+            toast('مدت مطالعه یا ساعت شروع و پایان را وارد کن', 'error', 4000);
+            return;
+          }
+          const q = Math.round(Number(stEl('stQuestions').value) || 0);
+          let c = Math.round(Number(stEl('stCorrect').value) || 0);
+          if (c > q) c = q; // never allow more correct than attempted
+          const s = state();
+          const rev = A.nextRevision();
+          const rec = A.normalizeStudy({
+            id: editingStudyId || A.newNumericId(),
+            jdate: jdate, minutes: minutes, start: start, end: end,
+            subject: stEl('stSubject').value, topic: stEl('stTopic').value,
+            method: stEl('stMethod').value,
+            focus: Number(stEl('stFocus').value) || 0,
+            difficulty: Number(stEl('stDifficulty').value) || 0,
+            satisfaction: Number(stEl('stSatisfaction').value) || 0,
+            distractions: Number(stEl('stDistractions').value) || 0,
+            questions: q, correct: c,
+            note: stEl('stNote').value,
+            _updatedAt: rev,
+          }, 0);
+          if (!rec) { toast('ثبت ناموفق بود', 'error', 3500); return; }
+
+          if (!Array.isArray(s.study)) s.study = [];
+          const idx = s.study.findIndex(function (x) { return String(x.id) === String(rec.id); });
+          if (idx >= 0) s.study[idx] = rec; else s.study.push(rec);
+          delete s._sync.studyDeleted[String(rec.id)];
+          if (!save()) { toast('ذخیره ناموفق بود', 'error', 5000); return; }
+
+          closeStudyModal();
+          A.renderStudyAll();
+          toast(idx >= 0 ? '✅ جلسه به‌روزرسانی شد' : '✅ جلسه ثبت شد', 'success', 2600);
+          scheduleCloudSync('after-save');
+        }
+
+        function deleteStudySession() {
+          if (!editingStudyId) return;
+          const s = state();
+          const id = String(editingStudyId);
+          const removed = (s.study || []).find(function (x) { return String(x.id) === id; });
+          if (!removed) { closeStudyModal(); return; }
+          s.study = s.study.filter(function (x) { return String(x.id) !== id; });
+          s._sync.studyDeleted[id] = A.nextRevision();
+          if (!save()) { toast('حذف ناموفق بود', 'error', 5000); return; }
+          closeStudyModal();
+          A.renderStudyAll();
+          // Undo window, same pattern as the sport rows.
+          toastAction('🗑️ جلسه حذف شد', 'برگردان', function () {
+            const st2 = state();
+            delete st2._sync.studyDeleted[id];
+            removed._updatedAt = A.nextRevision();
+            st2.study.push(removed);
+            if (save()) {
+              A.renderStudyAll();
+              toast('↩️ برگردانده شد', 'success', 2200);
+              scheduleCloudSync('undo');
+            }
+          }, 8000);
+          scheduleCloudSync('after-save');
+        }
 
         // ===== FUTSAL MODAL =====
         let editingFutsalId = null;
@@ -9917,10 +12217,12 @@
             (observed && observed.key !== g.preferredTime
               ? ' | داده می‌گوید ' + TIME_WINDOWS[observed.key].label + ' بهتر جواب داده'
               : ''));
-          lines.push('- ظرفیت واقعی: ' + wp.target + ' روز در هفته' +
+          lines.push('- ظرفیت واقعی: ' + wp.target + ' روز ورزش برنامه‌ریزی‌شده در هفته' +
             (wp.auto ? ' (خودکار از روند)' : ' (دستی)'));
-          lines.push('- هدف خواب: ' + (g.sleepGoalHours || 7) + 'h | هدف فعالیت: ' +
+          lines.push('- هدف خواب: ' + (g.sleepGoalHours || 7) + 'h | هدف هر جلسه: ' +
             (g.activityGoalMin || 20) + 'min');
+          lines.push('- تعریف روز ورزشی: دویدن یا حداقل ' + A.TRAINING_WALK_MIN +
+            ' دقیقه پیاده‌روی ورزشی. پیاده‌روی رفت‌وآمد جدا شمرده می‌شود و روز ورزشی حساب نیست.');
           if (best && best.n >= 2) {
             lines.push('- قوی‌ترین روز: ' + best.wd + ' (' + Math.round(best.rate * 100) + '%)' +
               (worst && worst.wd !== best.wd
@@ -9979,8 +12281,14 @@
           lines.push('- خواب: میانگین ' + s.avgSleepDisplay + ' | هدف ' + (g.sleepGoalHours || 7) + 'h' +
             ' | شب‌های ثبت‌شده ' + s.sleepDays);
           lines.push('- انرژی ' + compactNum(s.avgEnergy) + '/10 | حال ' + compactNum(s.avgMood) + '/10');
-          lines.push('- دویدن کل ' + formatMin(s.totalRun) + ' | پیاده‌روی کل ' + formatMin(s.totalWalk) +
+          lines.push('- ورزش برنامه‌ریزی‌شده: دویدن ' + formatMin(s.totalRun) +
+            ' + پیاده‌روی ورزشی ' + formatMin(s.totalWalk) +
             ' | رکورد پیوسته ' + formatMin(s.runBest));
+          if (s.totalDaily > 0) {
+            lines.push('- فعالیت روزمره (رفت‌وآمد، تقریبی و خوداظهار): ' +
+              Math.round(s.totalDaily) + 'min در ' + s.dailyLoggedDays + ' روز' +
+              ' — جزو هدف نیست، فقط برای تفسیر انرژی.');
+          }
           if (corrLine) lines.push(corrLine);
           return lines.join('\n');
         }
@@ -9993,19 +12301,21 @@
         function buildAIDays(rows, opts) {
           const lines = [];
           lines.push('## روزها');
-          lines.push('قالب: `تاریخ|روز|فعال|انرژی|حال|دویدن|پیاده‌روی|خواب|ساعت‌تمرین`' +
-            ' — روز: ش=شنبه ی=یکشنبه د=دوشنبه س=سه‌شنبه چ=چهارشنبه پ=پنجشنبه ج=جمعه');
+          lines.push('قالب: `تاریخ|روز|ورزشی؟|انرژی|حال|دویدن|پیاده‌روی‌ورزشی|روزمره|خواب|ساعت‌تمرین`' +
+            ' — روز: ش=شنبه ی=یکشنبه د=دوشنبه س=سه‌شنبه چ=چهارشنبه پ=پنجشنبه ج=جمعه' +
+            ' • ستون «روزمره» تقریبی است و روز ورزشی حساب نمی‌شود');
           rows.forEach(function (r) {
             const si = sleepInfo(r.sleepBlocks);
             const th = r.trainHour;
             const cells = [
               r.jdate.slice(5),
               AI_DAY_CODES[Jalali.weekday(r.jdate)] || '?',
-              r.completed ? '✓' : '·',
+              isTrainingDay(r) ? '✓' : '·',
               String(r.energy),
               String(r.mood),
               formatMin(r.runMin),
               formatMin(r.walkMin),
+              dailyMin(r) > 0 ? Math.round(dailyMin(r)) + 'm' : '—',
               si.totalH > 0 ? si.totalDisplay : '—',
               th !== null && th !== undefined && Number.isFinite(Number(th))
                 ? String(th) + 'h' : '—',
@@ -10024,6 +12334,180 @@
           return lines.join('\n');
         }
 
+        // ===== v6.2 PRINTABLE HTML REPORT =====
+        // Produces a standalone, self-contained HTML document: correct Persian
+        // typography, RTL layout, print stylesheet (A4) and a Print button that
+        // maps to "Save as PDF". Fonts are embedded by reference with a local
+        // fallback so it still reads correctly offline.
+        function reportEscape(v) {
+          return String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function faNum(v) {
+          return String(v).replace(/[0-9]/g, function (d) {
+            return '۰۱۲۳۴۵۶۷۸۹'[Number(d)];
+          });
+        }
+
+        function buildPrintableReport(rows, opts) {
+          opts = opts || {};
+          const st = state();
+          const goals = st.goals || {};
+          const s = computeStats(rows);
+          const wp = A.weekProgress(st.rows);
+          const mo = A.momentumTrend(st.rows, goals);
+          const wow = A.weekOverWeek();
+          const from = rows.length ? rows[0].jdate : Jalali.today();
+          const to = rows.length ? rows[rows.length - 1].jdate : Jalali.today();
+          const accent = getComputedStyle(document.documentElement)
+            .getPropertyValue('--accent').trim() || '#8b5cf6';
+          const accent2 = getComputedStyle(document.documentElement)
+            .getPropertyValue('--accent2').trim() || '#a78bfa';
+
+          const trainDays = rows.filter(isTrainingDay).length;
+          const totalPlanned = rows.reduce(function (a, r) { return a + plannedMin(r); }, 0);
+          const totalDaily = rows.reduce(function (a, r) { return a + dailyMin(r); }, 0);
+
+          function card(value, label, sub) {
+            return '<div class="kpi"><div class="kpi-v">' + value + '</div>' +
+              '<div class="kpi-l">' + label + '</div>' +
+              (sub ? '<div class="kpi-s">' + sub + '</div>' : '') + '</div>';
+          }
+
+          const kpis = [
+            card(faNum(mo.score) + '<small>/۱۰۰</small>', 'مومنتوم', reportEscape(mo.label)),
+            card(faNum(wp.done) + '<small>/' + faNum(wp.target) + '</small>', 'روز ورزش هفته',
+                 wp.achieved ? 'هدف رسیده' : faNum(wp.need) + ' روز مانده'),
+            card(faNum(s.avgSleepDisplay), 'میانگین خواب', 'هدف ' + faNum(goals.sleepGoalHours || 7) + ' ساعت'),
+            card(faNum(s.avgEnergy) + '<small>/۱۰</small>', 'میانگین انرژی',
+                 'حال ' + faNum(s.avgMood) + '/۱۰'),
+          ].join('');
+
+          const dayRows = rows.slice().reverse().map(function (r) {
+            const si = sleepInfo(r.sleepBlocks);
+            const isT = isTrainingDay(r);
+            return '<tr class="' + (isT ? 'is-train' : '') + '">' +
+              '<td class="c-date">' + faNum(reportEscape(r.jdate)) +
+                '<span>' + reportEscape(Jalali.weekdayName(r.jdate)) + '</span></td>' +
+              '<td class="c-mid">' + (isT ? '<span class="tick">✓</span>' : '<span class="dot">–</span>') + '</td>' +
+              '<td class="c-mid">' + (Number(r.runMin) ? faNum(formatMin(r.runMin)) : '—') + '</td>' +
+              '<td class="c-mid">' + (Number(r.walkMin) ? faNum(formatMin(r.walkMin)) : '—') + '</td>' +
+              '<td class="c-mid soft">' + (dailyMin(r) ? faNum(Math.round(dailyMin(r))) + '′' : '—') + '</td>' +
+              '<td class="c-mid">' + (si.totalH > 0 ? faNum(si.totalDisplay) : '—') + '</td>' +
+              '<td class="c-mid">' + (Number.isFinite(Number(r.energy)) ? faNum(r.energy) : '—') + '</td>' +
+              '<td class="c-note">' + reportEscape((r.activity || '').slice(0, 60)) + '</td>' +
+            '</tr>';
+          }).join('');
+
+          const notes = [];
+          if (wow.hasPrev) {
+            notes.push(wow.dayDelta > 0
+              ? 'نسبت به هفته‌ی گذشته ' + faNum(wow.dayDelta) + ' روز فعال‌تر بوده‌ای.'
+              : wow.dayDelta < 0
+                ? 'هفته‌ی گذشته ' + faNum(Math.abs(wow.dayDelta)) + ' روز فعال‌تر بود.'
+                : 'تعداد روزهای فعال با هفته‌ی گذشته برابر است.');
+          }
+          if (s.runBest > 0) notes.push('بهترین دویدن پیوسته در این بازه: ' + faNum(formatMin(s.runBest)) + '.');
+          if (totalDaily > 0) {
+            notes.push('حدود ' + faNum(Math.round(totalDaily)) +
+              ' دقیقه فعالیت روزمره (تقریبی) هم ثبت شده که جزو هدف ورزشی نیست.');
+          }
+          const notesHtml = notes.length
+            ? '<ul>' + notes.map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>'
+            : '<p class="muted">یادداشتی برای این بازه نیست.</p>';
+
+          const title = 'گزارش ورزش و خواب — ' + faNum(from) + ' تا ' + faNum(to);
+
+          return '<!DOCTYPE html>\n<html lang="fa" dir="rtl"><head><meta charset="utf-8">\n' +
+'<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+'<title>' + reportEscape(title) + '</title>\n' +
+'<link rel="preconnect" href="https://fonts.googleapis.com">\n' +
+'<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;800&display=swap" rel="stylesheet">\n' +
+'<style>\n' +
+'  :root{--ac:' + accent + ';--ac2:' + accent2 + ';--ink:#1a1626;--soft:#6b6580;--line:#e2ddf0;--bg:#faf9ff}\n' +
+'  *{box-sizing:border-box}\n' +
+'  body{margin:0;background:var(--bg);color:var(--ink);\n' +
+'    font-family:Vazirmatn,"Segoe UI",Tahoma,sans-serif;line-height:1.9;padding:24px 14px}\n' +
+'  .sheet{max-width:900px;margin:0 auto;background:#fff;border:1px solid var(--line);\n' +
+'    border-radius:16px;padding:clamp(20px,4vw,40px);box-shadow:0 8px 32px rgba(80,60,140,.08)}\n' +
+'  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;\n' +
+'    flex-wrap:wrap;border-bottom:3px solid var(--ac);padding-bottom:14px;margin-bottom:20px}\n' +
+'  h1{font-size:1.35rem;margin:0 0 4px;color:var(--ac)}\n' +
+'  .sub{font-size:.8rem;color:var(--soft)}\n' +
+'  .goal{background:rgba(139,92,246,.07);border:1px solid var(--line);border-radius:12px;\n' +
+'    padding:11px 14px;margin-bottom:18px;font-size:.85rem}\n' +
+'  .goal b{color:var(--ac)}\n' +
+'  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}\n' +
+'  .kpi{border:1px solid var(--line);border-radius:12px;padding:12px 10px;text-align:center;\n' +
+'    background:linear-gradient(160deg,rgba(139,92,246,.08),rgba(139,92,246,.02))}\n' +
+'  .kpi-v{font-size:1.5rem;font-weight:800;color:var(--ac);line-height:1.2}\n' +
+'  .kpi-v small{font-size:.7rem;color:var(--soft);font-weight:600}\n' +
+'  .kpi-l{font-size:.75rem;font-weight:700;margin-top:3px}\n' +
+'  .kpi-s{font-size:.65rem;color:var(--soft);margin-top:1px}\n' +
+'  h2{font-size:1rem;margin:22px 0 10px;padding-right:10px;border-right:4px solid var(--ac2)}\n' +
+'  table{width:100%;border-collapse:collapse;font-size:.78rem}\n' +
+'  th{background:var(--ac);color:#fff;font-weight:700;padding:8px 6px;font-size:.72rem}\n' +
+'  td{border-bottom:1px solid var(--line);padding:7px 6px}\n' +
+'  tr.is-train td{background:rgba(139,92,246,.05)}\n' +
+'  .c-date{white-space:nowrap;font-weight:600}\n' +
+'  .c-date span{display:block;font-size:.62rem;color:var(--soft);font-weight:400}\n' +
+'  .c-mid{text-align:center;white-space:nowrap}\n' +
+'  .c-mid.soft{color:var(--soft)}\n' +
+'  .c-note{font-size:.72rem;color:var(--soft)}\n' +
+'  .tick{color:var(--ac);font-weight:800}\n' +
+'  .dot{color:#c9c3d8}\n' +
+'  ul{margin:0;padding-right:18px;font-size:.82rem}\n' +
+'  li{margin:4px 0}\n' +
+'  .muted{color:var(--soft);font-size:.82rem}\n' +
+'  .foot{margin-top:24px;padding-top:14px;border-top:1px solid var(--line);\n' +
+'    font-size:.68rem;color:var(--soft);text-align:center}\n' +
+'  .bar{max-width:900px;margin:0 auto 14px;display:flex;gap:8px;justify-content:flex-end}\n' +
+'  .bar button{font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;\n' +
+'    padding:10px 18px;border-radius:10px;border:1px solid var(--ac);background:var(--ac);color:#fff}\n' +
+'  .bar .ghost{background:#fff;color:var(--ac)}\n' +
+'  @media print{\n' +
+'    @page{size:A4;margin:12mm}\n' +
+'    body{background:#fff;padding:0}\n' +
+'    .bar{display:none}\n' +
+'    .sheet{border:0;box-shadow:none;border-radius:0;padding:0;max-width:none}\n' +
+'    thead{display:table-header-group}\n' +
+'    tr{break-inside:avoid}\n' +
+'    h2{break-after:avoid}\n' +
+'  }\n' +
+'  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}.c-note{display:none}}\n' +
+'</style></head><body>\n' +
+'<div class="bar">\n' +
+'  <button id="btnPrint">🖨️ چاپ / ذخیره PDF</button>\n' +
+'</div>\n' +
+'<div class="sheet">\n' +
+'  <div class="head">\n' +
+'    <div><h1>🏃 گزارش ورزش، خواب و انرژی</h1>\n' +
+'      <div class="sub">بازه: ' + faNum(reportEscape(from)) + ' تا ' + faNum(reportEscape(to)) +
+        ' • ' + faNum(rows.length) + ' روز ثبت‌شده</div></div>\n' +
+'    <div class="sub">تاریخ گزارش: ' + faNum(Jalali.today()) + '</div>\n' +
+'  </div>\n' +
+(st.programGoal ? '  <div class="goal"><b>هدف برنامه:</b> ' + reportEscape(st.programGoal) + '</div>\n' : '') +
+'  <div class="kpis">' + kpis + '</div>\n' +
+'  <h2>خلاصه‌ی فعالیت</h2>\n' +
+'  <ul>\n' +
+'    <li>روزهای ورزش برنامه‌ریزی‌شده: <b>' + faNum(trainDays) + '</b> از ' + faNum(rows.length) + ' روز</li>\n' +
+'    <li>مجموع ورزش برنامه‌ریزی‌شده: <b>' + faNum(formatMin(totalPlanned)) + '</b>' +
+      ' (دویدن ' + faNum(formatMin(s.totalRun)) + ' + پیاده‌روی ورزشی ' + faNum(formatMin(s.totalWalk)) + ')</li>\n' +
+'    <li>فعالیت روزمره (تقریبی): <b>' + faNum(Math.round(totalDaily)) + ' دقیقه</b></li>\n' +
+'  </ul>\n' +
+'  <h2>نکته‌ها</h2>\n' + notesHtml + '\n' +
+'  <h2>جزئیات روزها</h2>\n' +
+'  <table><thead><tr>' +
+'<th>تاریخ</th><th>ورزش</th><th>دویدن</th><th>پیاده‌روی ورزشی</th>' +
+'<th>روزمره</th><th>خواب</th><th>انرژی</th><th>توضیح</th>' +
+'</tr></thead><tbody>' + dayRows + '</tbody></table>\n' +
+'  <div class="foot">ساخته‌شده با Sport Report • ستون «روزمره» تقریبی است و در هدف ورزشی محاسبه نمی‌شود</div>\n' +
+'</div>\n' +
+'<script>document.getElementById("btnPrint").addEventListener("click",function(){window.print();});<\/script>\n' +
+'</body></html>';
+        }
+
         function exportAI(rows, opts) {
           if (!rows.length) return 'داده‌ای نیست';
           const st = state();
@@ -10035,7 +12519,8 @@
             'قواعد: ۱) پروفایل ثابت را در کل گفتگو به خاطر بسپار و در هر پاسخ رعایت کن. ' +
             '۲) خارج از بازه‌ی تمرین من برنامه نده. ' +
             '۳) ظرفیت هفتگی‌ام را جدی بگیر؛ برنامه‌ی غیرقابل‌اجرا نده. ' +
-            '۴) کوتاه، مشخص و قابل‌اجرا بنویس؛ کلی‌گویی نکن.');
+            '۴) فعالیت روزمره را با ورزش برنامه‌ریزی‌شده یکی نکن؛ عددش هم تقریبی است. ' +
+            '۵) کوتاه، مشخص و قابل‌اجرا بنویس؛ کلی‌گویی نکن.');
           parts.push(buildAIProfile());
           if (opts.incStats) parts.push(buildAIFacts(rows));
           if (opts.incDays) parts.push(buildAIDays(rows, opts));
@@ -10169,7 +12654,8 @@
           };
           const rows = getFilteredRows();
           let out = '';
-          if (format === 'ai_text') out = exportAI(rows, opts);
+          if (format === 'report_html') out = buildPrintableReport(rows, opts);
+          else if (format === 'ai_text') out = exportAI(rows, opts);
           else if (format === 'markdown') out = exportMD(rows, opts);
           else if (format === 'json_min') out = exportJSON(rows, opts);
           else if (format === 'csv') out = exportCSV(rows);
@@ -10944,7 +13430,10 @@
 
         window.cloudUpload = cloudUpload;
         window.cloudDownload = cloudDownload;
+        A.openStudyModal = openStudyModal;
         A.exportAI = exportAI;
+        A.buildPrintableReport = buildPrintableReport;
+        A.buildStudyReport = buildStudyReport;
         A.describeSyncError = describeSyncError;
         A.isTransientNetworkError = isTransientNetworkError;
         A.cloudUpload = cloudUpload;
@@ -12170,6 +14659,8 @@
               else if (name === 'backup-skip') A.skipBackupReminder();
               else if (name === 'backup-dismiss') A.dismissBackupReminder();
               else if (name === 'test-github') window.testGitHubConnection();
+              else if (name === 'open-study') openStudyModal();
+              else if (name === 'edit-study') openStudyModal(action.getAttribute('data-id'));
               return;
             }
             const tab = e.target.closest('[data-tab]');
@@ -12194,6 +14685,195 @@
             addDayBtn.addEventListener('click', function () {
               openDayModal();
             });
+
+          // --- v6.1 quick review wiring ---
+          const quickReviewBtn = document.getElementById('quickReviewBtn');
+          if (quickReviewBtn) quickReviewBtn.addEventListener('click', openReviewModal);
+          const reviewCloseBtn = document.getElementById('modalReviewClose');
+          if (reviewCloseBtn) reviewCloseBtn.addEventListener('click', closeReviewModal);
+          const reviewCancelBtn = document.getElementById('reviewCancel');
+          if (reviewCancelBtn) reviewCancelBtn.addEventListener('click', closeReviewModal);
+          const reviewSaveBtn = document.getElementById('reviewSave');
+          if (reviewSaveBtn) reviewSaveBtn.addEventListener('click', saveReview);
+          const reviewRuleBtn = document.getElementById('reviewApplyRule');
+          if (reviewRuleBtn) reviewRuleBtn.addEventListener('click', applyReviewRule);
+          const reviewRangeSel = document.getElementById('reviewRange');
+          if (reviewRangeSel) reviewRangeSel.addEventListener('change', renderReviewList);
+          const reviewListEl = document.getElementById('reviewList');
+          if (reviewListEl) {
+            // Delegated: rows are re-rendered often, so listen on the container.
+            reviewListEl.addEventListener('input', function (e) {
+              const inp = e.target.closest('.review-inp');
+              if (!inp || !reviewDraft) return;
+              const row = inp.closest('.review-row');
+              if (!row) return;
+              // Object keys are strings, row ids may be numeric: normalise.
+              const id = row.getAttribute('data-id');
+              const entry = reviewDraft[id];
+              if (!entry) return;
+              const v = Math.max(0, Math.min(600, Math.round(Number(inp.value) || 0)));
+              entry[inp.getAttribute('data-field')] = v;
+              row.classList.add('changed');
+            });
+          }
+
+          // ===== v6.3 STUDY WIRING =====
+          function applyStudyVisibility() {
+            const on = A.studyEnabled();
+            document.querySelectorAll('.study-only').forEach(function (el) {
+              el.hidden = !on;
+            });
+            // If the module is switched off while its tab is open, fall back.
+            const view = document.getElementById('view-study');
+            if (!on && view && view.classList.contains('active')) {
+              const home = document.querySelector('.bottom-nav [data-tab="dashboard"]');
+              if (home) home.click();
+            }
+            if (on) A.renderStudyAll();
+          }
+          A.applyStudyVisibility = applyStudyVisibility;
+
+          function loadStudySettingsUI() {
+            const c = A.state().studyConfig || {};
+            const en = document.getElementById('studyEnabled');
+            const body = document.getElementById('studySettingsBody');
+            const goal = document.getElementById('studyDailyGoal');
+            const subs = document.getElementById('studySubjectsInput');
+            const sleep = document.getElementById('studySleepInReport');
+            const name = document.getElementById('studyStudentName');
+            if (en) en.checked = !!c.enabled;
+            if (body) body.style.display = c.enabled ? '' : 'none';
+            if (goal) goal.value = c.dailyGoalMin || 0;
+            if (subs) subs.value = (c.subjects || []).join('، ');
+            if (sleep) sleep.checked = !!c.showSleepInReport;
+            if (name) name.value = c.studentName || '';
+          }
+          A.loadStudySettingsUI = loadStudySettingsUI;
+
+          const studyEnabledEl = document.getElementById('studyEnabled');
+          if (studyEnabledEl)
+            studyEnabledEl.addEventListener('change', function () {
+              const s = A.state();
+              s.studyConfig.enabled = this.checked;
+              s._sync.fields.study = A.nextRevision();
+              if (!A.save()) { toast('ذخیره ناموفق بود', 'error', 4000); return; }
+              const body = document.getElementById('studySettingsBody');
+              if (body) body.style.display = this.checked ? '' : 'none';
+              applyStudyVisibility();
+              toast(this.checked ? '📚 بخش مطالعه فعال شد' : 'بخش مطالعه خاموش شد',
+                    'success', 2800);
+              scheduleCloudSync('after-save');
+            });
+
+          const saveStudySettingsBtn = document.getElementById('saveStudySettings');
+          if (saveStudySettingsBtn)
+            saveStudySettingsBtn.addEventListener('click', function () {
+              const s = A.state();
+              const goal = document.getElementById('studyDailyGoal');
+              const subs = document.getElementById('studySubjectsInput');
+              const sleep = document.getElementById('studySleepInReport');
+              const name = document.getElementById('studyStudentName');
+              s.studyConfig.dailyGoalMin = Math.max(0, Math.min(1440,
+                Math.round(Number(goal && goal.value) || 0)));
+              s.studyConfig.subjects = String((subs && subs.value) || '')
+                .split(/[،,\n]/).map(function (x) { return x.trim(); })
+                .filter(function (x) { return !!x; }).slice(0, 40);
+              s.studyConfig.showSleepInReport = !!(sleep && sleep.checked);
+              s.studyConfig.studentName = String((name && name.value) || '').trim().slice(0, 60);
+              s._sync.fields.study = A.nextRevision();
+              if (!A.save()) { toast('ذخیره ناموفق بود', 'error', 4000); return; }
+              A.renderStudyAll();
+              toast('📚 تنظیمات مطالعه ذخیره شد', 'success', 2600);
+              scheduleCloudSync('after-save');
+            });
+
+          const addStudyBtn = document.getElementById('addStudyBtn');
+          if (addStudyBtn) addStudyBtn.addEventListener('click', function () { openStudyModal(); });
+          const modalStudyClose = document.getElementById('modalStudyClose');
+          if (modalStudyClose) modalStudyClose.addEventListener('click', closeStudyModal);
+          const stCancel = document.getElementById('stCancel');
+          if (stCancel) stCancel.addEventListener('click', closeStudyModal);
+          const stSave = document.getElementById('stSave');
+          if (stSave) stSave.addEventListener('click', saveStudySession);
+          const stDelete = document.getElementById('stDelete');
+          if (stDelete) stDelete.addEventListener('click', deleteStudySession);
+          const studyRange = document.getElementById('studyRange');
+          if (studyRange) studyRange.addEventListener('change', function () { A.renderStudyList(); });
+
+          const stMinChips = document.getElementById('stMinChips');
+          if (stMinChips) stMinChips.addEventListener('click', function (e) {
+            const b = e.target.closest('.chip');
+            if (b) setStudyMinutes(b.dataset.min);
+          });
+          const stMinutesEl = document.getElementById('stMinutes');
+          if (stMinutesEl) stMinutesEl.addEventListener('input', function () {
+            syncStudyChips(Math.round(Number(this.value) || 0));
+          });
+          const stSubjectChips = document.getElementById('stSubjectChips');
+          if (stSubjectChips) stSubjectChips.addEventListener('click', function (e) {
+            const b = e.target.closest('.chip');
+            if (!b) return;
+            const inp = document.getElementById('stSubject');
+            // Tapping the active chip again clears it.
+            const val = inp.value === b.dataset.subject ? '' : b.dataset.subject;
+            inp.value = val;
+            syncSubjectChips(val);
+          });
+          const stSubjectInput = document.getElementById('stSubject');
+          if (stSubjectInput) stSubjectInput.addEventListener('input', function () {
+            syncSubjectChips(this.value);
+          });
+
+          const stMethodChips = document.getElementById('stMethodChips');
+          if (stMethodChips) stMethodChips.addEventListener('click', function (e) {
+            const b = e.target.closest('.chip');
+            if (!b) return;
+            const cur = document.getElementById('stMethod').value;
+            const val = b.dataset.method === cur ? '' : b.dataset.method; // tap again to clear
+            fillStudyMethods(val);
+          });
+          ['stFocus', 'stDifficulty', 'stSatisfaction'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', function () { setRange(id, this.value); });
+          });
+          ['stQuestions', 'stCorrect'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', updateStudyPercent);
+          });
+          // Auto-fill duration when both times are present and duration is empty.
+          ['stStart', 'stEnd'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', function () {
+              const a = document.getElementById('stStart').value;
+              const b = document.getElementById('stEnd').value;
+              const cur = Number(document.getElementById('stMinutes').value) || 0;
+              if (a && b && cur === 0) {
+                let d = A.timeToMin(b) - A.timeToMin(a);
+                if (d < 0) d += 1440;
+                setStudyMinutes(d);
+              }
+            });
+          });
+
+          const studyReportSleepEl = document.getElementById('studyReportSleep');
+          if (studyReportSleepEl)
+            studyReportSleepEl.addEventListener('change', function () {
+              const s2 = A.state();
+              s2.studyConfig.showSleepInReport = this.checked;
+              s2._sync.fields.study = A.nextRevision();
+              A.save();
+              const mirror = document.getElementById('studySleepInReport');
+              if (mirror) mirror.checked = this.checked;
+            });
+
+          const studyOpenReport = document.getElementById('studyOpenReport');
+          if (studyOpenReport) studyOpenReport.addEventListener('click', function () {
+            openStudyReport(false);
+          });
+          const studyDownloadReport = document.getElementById('studyDownloadReport');
+          if (studyDownloadReport) studyDownloadReport.addEventListener('click', function () {
+            openStudyReport(true);
+          });
 
           const modalDayClose = document.getElementById('modalDayClose');
           if (modalDayClose)
@@ -12395,6 +15075,30 @@
               const t = generateExport();
               if (await copyText(t)) toast('📋 کپی شد!', 'success');
             });
+          const exOpenReport = document.getElementById('exOpenReport');
+          if (exOpenReport)
+            exOpenReport.addEventListener('click', function () {
+              const rows = getFilteredRows();
+              if (!rows.length) { toast('برای این بازه داده‌ای نیست', 'error', 3500); return; }
+              const opts = {
+                incGoal: true, incStats: true, incDays: true,
+                incFutsal: false, incPatterns: false, notes: 'short',
+              };
+              const html = buildPrintableReport(rows, opts);
+              // Blob URL keeps this fully offline and avoids document.write.
+              const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+              const url = URL.createObjectURL(blob);
+              const win = window.open(url, '_blank');
+              if (!win) {
+                downloadFile(html, 'sport-report-' + Jalali.today() + '.html',
+                  'text/html;charset=utf-8');
+                toast('پاپ‌آپ مسدود بود؛ فایل دانلود شد', 'default', 4500);
+              } else {
+                toast('🖨️ گزارش باز شد — دکمه چاپ داخل صفحه', 'success', 4000);
+              }
+              setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+            });
+
           const exDownload = document.getElementById('exDownload');
           if (exDownload)
             exDownload.addEventListener('click', function () {
@@ -12406,12 +15110,21 @@
                 markdown: 'md',
                 json_min: 'json',
                 csv: 'csv',
+                report_html: 'html',
+              };
+              const mime = {
+                report_html: 'text/html;charset=utf-8',
+                json_min: 'application/json',
+                csv: 'text/csv;charset=utf-8',
               };
               downloadFile(
                 t,
                 'sport-report-' + Jalali.today() + '.' + (ext[fmt] || 'txt'),
+                mime[fmt] || 'text/plain;charset=utf-8',
               );
-              toast('💾 دانلود شد', 'success');
+              toast(fmt === 'report_html'
+                ? '💾 گزارش دانلود شد — بازش کن و دکمه چاپ را بزن'
+                : '💾 دانلود شد', 'success', fmt === 'report_html' ? 4200 : 2600);
             });
           const exShare = document.getElementById('exShare');
           if (exShare)
@@ -12691,6 +15404,9 @@
             loadCloudConfig();
             bindEvents();
             renderAll();
+            // v6.3: reveal the study tab only when the module is switched on.
+            if (typeof A.applyStudyVisibility === 'function') A.applyStudyVisibility();
+            if (typeof A.loadStudySettingsUI === 'function') A.loadStudySettingsUI();
             startAutoSync();
             if (window.__sportStorageWarning || !safeStorage.isPersistent()) {
               const warning = document.createElement('div');
@@ -12709,6 +15425,7 @@
               if (e.key === A.LS_KEY && e.newValue) {
                 A.loadState();
                 renderAll();
+                if (typeof A.applyStudyVisibility === 'function') A.applyStudyVisibility();
                 toast('تغییرات تب دیگر بارگذاری شد', 'default', 2000);
               }
             });
@@ -12735,7 +15452,7 @@
         }
       })();
     </script>
-  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a24461ae0d6c7f0d',t:'MTc4NTU4MjQ3MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26510a32e2fef11',t:'MTc4NTkyNTE4MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 <!-- ============================================================ -->
 <!-- ██████ PART 5/5 - JS FINAL - END ██████ -->
