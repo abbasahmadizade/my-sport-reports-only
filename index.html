@@ -16,7 +16,7 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-g1lexkss7olRXJF6bpEmXf5kP97horL4CYlMKkGGuhw=' 'sha256-rwmQ4eOW9+g26RIloZark48nXtbgjsnPZzC8Z/yUnmI=' 'sha256-gQ4iQrUlvXBWGA/DMAIhLXwEL4VOCFMXmimyDIV7vDY='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-g1lexkss7olRXJF6bpEmXf5kP97horL4CYlMKkGGuhw=' 'sha256-U0zK+RzTdj/WVXzd9/fLXhJjR+N06BGiBKU5cOs7Srs=' 'sha256-Wtbcjcch5Q3c6aONDEZr9dby5f2uL46JXl2BwYwm9kA='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -1969,6 +1969,60 @@
         box-shadow: 0 8px 26px rgba(var(--accent-rgb), .35);
       }
 
+      /* v6.3.3: everyday movement — deliberately quieter than the training
+         pills so the two are never confused at a glance. */
+      .pill-soft {
+        background: transparent;
+        border: 1px dashed var(--border);
+        color: var(--muted);
+      }
+
+      /* v6.3.3: compact study summary on the dashboard. */
+      .study-mini {
+        display: block; width: 100%; text-align: right; cursor: pointer;
+        margin-top: 9px; padding: 11px 13px; border-radius: 12px;
+        border: 1px solid var(--border); background: var(--card2);
+        color: var(--text); font-family: var(--font-family);
+      }
+      .study-mini:active { transform: scale(.995); }
+      .study-mini-head {
+        display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
+      }
+      .study-mini-title { font-size: .8rem; font-weight: 700; }
+      .study-mini-week { font-size: .68rem; color: var(--muted); }
+      .study-mini-msg { font-size: .72rem; color: var(--muted); margin-top: 3px; }
+      .study-mini-track {
+        height: 6px; border-radius: 4px; margin-top: 8px; overflow: hidden;
+        background: rgba(var(--accent-rgb), .12);
+      }
+      .study-mini-fill {
+        height: 100%; border-radius: 4px;
+        background: linear-gradient(90deg, var(--accent3), var(--accent2));
+      }
+
+      /* v6.3.3: theme swatches inside the drawer, above the fold. */
+      .menu-themes {
+        display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 14px 10px;
+      }
+      .menu-themes .theme-btn { width: 34px; height: 34px; }
+
+      /* v6.3.3: prominent link to the full settings page. */
+      .menu-primary {
+        display: block; width: 100%; text-align: right;
+        padding: 12px 14px; margin-bottom: 4px; min-height: 52px;
+        border-radius: 12px; cursor: pointer;
+        border: 1px solid rgba(var(--accent-rgb), .45);
+        background: linear-gradient(135deg,
+          rgba(var(--accent-rgb), .18), rgba(var(--accent-rgb), .06));
+        color: var(--text); font-family: var(--font-family);
+        font-size: .88rem; font-weight: 700;
+      }
+      .menu-primary small {
+        display: block; font-size: .66rem; font-weight: 400;
+        color: var(--muted); margin-top: 2px;
+      }
+      .menu-primary:active { transform: scale(.99); }
+
       /* v6.3.2: a switch row inside the settings drawer. */
       .menu-switch {
         display: flex; align-items: center; justify-content: space-between;
@@ -2963,12 +3017,29 @@
       id="settingsMenu"
       style="top: calc(var(--header-h) + 4px); left: 8px"
     >
-      <div class="menu-label">📚 مطالعه</div>
+      <button type="button" class="menu-primary" data-tab="settings">
+        ⚙️ تنظیمات کامل
+        <small>مطالعه • اهداف • تم رنگی</small>
+      </button>
       <label class="menu-switch">
-        <span>فعال کردن بخش مطالعه</span>
+        <span>📚 فعال کردن بخش مطالعه</span>
         <input type="checkbox" id="studyEnabledMenu" />
       </label>
-      <button type="button" id="studySettingsJump">⚙️ تنظیمات مطالعه</button>
+      <div class="menu-label">🎨 رنگ برنامه</div>
+      <div class="theme-btns menu-themes" id="themeSelectorMenu">
+        <button type="button" class="theme-btn" aria-label="تم بنفش" title="بنفش"
+          data-theme="violet" style="background: #8b5cf6"></button>
+        <button type="button" class="theme-btn" aria-label="تم یاسی" title="یاسی"
+          data-theme="lilac" style="background: #c084fc"></button>
+        <button type="button" class="theme-btn" aria-label="تم اقیانوسی" title="اقیانوسی"
+          data-theme="ocean" style="background: #0ea5e9"></button>
+        <button type="button" class="theme-btn" aria-label="تم جنگلی" title="جنگلی"
+          data-theme="forest" style="background: #10b981"></button>
+        <button type="button" class="theme-btn" aria-label="تم غروب" title="غروب"
+          data-theme="sunset" style="background: #f59e0b"></button>
+        <button type="button" class="theme-btn" aria-label="تم رز" title="رز"
+          data-theme="rose" style="background: #ec4899"></button>
+      </div>
       <hr />
       <div class="menu-label">📅 امروز</div>
       <div
@@ -3099,139 +3170,6 @@
           </button>
         </div>
         <div class="card">
-          <div class="card-title"><span class="emoji">📚</span> ماژول مطالعه</div>
-          <label class="checkbox-item">
-            <input type="checkbox" id="studyEnabled" /> فعال کردن بخش مطالعه
-          </label>
-          <div class="field-hint">
-            یک بخش کاملاً جدا برای ثبت مطالعه با گزارش مخصوص خودش. اگر خاموش
-            باشد، هیچ‌جای برنامه دیده نمی‌شود و روی آمار ورزش هم اثری ندارد.
-          </div>
-          <div id="studySettingsBody" style="display: none">
-            <div class="form-group" style="margin-top: 12px">
-              <label for="studyStudentName">نام روی گزارش <span class="lbl-opt">(اختیاری)</span></label>
-              <input type="text" class="form-input" id="studyStudentName"
-                placeholder="مثلاً: نام و نام خانوادگی" maxlength="60" />
-            </div>
-            <div class="form-group">
-              <label>هدف روزانه مطالعه</label>
-              <div class="num-stepper">
-                <button type="button" data-target="studyDailyGoal" data-step="-30">−</button>
-                <input type="number" id="studyDailyGoal" value="0" min="0" max="1440" step="30" />
-                <button type="button" data-target="studyDailyGoal" data-step="30">+</button>
-              </div>
-              <div class="field-hint">به دقیقه. صفر یعنی بدون هدف — فقط ثبت و تحلیل.</div>
-            </div>
-            <div class="form-group">
-              <label for="studySubjectsInput">عنوان‌های پرتکرار <span class="lbl-opt">(اختیاری)</span></label>
-              <input type="text" class="form-input" id="studySubjectsInput"
-                placeholder="با ویرگول جدا کن" maxlength="600" />
-              <div class="field-hint">
-                برای پیشنهاد سریع موقع ثبت. لازم نیست پر کنی؛ هرچه بنویسی خودش یاد می‌گیرد.
-              </div>
-            </div>
-            <label class="checkbox-item">
-              <input type="checkbox" id="studySleepInReport" /> 😴 ساعت خواب و بیداری در گزارش بیاید
-            </label>
-            <button type="button" class="btn btn-primary btn-block mt-2" id="saveStudySettings">
-              💾 ذخیره تنظیمات مطالعه
-            </button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="emoji">🎯</span> اهداف</div>
-          <div class="form-group">
-            <label>هدف خواب (ساعت)</label>
-            <div class="num-stepper">
-              <button type="button" data-target="goalSleep" data-step="-0.5">
-                −
-              </button>
-              <input
-                type="number"
-                id="goalSleep"
-                value="7"
-                min="4"
-                max="12"
-                step="0.5"
-              />
-              <button type="button" data-target="goalSleep" data-step="0.5">
-                +
-              </button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>هدف هر جلسه ورزش (دقیقه)</label>
-            <div class="num-stepper">
-              <button type="button" data-target="goalActivity" data-step="-5">
-                −
-              </button>
-              <input
-                type="number"
-                id="goalActivity"
-                value="20"
-                min="5"
-                max="120"
-                step="5"
-              />
-              <button type="button" data-target="goalActivity" data-step="5">
-                +
-              </button>
-            </div>
-            <div class="field-hint">
-              طول یک جلسه‌ی ورزش برنامه‌ریزی‌شده — نه مجموع حرکت روزانه.
-              پیاده‌روی رفت‌وآمد جداگانه ثبت می‌شود و در این هدف حساب نمی‌شود.
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="goalWeeklyMode">📅 هدف هفتگی (روز ورزش)</label>
-            <select class="form-input" id="goalWeeklyMode">
-              <option value="auto">خودکار — از روی روند خودم</option>
-              <option value="manual">دستی — خودم تعیین می‌کنم</option>
-            </select>
-            <div class="field-hint" id="goalWeeklyHint"></div>
-          </div>
-          <div class="form-group" id="goalWeeklyDaysWrap" style="display: none">
-            <label>چند روز در هفته؟</label>
-            <div class="num-stepper">
-              <button type="button" data-target="goalWeeklyDays" data-step="-1">
-                −
-              </button>
-              <input
-                type="number"
-                id="goalWeeklyDays"
-                value="3"
-                min="1"
-                max="7"
-                step="1"
-              />
-              <button type="button" data-target="goalWeeklyDays" data-step="1">
-                +
-              </button>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="goalPreferredTime">🕐 معمولاً کِی ورزش می‌کنی؟</label>
-            <select class="form-input" id="goalPreferredTime">
-              <option value="morning">🌅 صبح (۵ تا ۱۱)</option>
-              <option value="noon">🌞 ظهر (۱۱ تا ۱۵)</option>
-              <option value="evening">🌤️ عصر (۱۵ تا ۲۰)</option>
-              <option value="night">🌙 شب (۲۰ به بعد)</option>
-              <option value="flexible">🔄 منعطف — ثابت نیست</option>
-            </select>
-            <div class="field-hint">
-              تحلیل‌ها بر همین بازه تنظیم می‌شوند و توصیه‌ی بی‌ربط داده نمی‌شود.
-            </div>
-          </div>
-          <button
-            type="button"
-            class="btn btn-primary btn-block"
-            id="saveGoals"
-          >
-            💾 ذخیره اهداف
-          </button>
-          <div id="goalProgress" class="mt-3"></div>
-        </div>
-        <div class="card">
           <div class="card-title">
             <span class="emoji">⚡</span> دسترسی سریع
           </div>
@@ -3249,83 +3187,6 @@
             >
               📤 خروجی AI
             </button>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-title"><span class="emoji">🎨</span> تم رنگی</div>
-          <div class="theme-btns" id="themeSelector">
-            <button
-              type="button"
-              class="theme-btn active"
-              aria-label="تم بنفش"
-              title="تم بنفش"
-              data-theme="violet"
-              style="background: #8b5cf6"
-              data-accent="#8b5cf6"
-              data-accent2="#a78bfa"
-              data-accent3="#6d28d9"
-              data-rgb="139,92,246"
-            ></button>
-            <button
-              type="button"
-              class="theme-btn"
-              aria-label="تم یاسی"
-              title="تم یاسی"
-              data-theme="lilac"
-              style="background: #c084fc"
-              data-accent="#c084fc"
-              data-accent2="#e9d5ff"
-              data-accent3="#9333ea"
-              data-rgb="192,132,252"
-            ></button>
-            <button
-              type="button"
-              class="theme-btn"
-              aria-label="تم اقیانوسی"
-              title="تم اقیانوسی"
-              data-theme="ocean"
-              style="background: #0ea5e9"
-              data-accent="#0ea5e9"
-              data-accent2="#38bdf8"
-              data-accent3="#0369a1"
-              data-rgb="14,165,233"
-            ></button>
-            <button
-              type="button"
-              class="theme-btn"
-              aria-label="تم جنگلی"
-              title="تم جنگلی"
-              data-theme="forest"
-              style="background: #10b981"
-              data-accent="#10b981"
-              data-accent2="#34d399"
-              data-accent3="#047857"
-              data-rgb="16,185,129"
-            ></button>
-            <button
-              type="button"
-              class="theme-btn"
-              aria-label="تم طلایی"
-              title="تم طلایی"
-              data-theme="sunset"
-              style="background: #f59e0b"
-              data-accent="#f59e0b"
-              data-accent2="#fbbf24"
-              data-accent3="#b45309"
-              data-rgb="245,158,11"
-            ></button>
-            <button
-              type="button"
-              class="theme-btn"
-              aria-label="تم رز"
-              title="تم رز"
-              data-theme="rose"
-              style="background: #ec4899"
-              data-accent="#ec4899"
-              data-accent2="#f472b6"
-              data-accent3="#be185d"
-              data-rgb="236,72,153"
-            ></button>
           </div>
         </div>
       </div>
@@ -3527,7 +3388,7 @@
                   min="4"
                   max="12"
                   step="0.5"
-                />
+                 inputmode="decimal" />
                 <button
                   type="button"
                   data-target="calcSleepLen"
@@ -3575,7 +3436,7 @@
                   min="0"
                   max="10"
                   step="0.5"
-                />
+                 inputmode="decimal" />
                 <button
                   type="button"
                   data-target="calcActEnergy"
@@ -3602,7 +3463,7 @@
                   min="0"
                   max="15"
                   step="0.5"
-                />
+                 inputmode="decimal" />
                 <button
                   type="button"
                   data-target="calcActSleep"
@@ -3629,7 +3490,7 @@
                   min="0"
                   max="10"
                   step="0.5"
-                />
+                 inputmode="decimal" />
                 <button
                   type="button"
                   data-target="calcActFatigue"
@@ -3673,7 +3534,7 @@
                   min="0"
                   max="60"
                   step="0.5"
-                />
+                 inputmode="decimal" />
                 <button type="button" data-target="calcRunBest" data-step="0.5">
                   +
                 </button>
@@ -3692,7 +3553,7 @@
                   min="5"
                   max="120"
                   step="5"
-                />
+                 inputmode="numeric" />
                 <button type="button" data-target="calcRunTotal" data-step="5">
                   +
                 </button>
@@ -3736,7 +3597,7 @@
                   min="10"
                   max="180"
                   step="5"
-                />
+                 inputmode="numeric" />
                 <button type="button" data-target="calcRecDur" data-step="5">
                   +
                 </button>
@@ -3755,7 +3616,7 @@
                   min="1"
                   max="10"
                   step="0.5"
-                />
+                 inputmode="decimal" />
                 <button type="button" data-target="calcRecInt" data-step="0.5">
                   +
                 </button>
@@ -3822,6 +3683,226 @@
 
       <!-- === VIEW: EXPORT === -->
       <!-- === VIEW: STUDY (v6.3, opt-in) === -->
+      <!-- === VIEW: SETTINGS (v6.3.3) === -->
+      <div class="view" id="view-settings">
+        <div class="flex items-center justify-between mb-3">
+          <h2 style="font-size: 1.05rem">⚙️ تنظیمات</h2>
+          <button type="button" class="btn btn-ghost btn-sm" data-tab="dashboard">
+            ← بازگشت
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="emoji">📚</span> ماژول مطالعه</div>
+          <label class="checkbox-item">
+            <input type="checkbox" id="studyEnabled" /> فعال کردن بخش مطالعه
+          </label>
+          <div class="field-hint">
+            یک بخش کاملاً جدا برای ثبت مطالعه با گزارش مخصوص خودش. اگر خاموش
+            باشد، هیچ‌جای برنامه دیده نمی‌شود و روی آمار ورزش هم اثری ندارد.
+          </div>
+          <div id="studySettingsBody" style="display: none">
+            <div class="form-group" style="margin-top: 12px">
+              <label for="studyStudentName">نام روی گزارش <span class="lbl-opt">(اختیاری)</span></label>
+              <input type="text" class="form-input" id="studyStudentName"
+                placeholder="مثلاً: نام و نام خانوادگی" maxlength="60" />
+            </div>
+            <div class="form-group">
+              <label>هدف روزانه مطالعه</label>
+              <div class="num-stepper">
+                <button type="button" data-target="studyDailyGoal" data-step="-30">−</button>
+                <input type="number" id="studyDailyGoal" value="0" min="0" max="1440" step="30" / inputmode="numeric" />
+                <button type="button" data-target="studyDailyGoal" data-step="30">+</button>
+              </div>
+              <div class="field-hint">به دقیقه. صفر یعنی بدون هدف — فقط ثبت و تحلیل.</div>
+            </div>
+            <div class="form-group">
+              <label for="studySubjectsInput">عنوان‌های پرتکرار <span class="lbl-opt">(اختیاری)</span></label>
+              <input type="text" class="form-input" id="studySubjectsInput"
+                placeholder="با ویرگول جدا کن" maxlength="600" />
+              <div class="field-hint">
+                برای پیشنهاد سریع موقع ثبت. لازم نیست پر کنی؛ هرچه بنویسی خودش یاد می‌گیرد.
+              </div>
+            </div>
+            <label class="checkbox-item">
+              <input type="checkbox" id="studySleepInReport" /> 😴 ساعت خواب و بیداری در گزارش بیاید
+            </label>
+            <button type="button" class="btn btn-primary btn-block mt-2" id="saveStudySettings">
+              💾 ذخیره تنظیمات مطالعه
+            </button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="emoji">🎯</span> اهداف</div>
+          <div class="form-group">
+            <label>هدف خواب (ساعت)</label>
+            <div class="num-stepper">
+              <button type="button" data-target="goalSleep" data-step="-0.5">
+                −
+              </button>
+              <input
+                type="number"
+                id="goalSleep"
+                value="7"
+                min="4"
+                max="12"
+                step="0.5"
+              / inputmode="decimal" />
+              <button type="button" data-target="goalSleep" data-step="0.5">
+                +
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>هدف هر جلسه ورزش (دقیقه)</label>
+            <div class="num-stepper">
+              <button type="button" data-target="goalActivity" data-step="-5">
+                −
+              </button>
+              <input
+                type="number"
+                id="goalActivity"
+                value="20"
+                min="5"
+                max="120"
+                step="5"
+              / inputmode="numeric" />
+              <button type="button" data-target="goalActivity" data-step="5">
+                +
+              </button>
+            </div>
+            <div class="field-hint">
+              طول یک جلسه‌ی ورزش برنامه‌ریزی‌شده — نه مجموع حرکت روزانه.
+              پیاده‌روی رفت‌وآمد جداگانه ثبت می‌شود و در این هدف حساب نمی‌شود.
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="goalWeeklyMode">📅 هدف هفتگی (روز ورزش)</label>
+            <select class="form-input" id="goalWeeklyMode">
+              <option value="auto">خودکار — از روی روند خودم</option>
+              <option value="manual">دستی — خودم تعیین می‌کنم</option>
+            </select>
+            <div class="field-hint" id="goalWeeklyHint"></div>
+          </div>
+          <div class="form-group" id="goalWeeklyDaysWrap" style="display: none">
+            <label>چند روز در هفته؟</label>
+            <div class="num-stepper">
+              <button type="button" data-target="goalWeeklyDays" data-step="-1">
+                −
+              </button>
+              <input
+                type="number"
+                id="goalWeeklyDays"
+                value="3"
+                min="1"
+                max="7"
+                step="1"
+              / inputmode="numeric" />
+              <button type="button" data-target="goalWeeklyDays" data-step="1">
+                +
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="goalPreferredTime">🕐 معمولاً کِی ورزش می‌کنی؟</label>
+            <select class="form-input" id="goalPreferredTime">
+              <option value="morning">🌅 صبح (۵ تا ۱۱)</option>
+              <option value="noon">🌞 ظهر (۱۱ تا ۱۵)</option>
+              <option value="evening">🌤️ عصر (۱۵ تا ۲۰)</option>
+              <option value="night">🌙 شب (۲۰ به بعد)</option>
+              <option value="flexible">🔄 منعطف — ثابت نیست</option>
+            </select>
+            <div class="field-hint">
+              تحلیل‌ها بر همین بازه تنظیم می‌شوند و توصیه‌ی بی‌ربط داده نمی‌شود.
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary btn-block"
+            id="saveGoals"
+          >
+            💾 ذخیره اهداف
+          </button>
+          <div id="goalProgress" class="mt-3"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="emoji">🎨</span> تم رنگی</div>
+          <div class="theme-btns" id="themeSelector">
+            <button
+              type="button"
+              class="theme-btn active"
+              aria-label="تم بنفش"
+              title="تم بنفش"
+              data-theme="violet"
+              style="background: #8b5cf6"
+              data-accent="#8b5cf6"
+              data-accent2="#a78bfa"
+              data-accent3="#6d28d9"
+              data-rgb="139,92,246"
+            ></button>
+            <button
+              type="button"
+              class="theme-btn"
+              aria-label="تم یاسی"
+              title="تم یاسی"
+              data-theme="lilac"
+              style="background: #c084fc"
+              data-accent="#c084fc"
+              data-accent2="#e9d5ff"
+              data-accent3="#9333ea"
+              data-rgb="192,132,252"
+            ></button>
+            <button
+              type="button"
+              class="theme-btn"
+              aria-label="تم اقیانوسی"
+              title="تم اقیانوسی"
+              data-theme="ocean"
+              style="background: #0ea5e9"
+              data-accent="#0ea5e9"
+              data-accent2="#38bdf8"
+              data-accent3="#0369a1"
+              data-rgb="14,165,233"
+            ></button>
+            <button
+              type="button"
+              class="theme-btn"
+              aria-label="تم جنگلی"
+              title="تم جنگلی"
+              data-theme="forest"
+              style="background: #10b981"
+              data-accent="#10b981"
+              data-accent2="#34d399"
+              data-accent3="#047857"
+              data-rgb="16,185,129"
+            ></button>
+            <button
+              type="button"
+              class="theme-btn"
+              aria-label="تم طلایی"
+              title="تم طلایی"
+              data-theme="sunset"
+              style="background: #f59e0b"
+              data-accent="#f59e0b"
+              data-accent2="#fbbf24"
+              data-accent3="#b45309"
+              data-rgb="245,158,11"
+            ></button>
+            <button
+              type="button"
+              class="theme-btn"
+              aria-label="تم رز"
+              title="تم رز"
+              data-theme="rose"
+              style="background: #ec4899"
+              data-accent="#ec4899"
+              data-accent2="#f472b6"
+              data-accent3="#be185d"
+              data-rgb="236,72,153"
+            ></button>
+          </div>
+        </div>
+      </div>
+
       <div class="view" id="view-study">
         <div class="flex items-center justify-between mb-3">
           <h2 style="font-size: 1.05rem">📚 مطالعه</h2>
@@ -4707,7 +4788,7 @@
                   min="0"
                   max="10"
                   step="0.5"
-                />
+                / inputmode="decimal" />
                 <button
                   type="button"
                   data-target="mfEnergyBefore"
@@ -4734,7 +4815,7 @@
                   min="0"
                   max="10"
                   step="0.5"
-                />
+                / inputmode="decimal" />
                 <button
                   type="button"
                   data-target="mfFatigueBefore"
@@ -4759,7 +4840,7 @@
                   min="0"
                   max="300"
                   step="5"
-                />
+                / inputmode="numeric" />
                 <button type="button" data-target="mfDuration" data-step="5">
                   +
                 </button>
@@ -4782,7 +4863,7 @@
                   min="1"
                   max="10"
                   step="0.5"
-                />
+                / inputmode="decimal" />
                 <button type="button" data-target="mfIntensity" data-step="0.5">
                   +
                 </button>
@@ -4802,7 +4883,7 @@
                 min="0"
                 max="20"
                 step="1"
-              />
+              / inputmode="numeric" />
               <button type="button" data-target="mfRestCount" data-step="1">
                 +
               </button>
@@ -4858,7 +4939,7 @@
                   min="0"
                   max="10"
                   step="0.5"
-                />
+                / inputmode="decimal" />
                 <button
                   type="button"
                   data-target="mfEnergyAfter"
@@ -4885,7 +4966,7 @@
                   min="0"
                   max="10"
                   step="0.5"
-                />
+                / inputmode="decimal" />
                 <button
                   type="button"
                   data-target="mfFatigueAfter"
@@ -4909,7 +4990,7 @@
                 min="0"
                 max="10"
                 step="0.5"
-              />
+              / inputmode="decimal" />
               <button type="button" data-target="mfMoodAfter" data-step="0.5">
                 +
               </button>
@@ -7975,6 +8056,7 @@
             'ai',
             'study',
             'export',
+            'settings',
           ];
           if (valid.indexOf(view) === -1) return;
           // The study tab only exists when the module is switched on.
@@ -7997,9 +8079,15 @@
           if (view === 'charts') renderChartsIfReady();
           if (view === 'ai') renderAIView();
           if (view === 'study') renderStudyAll();
+          if (view === 'settings') {
+            if (A.loadStudySettingsUI) A.loadStudySettingsUI();
+            if (A.syncWeeklyGoalUI) A.syncWeeklyGoalUI();
+            if (A.renderGoalProgress) A.renderGoalProgress();
+          }
           // The floating add-button is only meaningful on the sport screens.
           document.body.classList.toggle('hide-fab',
-            view === 'study' || view === 'export' || view === 'charts');
+            view === 'study' || view === 'export' ||
+            view === 'charts' || view === 'settings');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -8110,6 +8198,36 @@
             wowLine = '<div class="wow-line">' + ico + ' ' + escapeHTML(msg) + '</div>';
           }
 
+          // v6.3.3: a compact study line on the dashboard, only when the module
+          // is on. Deliberately separate from the sport metrics above it.
+          let studyRow = '';
+          if (A.studyEnabled && A.studyEnabled()) {
+            const cfgS = state().studyConfig || {};
+            const todayMin = A.studyMinutesOn(Jalali.today());
+            const week = A.studyStats(A.studySessions(7));
+            const goalS = cfgS.dailyGoalMin || 0;
+            const pctS = goalS > 0 ? Math.min(100, Math.round((todayMin / goalS) * 100)) : null;
+            const barS = pctS === null ? '' :
+              '<div class="study-mini-track"><div class="study-mini-fill" style="width:' +
+                pctS + '%"></div></div>';
+            const msgS = todayMin === 0
+              ? 'امروز هنوز مطالعه‌ای ثبت نشده'
+              : (goalS > 0 && todayMin >= goalS
+                  ? 'هدف امروز کامل شد 🎉'
+                  : A.fmtHM(todayMin) + ' مطالعه امروز' +
+                    (goalS > 0 ? ' • ' + A.fmtHM(goalS - todayMin) + ' تا هدف' : ''));
+            studyRow =
+              '<button type="button" class="study-mini" data-tab="study">' +
+                '<div class="study-mini-head">' +
+                  '<span class="study-mini-title">📚 مطالعه</span>' +
+                  '<span class="study-mini-week">۷ روز: ' +
+                    escapeHTML(A.fmtHMShort(week.total)) + '</span>' +
+                '</div>' +
+                '<div class="study-mini-msg">' + escapeHTML(msgS) + '</div>' +
+                barS +
+              '</button>';
+          }
+
           const splitRow =
             '<div class="split-metrics">' +
               '<div class="split-metric primary">' +
@@ -8143,6 +8261,7 @@
             '</div>' +
             weekStrip +
             splitRow +
+            studyRow +
             wowLine +
             nudge +
             '<div class="hero-actions">' + action +
@@ -9031,6 +9150,12 @@
                     formatMin(r.walkMin) +
                     '</span>'
                   : '') +
+                // v6.3.3: everyday movement is shown, but in a muted pill so it
+                // never reads as a training session.
+                (r.walkDailyMin
+                  ? '<span class="pill pill-soft" title="فعالیت روزمره (تقریبی)">🚶‍♂️' +
+                    Math.round(r.walkDailyMin) + '′</span>'
+                  : '') +
                 '<span class="pill pill-info">😴' +
                 si.totalDisplay +
                 '</span>' +
@@ -9401,6 +9526,10 @@
                       ? '<span class="pill pill-info">🚶' +
                         formatMin(r.walkMin) +
                         '</span>'
+                      : '') +
+                    (r.walkDailyMin
+                      ? '<span class="pill pill-soft" title="فعالیت روزمره (تقریبی)">🚶‍♂️' +
+                        Math.round(r.walkDailyMin) + '′</span>'
                       : '') +
                     '<span class="pill pill-info">😴' +
                     si.totalDisplay +
@@ -14113,6 +14242,15 @@
             lines.push('✅ دسترسی خواندن Gist برقرار است');
             lines.push((hasCanonical ? '✅' : '⚠️') + ' فایل اصلی sport-data.json: ' + (hasCanonical ? 'موجود' : 'پیدا نشد'));
             lines.push('ℹ️ رکورد ابری: ' + remote.rows.length + ' روز • ' + remote.futsal.length + ' فوتسال');
+            // v6.3.3: confirm the study module is really reaching the Gist.
+            const remoteStudy = Array.isArray(remote.study) ? remote.study : [];
+            const remoteStudyCfg = remote.studyConfig || {};
+            if (remoteStudy.length || remoteStudyCfg.enabled) {
+              lines.push('ℹ️ مطالعه در Gist: ' + remoteStudy.length + ' جلسه • ماژول ' +
+                (remoteStudyCfg.enabled ? 'فعال' : 'خاموش'));
+            } else {
+              lines.push('ℹ️ مطالعه در Gist: چیزی ثبت نشده (اگر ماژول را فعال نکرده‌ای طبیعی است)');
+            }
             lines.push('ℹ️ فایل دستگاه‌ها: ' + shards.length);
             lines.push((hasBackup ? '✅' : '⚠️') + ' بکاپ محافظ: ' + (hasBackup ? 'موجود' : 'هنوز ساخته نشده'));
             lines.push((localHasUnpushedChanges || cloudPendingLocalChange ? '⏳' : '✅') + ' وضعیت محلی: ' +
@@ -14204,6 +14342,24 @@
             (rowsCount > 0 ? ok : warn) + ' Rows: ' + rowsCount + ' روز',
           );
           results.push(info + ' Futsal: ' + futsalCount + ' جلسه');
+          // v6.3.3: report the study module so a support screenshot shows it.
+          const studyArr = Array.isArray(data.study) ? data.study : [];
+          const studyCfg = data.studyConfig || {};
+          results.push(
+            (studyCfg.enabled ? ok : info) + ' ماژول مطالعه: ' +
+            (studyCfg.enabled ? 'فعال' : 'خاموش') +
+            ' — ' + studyArr.length + ' جلسه ثبت‌شده',
+          );
+          if (studyCfg.enabled) {
+            const stMin = studyArr.reduce(function (a, x) {
+              return a + (Number(x.minutes) || 0); }, 0);
+            const stDays = Object.keys(studyArr.reduce(function (a, x) {
+              a[x.jdate] = 1; return a; }, {})).length;
+            results.push(info + ' مجموع مطالعه: ' + Math.round(stMin / 60) +
+              ' ساعت در ' + stDays + ' روز');
+            results.push(info + ' هدف روزانه مطالعه: ' +
+              (studyCfg.dailyGoalMin ? studyCfg.dailyGoalMin + ' دقیقه' : 'تعیین نشده'));
+          }
 
           if (rowsCount > 0) {
             const sorted = data.rows.slice().sort(function (a, b) {
@@ -14524,16 +14680,19 @@
           document.querySelectorAll('.theme-btn').forEach(function (b) {
             b.classList.toggle('active', b.getAttribute('data-theme') === themeName);
           });
-          const sel = document.getElementById('themeSelector');
-          if (!sel) return;
-          sel.addEventListener('click', function (e) {
+          // v6.3.3: swatches exist in two places (drawer + settings page), so
+          // listen once on the document instead of binding a single container.
+          document.addEventListener('click', function (e) {
             const btn = e.target.closest('.theme-btn');
             if (!btn) return;
             const name = btn.getAttribute('data-theme') || 'violet';
             const t = THEME_PALETTES[name];
+            if (!t) return;
             applyTheme(name);
-            document.querySelectorAll('.theme-btn').forEach(function (b) { b.classList.remove('active'); });
-            btn.classList.add('active');
+            // Mark the matching swatch active in every selector.
+            document.querySelectorAll('.theme-btn').forEach(function (b) {
+              b.classList.toggle('active', b.getAttribute('data-theme') === name);
+            });
             safeStorage.setItem(A.LS_THEME, JSON.stringify({
               theme:name, accent:t.accent, accent2:t.accent2, accent3:t.accent3, rgb:t.rgb
             }));
@@ -14934,24 +15093,16 @@
             studyEnabledMenu.addEventListener('change', function () {
               setStudyEnabled(this.checked);
             });
-          const studySettingsJump = document.getElementById('studySettingsJump');
-          if (studySettingsJump)
-            studySettingsJump.addEventListener('click', function () {
-              // Close the drawer, then scroll the study card into view.
-              const menu = document.getElementById('settingsMenu');
+          // Any [data-tab] inside the drawer should close it first, otherwise the
+          // backdrop stays and the page underneath is left scroll-locked.
+          const drawerMenu = document.getElementById('settingsMenu');
+          if (drawerMenu)
+            drawerMenu.addEventListener('click', function (e) {
+              if (!e.target.closest('[data-tab]')) return;
               const back = document.getElementById('settingsBackdrop');
-              if (menu) menu.classList.remove('open');
+              drawerMenu.classList.remove('open');
               if (back) back.classList.remove('open');
               document.body.style.overflow = '';
-              A.goto('dashboard');
-              setTimeout(function () {
-                const card = document.getElementById('studyEnabled');
-                if (!card) return;
-                const wrap = card.closest('.card') || card;
-                wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                wrap.classList.add('flash-target');
-                setTimeout(function () { wrap.classList.remove('flash-target'); }, 1600);
-              }, 220);
             });
 
           const saveStudySettingsBtn = document.getElementById('saveStudySettings');
@@ -15646,7 +15797,7 @@
         }
       })();
     </script>
-  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26595184ce41674',t:'MTc4NTkzMDYwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a268444a89c393d4',t:'MTc4NTk1ODc1NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 <!-- ============================================================ -->
 <!-- ██████ PART 5/5 - JS FINAL - END ██████ -->
