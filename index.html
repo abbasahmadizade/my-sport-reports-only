@@ -181,19 +181,25 @@
       }
 
       /* === NAVIGATION === */
+      /* v6.3.4: a floating pill bar reads better on a phone than an edge-to-edge
+         strip — it stays clearly above the content and away from the system
+         gesture area, while remaining pinned regardless of scroll position. */
       .bottom-nav {
         display: flex;
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+        left: 10px;
+        right: 10px;
         z-index: 100;
-        background: rgba(var(--bg-rgb), 0.97);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-top: 1px solid var(--border);
+        background: rgba(var(--bg-rgb), 0.92);
+        backdrop-filter: blur(18px) saturate(140%);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        border: 1px solid var(--border);
+        border-radius: 20px;
         height: var(--bottom-nav-h);
-        padding-bottom: env(safe-area-inset-bottom, 0);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, .45),
+                    0 0 0 1px rgba(var(--accent-rgb), .10);
+        overflow: hidden;
       }
       .bottom-nav button {
         flex: 1;
@@ -290,11 +296,14 @@
       body.hide-fab .fab { display: none !important; }
       /* Leave room so the floating button never sits on top of real content. */
       @media (max-width: 759px) {
-        .main { padding-bottom: calc(var(--bottom-nav-h) + 92px) !important; }
+        /* room for the floating bar (nav height + its offset) plus the FAB */
+        .main {
+          padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 104px) !important;
+        }
       }
       .fab {
         position: fixed;
-        bottom: calc(var(--bottom-nav-h) + 16px);
+        bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 24px);
         left: 16px;
         z-index: 90;
         width: 58px;
@@ -2693,7 +2702,14 @@
         z-index: 0;
         filter: blur(6px);
       }
-      .header, .main, .bottom-nav { position: relative; z-index: 1; }
+      /* v6.3.4 FIX: this previously set `position: relative` on .header and
+         .bottom-nav, which destroyed their `position: fixed` and pushed the
+         tab bar to the very bottom of the document — the user had to scroll
+         the whole page to change tabs. Only .main needs a stacking context;
+         the fixed bars simply need a z-index above the decorative glow. */
+      .main { position: relative; z-index: 1; }
+      .header { z-index: 50; }
+      .bottom-nav { z-index: 100; }
 
       /* Cards get a faint top highlight so they read as raised, not flat.
          .card uses the `background` shorthand, so the colour is restated here
@@ -15797,7 +15813,7 @@
         }
       })();
     </script>
-  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a268444a89c393d4',t:'MTc4NTk1ODc1NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </body>
 </html>
 <!-- ============================================================ -->
 <!-- ██████ PART 5/5 - JS FINAL - END ██████ -->
