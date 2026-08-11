@@ -16,14 +16,14 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-g1lexkss7olRXJF6bpEmXf5kP97horL4CYlMKkGGuhw=' 'sha256-U0zK+RzTdj/WVXzd9/fLXhJjR+N06BGiBKU5cOs7Srs=' 'sha256-Wtbcjcch5Q3c6aONDEZr9dby5f2uL46JXl2BwYwm9kA='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-NikA7nmy+KmW8tuwjqcOpDDt60sfbIgVIi21AbUUS+0=' 'sha256-KX8KcH2SuHYU9YnBTQPCNFQxXzpRLjxAY+a9pFDSLmo=' 'sha256-B5J8jr4jedHubNtHia4ET3i9uuu6CdgtlcbqHiuhtLA='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sport Report" />
-    <title>🏃 گزارش ورزش، خواب و انرژی — v6.0</title>
+    <title>🏃 گزارش ورزش، خواب و انرژی — v6.5</title>
 
     <link
       rel="icon"
@@ -687,298 +687,257 @@
       }
 
       /* ═══════════════════════════════════
-               STREAK MAP v2 — GitHub Style
-            ═══════════════════════════════════ */
+         ACTIVITY MAP v3 — v6.5
+         Rebuilt for a phone held in one hand. The old version squeezed 20
+         weeks into 358px, which meant 12px cells you could not aim at and
+         could not read. Now the cells scale with the card, the map only
+         shows a range that actually fits, and everything follows the theme
+         colour instead of the leftover GitHub green.
+         ═══════════════════════════════════ */
       .streak-map {
         width: 100%;
         overflow: hidden;
-        --sm-size: 12px;
-        --sm-gap: 3px;
+        --sm-size: 26px;
+        --sm-gap: 5px;
+        --sm-radius: 8px;
+      }
+      @media (min-width: 600px) {
+        .streak-map { --sm-size: 30px; --sm-gap: 6px; --sm-radius: 9px; }
       }
       @media (min-width: 1024px) {
-        .sm-stats {
-          grid-template-columns: repeat(4, 1fr);
-          gap: 12px;
-          margin-top: 16px;
-        }
-        .sm-stat-val {
-          font-size: 1.6rem;
-        }
-        .sm-stat-lbl {
-          font-size: 0.75rem;
-        }
-        .sm-stat {
-          padding: 14px 10px;
-        }
-        .sm-ylabel {
-          width: 18px;
-          font-size: 0.65rem;
-        }
+        .streak-map { --sm-size: 26px; --sm-gap: 5px; }
       }
+
       .sm-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
         flex-wrap: wrap;
-        gap: 4px;
+        gap: 6px;
       }
-      .sm-title {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--text);
+      .sm-range {
+        font-size: 0.72rem;
+        color: var(--muted);
       }
+      .sm-range b { color: var(--accent2); font-weight: 700; }
       .sm-legend {
         display: flex;
         align-items: center;
-        gap: 3px;
+        gap: 4px;
         font-size: 0.65rem;
         color: var(--muted);
         direction: ltr;
       }
       .sm-leg-cell {
-        width: 10px;
-        height: 10px;
-        border-radius: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
       }
-      .sm-scroll {
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 4px;
-      }
-      .sm-wrap {
-        display: flex;
-        flex-direction: row;
-        gap: 0;
-        direction: ltr;
-        min-width: max-content;
-        align-items: flex-start;
-      }
-      .sm-ylabels {
-        display: flex;
-        flex-direction: column;
+
+      /* The grid itself: rows = weeks, columns = weekdays. Reading a week
+         left-to-right along a row is how a calendar works, and it needs no
+         horizontal scrolling. */
+      .sm-cal {
+        display: grid;
+        grid-template-columns: auto repeat(7, minmax(0, 1fr));
         gap: var(--sm-gap);
-        margin-right: 3px;
-        padding-top: 17px;
-        flex-shrink: 0;
+        direction: rtl;
+        align-items: center;
+        justify-items: center;
       }
-      .sm-ylabel {
-        width: 14px;
-        height: var(--sm-size, 12px);
-        font-size: 0.55rem;
+      .sm-cal > .sm-cell { width: 100%; max-width: 40px; }
+      .sm-dow {
+        font-size: 0.66rem;
         color: var(--muted);
+        text-align: center;
+        font-weight: 700;
+        padding-bottom: 2px;
+        line-height: 1;
+      }
+      .sm-wk {
+        font-size: 0.6rem;
+        color: var(--muted);
+        text-align: left;
+        padding-left: 4px;
+        white-space: nowrap;
+        line-height: 1;
+      }
+      .sm-cell {
+        aspect-ratio: 1 / 1;
+        min-height: var(--sm-size);
+        /* Cap the height so 8 weeks still fits in about one thumb-scroll.
+           Without this the squares grow to ~46px on a Pixel and the card
+           becomes 1100px tall. */
+        max-height: 40px;
+        border-radius: var(--sm-radius);
+        position: relative;
+        cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        flex-shrink: 0;
+        font-size: 0.62rem;
+        font-weight: 700;
+        color: transparent;
+        border: 1px solid transparent;
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .sm-cell:active { transform: scale(0.92); }
+      .sm-cell.sm-future { visibility: hidden; pointer-events: none; }
+
+      /* Day number stays visible on filled days — the map is now readable
+         without tapping anything. */
+      .sm-cell .sm-d {
+        font-size: 0.62rem;
         line-height: 1;
-      }
-      @media (min-width: 600px) {
-        .sm-ylabel {
-          height: 13px;
-        }
-      }
-      @media (min-width: 1024px) {
-        .sm-ylabel {
-          height: 16px;
-          width: 18px;
-          font-size: 0.65rem;
-        }
-      }
-      .sm-gridwrap {
-        display: flex;
-        flex-direction: column;
-      }
-      .sm-xlabels {
-        position: relative;
-        height: 18px;
-        margin-bottom: 2px;
-      }
-
-      .sm-cols {
-        display: flex;
-        flex-direction: row;
-        gap: var(--sm-gap);
-      }
-
-      .sm-col {
-        display: flex;
-        flex-direction: column;
-        gap: var(--sm-gap);
-        flex-shrink: 0;
-      }
-
-      .sm-cell {
-        width: var(--sm-size);
-        height: var(--sm-size);
-        border-radius: 3px;
-        flex-shrink: 0;
-        position: relative;
-        cursor: pointer;
-        transition: transform 0.12s;
-      }
-      @media (min-width: 600px) {
-        .sm-cell {
-          width: 13px;
-          height: 13px;
-          border-radius: 3px;
-        }
-        .sm-col {
-          gap: 3px;
-        }
-        .sm-cols {
-          gap: 3px;
-        }
-      }
-      @media (min-width: 1024px) {
-        .sm-cell {
-          width: 16px;
-          height: 16px;
-          border-radius: 3px;
-        }
-        .sm-col {
-          gap: 3px;
-        }
-        .sm-cols {
-          gap: 3px;
-        }
-        .sm-stats {
-          grid-template-columns: repeat(4, 1fr);
-          gap: 12px;
-          margin-top: 16px;
-        }
-        .sm-stat-val {
-          font-size: 1.6rem;
-        }
-        .sm-stat-lbl {
-          font-size: 0.75rem;
-        }
-        .sm-stat {
-          padding: 14px 10px;
-        }
-      }
-      .sm-cell:hover {
-        transform: scale(1.6);
-        z-index: 10;
-      }
-      .sm-cell.sm-future {
-        opacity: 0;
+        font-weight: 700;
         pointer-events: none;
       }
-      .sm-cell.sm-today {
-        outline: 2px solid var(--text);
-        outline-offset: 2px;
-        border-radius: 4px;
-        box-shadow: 0 0 0 2px var(--green);
+      @media (max-width: 380px) {
+        .streak-map { --sm-size: 22px; --sm-gap: 4px; }
+        .sm-cell .sm-d { font-size: 0.56rem; }
       }
 
-      /* ۵ سطح رنگ — v6.2: follows the active theme instead of GitHub green,
-         so the whole app stays on one palette. */
+      /* 5 intensity levels, all derived from the active theme. */
       .sm-l0 {
-        background: var(--border);
-        opacity: 0.6;
+        background: rgba(var(--accent-rgb), 0.05);
+        border-color: var(--border);
       }
+      .sm-l0 .sm-d { color: var(--muted); opacity: 0.55; }
       .sm-l1 {
-        background: rgba(var(--accent-rgb), 0.28);
+        background: rgba(var(--accent-rgb), 0.24);
+        border-color: rgba(var(--accent-rgb), 0.3);
       }
+      .sm-l1 .sm-d { color: var(--text); opacity: 0.75; }
       .sm-l2 {
-        background: rgba(var(--accent-rgb), 0.5);
+        background: rgba(var(--accent-rgb), 0.45);
+        border-color: rgba(var(--accent-rgb), 0.5);
       }
+      .sm-l2 .sm-d { color: #fff; opacity: 0.9; }
       .sm-l3 {
-        background: rgba(var(--accent-rgb), 0.72);
+        background: rgba(var(--accent-rgb), 0.7);
+        border-color: rgba(var(--accent-rgb), 0.75);
       }
+      .sm-l3 .sm-d { color: #fff; }
       .sm-l4 {
         background: rgba(var(--accent-rgb), 0.95);
-        box-shadow: 0 0 6px rgba(var(--accent-rgb), 0.4);
+        border-color: rgba(var(--accent-rgb), 1);
+        box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.35);
+      }
+      .sm-l4 .sm-d { color: #fff; }
+
+      /* Not logged at all — visibly different from "logged but did nothing". */
+      .sm-cell.sm-nodata {
+        background: transparent;
+        border: 1px dashed var(--border);
+      }
+      .sm-cell.sm-nodata .sm-d { color: var(--muted); opacity: 0.4; }
+
+      .sm-cell.sm-today {
+        border-color: var(--accent2);
+        box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.55);
+      }
+      .sm-cell.sm-today .sm-d { color: var(--text); }
+      .sm-cell.sm-l3.sm-today .sm-d,
+      .sm-cell.sm-l4.sm-today .sm-d { color: #fff; }
+
+      /* Futsal marker: a dot, not an outline fighting the today ring. */
+      .sm-cell.sm-futsal::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--yellow);
+        box-shadow: 0 0 4px var(--yellow);
       }
 
-      /* فوتسال */
-      .sm-futsal {
-        outline: 2px solid var(--yellow);
-        outline-offset: 1px;
+      /* Month separators so a long map does not blur into one block. */
+      .sm-month {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+        width: 100%;
+        text-align: center;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: var(--accent2);
+        margin: 7px 0 1px;
+        padding-top: 6px;
+        border-top: 1px solid var(--border);
       }
-      .sm-cell.sm-today.sm-futsal {
-        outline: 2px solid var(--yellow);
-      }
+      .sm-cal .sm-month:first-child { border-top: none; margin-top: 0; padding-top: 0; }
 
       /* Tooltip */
       .sm-tip {
         position: fixed;
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 8px 11px;
+        background: var(--card2);
+        border: 1px solid var(--accent3);
+        border-radius: 12px;
+        padding: 9px 12px;
         font-size: 0.74rem;
         color: var(--text);
         z-index: 9999;
         pointer-events: none;
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
-        max-width: 155px;
-        min-width: 120px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+        max-width: 180px;
+        min-width: 130px;
         text-align: right;
         direction: rtl;
-        line-height: 1.8;
+        line-height: 1.75;
         display: none;
       }
-      .sm-tip.on {
-        display: block;
-      }
+      .sm-tip.on { display: block; }
       .sm-tip-date {
-        font-weight: 700;
+        font-weight: 800;
         font-size: 0.76rem;
-        color: var(--green);
-        margin-bottom: 2px;
+        color: var(--accent2);
+        margin-bottom: 3px;
         display: block;
       }
 
-      /* کارت‌های آمار */
+      /* Stat cards under the map */
       .sm-stats {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 7px;
-        margin-top: 11px;
+        gap: 8px;
+        margin-top: 13px;
       }
-      @media (min-width: 400px) {
-        .sm-stats {
-          grid-template-columns: repeat(4, 1fr);
-        }
+      @media (min-width: 480px) {
+        .sm-stats { grid-template-columns: repeat(4, 1fr); }
       }
       .sm-stat {
-        background: var(--bg);
+        background: rgba(var(--accent-rgb), 0.07);
         border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 8px 5px;
+        border-radius: 12px;
+        padding: 10px 6px;
         text-align: center;
+        min-width: 0;
       }
       .sm-stat-val {
         display: block;
         font-size: 1.15rem;
-        font-weight: 800;
-        color: var(--green);
-        line-height: 1.2;
-      }
-      @media (min-width: 768px) {
-        .sm-stat-val {
-          font-size: 1.5rem;
-        }
-        .sm-stat-lbl {
-          font-size: 0.75rem;
-        }
-        .sm-stat {
-          padding: 12px 8px;
-          border-radius: 14px;
-        }
-        .sm-stats {
-          gap: 10px;
-          margin-top: 16px;
-        }
+        font-weight: 900;
+        color: var(--accent2);
+        line-height: 1.25;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .sm-stat-lbl {
         display: block;
         font-size: 0.62rem;
         color: var(--muted);
-        margin-top: 2px;
+        margin-top: 3px;
+      }
+      @media (min-width: 768px) {
+        .sm-stat-val { font-size: 1.45rem; }
+        .sm-stat-lbl { font-size: 0.72rem; }
+        .sm-stat { padding: 13px 9px; border-radius: 14px; }
+        .sm-stats { gap: 10px; margin-top: 16px; }
       }
 
       /* === SLEEP TIMELINE === */
@@ -1517,12 +1476,16 @@
         height: 380px !important;
       }
 
-      .chart-view-head { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:10px; }
-      .chart-view-head h2 { font-size:1.05rem; margin:0 0 2px; }
-      .chart-controls { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+      .chart-view-head { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:9px; flex-wrap:wrap; }
+      .chart-view-head h2 { font-size:1.02rem; margin:0; white-space:nowrap; }
+      .chart-controls { display:flex; align-items:center; justify-content:flex-end; gap:6px; flex-wrap:wrap; }
       .chart-controls label { color:var(--muted); font-size:.72rem; }
-      .chart-controls select { width:auto; min-width:90px; padding:7px 9px; min-height:40px; }
+      .chart-controls select { width:auto; min-width:84px; padding:6px 8px; min-height:38px; font-size:.78rem; }
+      .chart-controls .btn { padding:6px 10px; font-size:.75rem; min-height:38px; }
       .chart-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-bottom:10px; }
+      /* The user's collapse choice must win everywhere, including focus and
+         forced-landscape mode, which both raise specificity on .chart-summary. */
+      .chart-summary[hidden] { display:none !important; }
       .chart-summary-item { padding:9px; border:1px solid var(--border); background:rgba(var(--accent-rgb),.06); border-radius:11px; min-width:0; }
       .chart-summary-value { color:var(--accent2); font-weight:900; font-size:.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       .chart-summary-label { color:var(--muted); font-size:.65rem; margin-top:2px; }
@@ -1985,6 +1948,26 @@
         border: 1px dashed var(--border);
         color: var(--muted);
       }
+
+      /* v6.4: usage-mode picker. */
+      .mode-picker { display: grid; gap: 8px; }
+      .mode-opt {
+        display: grid; grid-template-columns: 34px 1fr; gap: 4px 10px;
+        align-items: center; text-align: right; cursor: pointer;
+        padding: 11px 13px; border-radius: 12px;
+        border: 1px solid var(--border); background: var(--card2);
+        color: var(--text); font-family: var(--font-family);
+      }
+      .mode-opt .mode-ico { grid-row: span 2; font-size: 1.4rem; text-align: center; }
+      .mode-name { font-size: .86rem; font-weight: 700; }
+      .mode-desc { font-size: .68rem; color: var(--muted); }
+      .mode-opt.active {
+        border-color: var(--accent);
+        background: linear-gradient(135deg,
+          rgba(var(--accent-rgb), .18), rgba(var(--accent-rgb), .05));
+        box-shadow: 0 2px 12px rgba(var(--accent-rgb), .22);
+      }
+      .mode-opt.active .mode-name { color: var(--accent2); }
 
       /* v6.3.3: compact study summary on the dashboard. */
       .study-mini {
@@ -2955,7 +2938,7 @@
       }
     </style>
   </head>
-  <body>
+  <body data-version="v6.5">
     <!-- ============================================================ -->
     <!-- ██████ PART 1/5 - HEAD + CSS - END ██████ -->
     <!-- ============================================================ -->
@@ -3284,21 +3267,25 @@
 
       <!-- === VIEW: CHARTS === -->
       <div class="view" id="view-charts">
+        <!-- v6.5: the old header pushed the canvas 424px down on a Pixel, so
+             the chart itself was mostly off-screen when you opened the tab.
+             Range + buttons now sit on one compact row and the four summary
+             numbers are collapsed by default. -->
         <div class="chart-view-head">
-          <div><h2>📊 نمودارها و تحلیل روند</h2><div class="text-sm text-muted">بازه را انتخاب کن؛ برای نمای افقی دکمه بزرگ‌نمایی را بزن.</div></div>
+          <h2>📊 نمودارها</h2>
           <div class="chart-controls">
-            <label for="chartRange">بازه</label>
             <select id="chartRange" class="form-input" aria-label="بازه نمودار">
               <option value="14">۱۴ روز</option>
               <option value="30" selected>۳۰ روز</option>
               <option value="90">۹۰ روز</option>
               <option value="all">همه</option>
             </select>
-            <button type="button" class="btn btn-ghost btn-sm" id="chartDownloadBtn">📥 تصویر</button>
-            <button type="button" class="btn btn-primary btn-sm" id="chartFocusBtn" aria-expanded="false">⛶ نمایش بزرگ</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="chartSummaryBtn" aria-expanded="false" aria-controls="chartSummary">📋 خلاصه</button>
+            <button type="button" class="btn btn-ghost btn-sm" id="chartDownloadBtn">📥</button>
+            <button type="button" class="btn btn-primary btn-sm" id="chartFocusBtn" aria-expanded="false">⛶ بزرگ</button>
           </div>
         </div>
-        <div class="chart-summary" id="chartSummary" aria-live="polite"></div>
+        <div class="chart-summary" id="chartSummary" aria-live="polite" hidden></div>
         <div class="chart-landscape-hint">📱 در حالت نمایش بزرگ، گوشی را افقی بچرخان.</div>
         <div class="chart-tabs" id="chartTabs">
           <button type="button" class="chart-tab active" data-chart="sleep">
@@ -3708,6 +3695,29 @@
           </button>
         </div>
         <div class="card">
+          <div class="card-title"><span class="emoji">🎛️</span> حالت استفاده</div>
+          <div class="field-hint" style="margin-bottom: 10px">
+            مشخص کن از کدام بخش‌ها استفاده می‌کنی تا فقط همان‌ها نمایش داده شوند.
+          </div>
+          <div class="mode-picker" id="modePicker">
+            <button type="button" class="mode-opt" data-mode="sport">
+              <span class="mode-ico">🏃</span>
+              <span class="mode-name">فقط ورزش</span>
+              <span class="mode-desc">ورزش، خواب و انرژی</span>
+            </button>
+            <button type="button" class="mode-opt" data-mode="study">
+              <span class="mode-ico">📚</span>
+              <span class="mode-name">فقط مطالعه</span>
+              <span class="mode-desc">جلسه‌ها و گزارش مطالعه</span>
+            </button>
+            <button type="button" class="mode-opt" data-mode="both">
+              <span class="mode-ico">🎯</span>
+              <span class="mode-name">هر دو</span>
+              <span class="mode-desc">همه‌ی بخش‌ها</span>
+            </button>
+          </div>
+        </div>
+        <div class="card" id="studyModuleCard">
           <div class="card-title"><span class="emoji">📚</span> ماژول مطالعه</div>
           <label class="checkbox-item">
             <input type="checkbox" id="studyEnabled" /> فعال کردن بخش مطالعه
@@ -4445,6 +4455,15 @@
                 <option value="false">❌ انجام نشد</option>
               </select>
             </div>
+            <div class="form-group" id="mdMissWrap" style="display: none">
+              <label>چرا امروز نشد؟ <span class="lbl-opt">(اختیاری)</span></label>
+              <div class="quick-chips" id="mdMissChips"></div>
+              <input type="hidden" id="mdMissReason" value="" />
+              <div class="field-hint">
+                بعد از چند هفته می‌بینی بیشترین مانع چه بوده — همین برای اصلاح
+                برنامه از تعداد روزهای فعال مفیدتر است.
+              </div>
+            </div>
             <label class="checkbox-item"
               ><input type="checkbox" id="mdFutsalRef" /> ⚽ مرتبط با
               فوتسال</label
@@ -4461,6 +4480,11 @@
           <div class="step-page" id="step-1">
             <div class="form-group">
               <label>⚡ انرژی (0-10)</label>
+              <div class="field-hint" style="margin: -2px 0 8px">
+                همان ۳۰–۶۰ دقیقه اول بعد از بیدار شدن را بسنج — قبل از قهوه،
+                ورزش یا درس. <b>۱</b> به‌زور بلند شدم • <b>۳</b> خواب‌آلود •
+                <b>۵</b> معمولی • <b>۷</b> سرحال • <b>۱۰</b> فوق‌العاده.
+              </div>
               <div class="rating-slider-wrap">
                 <div class="rating-value-display">
                   <span id="mdEnergyDisplay">5</span>
@@ -5939,6 +5963,9 @@
           // v6.3: optional study module. Entirely separate from the sport data
           // and hidden unless the user switches it on.
           study: [],
+          // v6.4: which side of the app this person actually uses.
+          // 'sport' | 'study' | 'both'
+          appMode: 'sport',
           studyConfig: {
             enabled: false,
             dailyGoalMin: 0,
@@ -6069,6 +6096,12 @@
             futsalRef: r.futsalRef === true || r.futsalRef === 'true' || r.futsalRef === 1,
             sleepBlocks: normalizeSleepBlocks(r.sleepBlocks),
             officialWake: validTime(r.officialWake) ? r.officialWake : null,
+            // v6.4: why a planned day did not happen. Fixed options only, so
+            // the answer is analysable later instead of free text.
+            missReason: (function () {
+              const v = cleanText(r.missReason, 20);
+              return MISS_REASONS.indexOf(v) >= 0 ? v : '';
+            })(),
             // v6: optional hour of the training session (0-23). Powers the
             // "which time of day actually works for you" analysis. null = unknown.
             trainHour: (function () {
@@ -6095,6 +6128,13 @@
         // "2 hours, done" in three seconds, or fill in subject/method/focus/
         // notes when they feel like it. Nothing here touches sport metrics.
         const STUDY_METHODS = ['مطالعه', 'تست', 'مرور', 'حل تمرین', 'خلاصه‌نویسی', 'کلاس', 'رفع اشکال'];
+        // v6.4: reasons a planned training day was missed.
+        const MISS_REASONS = ['sleep', 'work', 'sick', 'weather', 'lazy', 'recovery', 'other'];
+        const MISS_LABELS = {
+          sleep: '😴 خواب', work: '💼 کار/دانشگاه', sick: '🤒 بیماری',
+          weather: '🌧️ آب‌وهوا', lazy: '📱 اهمال‌کاری', recovery: '❤️ ریکاوری',
+          other: '❓ سایر',
+        };
 
         function normalizeStudy(x, index) {
           if (!x || typeof x !== 'object') return null;
@@ -6126,7 +6166,12 @@
             satisfaction: finiteNumber(x.satisfaction, 0, 0, 10),
             distractions: finiteNumber(x.distractions, 0, 0, 200),
             questions: finiteNumber(x.questions, 0, 0, 10000),
-            correct: finiteNumber(x.correct, 0, 0, 10000),
+            // v6.5: never store more correct answers than questions attempted.
+            // Anything else produces impossible percentages downstream.
+            correct: Math.min(
+              finiteNumber(x.questions, 0, 0, 10000),
+              finiteNumber(x.correct, 0, 0, 10000)
+            ),
             note: cleanText(x.note, 2000),
             _updatedAt: normalizeRevision(x._updatedAt),
           };
@@ -6198,6 +6243,8 @@
           };
           out.programGoal = cleanText(input.programGoal || DEFAULT_DATA.programGoal, 5000);
           out.notes = Array.isArray(input.notes) ? input.notes.slice(0, 1000) : [];
+          const modeRaw = cleanText(input.appMode, 10);
+          out.appMode = ['sport', 'study', 'both'].indexOf(modeRaw) >= 0 ? modeRaw : 'sport';
           out.studyConfig = normalizeStudyConfig(input.studyConfig);
           const studyMap = {};
           (Array.isArray(input.study) ? input.study : []).slice(0, 20000)
@@ -6305,6 +6352,8 @@
           else merged.goals = JSON.stringify(local.goals) >= JSON.stringify(remote.goals) ? deepClone(local.goals) : deepClone(remote.goals);
           if (lf.programGoal !== rf.programGoal) merged.programGoal = lf.programGoal > rf.programGoal ? local.programGoal : remote.programGoal;
           else merged.programGoal = local.programGoal >= remote.programGoal ? local.programGoal : remote.programGoal;
+          if (lf.study !== rf.study) merged.appMode = lf.study > rf.study ? local.appMode : remote.appMode;
+          else merged.appMode = local.appMode !== 'sport' ? local.appMode : remote.appMode;
           if (lf.study !== rf.study) merged.studyConfig = deepClone(lf.study > rf.study ? local.studyConfig : remote.studyConfig);
           else merged.studyConfig = deepClone(local.studyConfig.enabled || !remote.studyConfig.enabled ? local.studyConfig : remote.studyConfig);
           merged._sync.fields = {
@@ -6418,6 +6467,10 @@
         // ===== STATS =====
         function computeStats(rows) {
           if (!rows || !rows.length) {
+            // v6.5 fix: this early return was missing the v6.1+ fields, so a
+            // brand-new install rendered "NaN دقیقه" in the روزمره tile on the
+            // dashboard (Math.round(undefined)). Every key the populated branch
+            // returns must exist here too, at zero.
             return {
               streak: 0,
               avgSleep: 0,
@@ -6427,6 +6480,10 @@
               runBest: 0,
               totalRun: 0,
               totalWalk: 0,
+              totalDaily: 0,
+              dailyLoggedDays: 0,
+              avgDailyPerLoggedDay: 0,
+              totalPlanned: 0,
               completedCount: 0,
               totalDays: 0,
               sleepDays: 0,
@@ -6568,23 +6625,70 @@
           return Math.max(0, Math.min(1, v));
         }
 
-        function momentumScore(rows, goals, endDate) {
+        // v6.4: sleep quality scored by CLOSENESS to the goal, not "more is
+        // better". Ten hours is not a win — it usually signals a wrecked rhythm.
+        function sleepQuality(hours, goalHours) {
+          const goal = goalHours || 7;
+          if (!(hours > 0)) return null;          // not logged
+          const diff = hours - goal;
+          // Comfortable band: goal -0.5h .. +1h scores full marks.
+          if (diff >= -0.5 && diff <= 1) return 1;
+          // Outside the band the score tapers; oversleeping is penalised more
+          // gently than undersleeping, but it IS penalised.
+          const over = diff > 0;
+          const dist = Math.abs(diff) - (over ? 1 : 0.5);
+          const tolerance = over ? 3.5 : 2.5;
+          return Math.max(0, 1 - dist / tolerance);
+        }
+
+        // v6.4: momentum is no longer sport-only. A week of poor training with
+        // solid sleep and honest logging should dip, not collapse.
+        const MOMENTUM_W = { train: 0.60, sleep: 0.25, logging: 0.15 };
+
+        function momentumParts(rows, goals, endDate) {
           rows = Array.isArray(rows) ? rows : state.rows;
           endDate = endDate || Jalali.today();
           goals = goals || (state.goals || {});
+          const sleepGoal = goals.sleepGoalHours || 7;
           const byDate = {};
           rows.forEach(function (r) {
             const age = Jalali.diffDays(endDate, r.jdate);
             if (age >= 0 && age < MOMENTUM_WINDOW) byDate[r.jdate] = r;
           });
-          let weighted = 0, maxWeighted = 0;
+          let wTrain = 0, wSleep = 0, wLog = 0;
+          let maxW = 0, maxSleepW = 0;
           for (let i = 0; i < MOMENTUM_WINDOW; i++) {
             const d = Jalali.addDays(endDate, -i);
+            const r = byDate[d];
             const w = Math.pow(0.5, i / MOMENTUM_HALFLIFE);
-            maxWeighted += w;
-            weighted += w * dayEffort(byDate[d], goals);
+            maxW += w;
+            wTrain += w * dayEffort(r, goals);
+            wLog += w * (r ? 1 : 0);
+            if (r) {
+              const q = sleepQuality(sleepInfo(r.sleepBlocks).totalH, sleepGoal);
+              if (q !== null) { wSleep += w * q; maxSleepW += w; }
+            }
           }
-          return Math.round((weighted / Math.max(0.0001, maxWeighted)) * 100);
+          const train = wTrain / Math.max(0.0001, maxW);
+          const logging = wLog / Math.max(0.0001, maxW);
+          // With no sleep data at all, redistribute its weight onto training so
+          // the score is not silently dragged down by a field the user skipped.
+          const hasSleep = maxSleepW > 0.05;
+          const sleep = hasSleep ? wSleep / maxSleepW : null;
+          const total = hasSleep
+            ? train * MOMENTUM_W.train + sleep * MOMENTUM_W.sleep + logging * MOMENTUM_W.logging
+            : train * (MOMENTUM_W.train + MOMENTUM_W.sleep) + logging * MOMENTUM_W.logging;
+          return {
+            score: Math.round(total * 100),
+            train: Math.round(train * 100),
+            sleep: sleep === null ? null : Math.round(sleep * 100),
+            logging: Math.round(logging * 100),
+            hasSleep: hasSleep,
+          };
+        }
+
+        function momentumScore(rows, goals, endDate) {
+          return momentumParts(rows, goals, endDate).score;
         }
 
         function momentumTrend(rows, goals) {
@@ -6670,11 +6774,16 @@
           const remainingDays = days.filter(function (d) { return d.future || d.isToday; })
             .filter(function (d) { return !d.active; }).length;
           const need = Math.max(0, target - done);
+          // v6.4: on the last day of the week the target may already be out of
+          // reach. Telling someone "1 day left" when zero days remain is both
+          // wrong and demoralising, so surface that state explicitly.
+          const closed = need > 0 && remainingDays === 0;
           return {
             start: start, target: target, done: done, need: need,
             days: days, remainingDays: remainingDays,
             onTrack: need === 0 || need <= remainingDays,
             achieved: done >= target,
+            closed: closed,
             auto: (state.goals || {}).weeklyTargetMode !== 'manual',
           };
         }
@@ -6893,8 +7002,12 @@
             if (x.focus > 0) { focusSum += x.focus; focusN++; }
             if (x.satisfaction > 0) { satSum += x.satisfaction; satN++; }
             if (x.distractions > 0) { distract += x.distractions; distractN++; }
-            q += Number(x.questions) || 0;
-            c += Number(x.correct) || 0;
+            // v6.5 fix: `correct` can exceed `questions` in data that came
+            // from an older build or a hand-edited Gist. Clamping only at save
+            // time was not enough — a single bad row rendered "درصد: 400٪".
+            const xq = Math.max(0, Number(x.questions) || 0);
+            q += xq;
+            c += Math.min(xq, Math.max(0, Number(x.correct) || 0));
             if (x.subject) {
               if (!subjects[x.subject]) subjects[x.subject] = { min: 0, n: 0, focus: 0, fN: 0 };
               subjects[x.subject].min += m;
@@ -7035,6 +7148,26 @@
           if (h && m) return h + ':' + String(m).padStart(2, '0');
           if (h) return h + ':00';
           return '0:' + String(m).padStart(2, '0');
+        }
+
+        // v6.4: which obstacle costs the most days?
+        function missReasonStats(days) {
+          const rows = state.rows;
+          const today = Jalali.today();
+          const counts = {};
+          let total = 0;
+          rows.forEach(function (r) {
+            if (days && Jalali.diffDays(today, r.jdate) >= days) return;
+            if (isTrainingDay(r)) return;
+            if (!r.missReason) return;
+            counts[r.missReason] = (counts[r.missReason] || 0) + 1;
+            total++;
+          });
+          const list = Object.keys(counts).map(function (k) {
+            return { key: k, label: MISS_LABELS[k] || k, n: counts[k],
+                     pct: Math.round((counts[k] / total) * 100) };
+          }).sort(function (a, b) { return b.n - a.n; });
+          return { total: total, list: list };
         }
 
         function currentStreak(rows) {
@@ -7391,6 +7524,8 @@
         window._app.rowsInLastDays = rowsInLastDays;
         window._app.currentStreak = currentStreak;
         window._app.momentumScore = momentumScore;
+        window._app.momentumParts = momentumParts;
+        window._app.sleepQuality = sleepQuality;
         window._app.momentumTrend = momentumTrend;
         window._app.momentumLevel = momentumLevel;
         window._app.dayEffort = dayEffort;
@@ -7412,6 +7547,9 @@
         window._app.fmtHMShort = fmtHMShort;
         window._app.isTrainingDay = isTrainingDay;
         window._app.qualifiesAsTraining = qualifiesAsTraining;
+        window._app.MISS_REASONS = MISS_REASONS;
+        window._app.MISS_LABELS = MISS_LABELS;
+        window._app.missReasonStats = missReasonStats;
         window._app.plannedMin = plannedMin;
         window._app.dailyMin = dailyMin;
         window._app.TRAINING_WALK_MIN = TRAINING_WALK_MIN;
@@ -7745,11 +7883,13 @@
           if (!wp.achieved && wp.need > 0) {
             const tight = wp.need >= wp.remainingDays && wp.remainingDays > 0;
             out.push({
-              type: tight ? 'warn' : 'info',
+              type: wp.closed ? 'info' : tight ? 'warn' : 'info',
               emoji: '📅',
               title: 'هفته: ' + wp.done + ' از ' + wp.target + ' روز',
-              content: wp.remainingDays === 0
-                ? 'این هفته دیگه روزی نمونده. هفته‌ی بعد تازه شروع می‌شه — چیزی از دست نرفته.'
+              content: wp.closed
+                ? 'این هفته دیگه روزی نمونده' +
+                  (wp.done > 0 ? ' — ' + wp.done + ' روز فعال بودی که خودش ارزش دارد.' : '.') +
+                  ' شنبه هفته‌ی تازه شروع می‌شود.'
                 : (tight
                     ? 'برای رسیدن به هدف باید هر ' + wp.remainingDays + ' روز باقی‌مونده رو فعال باشی.'
                     : wp.remainingDays + ' روز فرصت داری و فقط ' + wp.need + ' روز لازمه. راحتی.'),
@@ -7801,7 +7941,9 @@
           // v6: consistency is momentum-based, so a single rest day no longer
           // punishes the score the way a broken streak used to.
           const consistencyScore = A.momentumScore(state().rows, state().goals);
-          const sleepScore = sleep.totalH > 0 ? Math.min(100, (sleep.totalH / sleepGoal) * 100) : null;
+          // v6.4: closeness to the goal, so 12h no longer scores like 7h.
+          const sq = A.sleepQuality(sleep.totalH, sleepGoal);
+          const sleepScore = sq === null ? null : sq * 100;
           const energyScore = Number.isFinite(energy) ? Math.min(100, Math.max(0, energy * 10)) : null;
 
           let weighted = consistencyScore * 25;
@@ -8003,7 +8145,8 @@
             insights.push({
               type: 'good', emoji: '💪',
               text: 'این هفته ' + wpIns.done + ' روز فعال بودی' +
-                (wpIns.need > 0 ? ' — ' + wpIns.need + ' روز تا هدف.' : '.'),
+                (wpIns.closed ? ' — هفته تمام شد، شنبه از نو.'
+                  : wpIns.need > 0 ? ' — ' + wpIns.need + ' روز تا هدف.' : '.'),
             });
           }
 
@@ -8096,6 +8239,7 @@
           if (view === 'ai') renderAIView();
           if (view === 'study') renderStudyAll();
           if (view === 'settings') {
+            if (A.syncModeUI) A.syncModeUI();
             if (A.loadStudySettingsUI) A.loadStudySettingsUI();
             if (A.syncWeeklyGoalUI) A.syncWeeklyGoalUI();
             if (A.renderGoalProgress) A.renderGoalProgress();
@@ -8168,10 +8312,12 @@
           }).join('');
           const wkMsg = wp.achieved
             ? 'هدف این هفته کامل شد 🎉'
-            : (wp.onTrack
-                ? wp.need + ' روز دیگه تا هدف — در مسیری'
-                : wp.remainingDays === 0
-                  ? 'این هفته تموم شد؛ هفته‌ی بعد از نو'
+            : wp.closed
+              ? (wp.done > 0
+                  ? 'این هفته ' + wp.done + ' روز فعال بودی — شنبه از نو'
+                  : 'هفته تمام شد؛ شنبه شروع تازه')
+              : (wp.onTrack
+                  ? wp.need + ' روز دیگه تا هدف — در مسیری'
                   : wp.need + ' روز مونده و ' + wp.remainingDays + ' روز فرصت');
           const weekStrip =
             '<div class="week-strip' + (wp.achieved ? ' achieved' : '') + '">' +
@@ -8384,7 +8530,9 @@
             if (x.focus > 0) chips.push('<span class="study-chip' + (x.focus >= 7 ? ' good' : '') +
               '">🎯 ' + x.focus + '</span>');
             if (x.questions > 0) {
-              const acc = x.questions ? Math.round((x.correct / x.questions) * 100) : 0;
+              // v6.5: clamp here too — legacy/hand-edited rows could show 400٪.
+              const acc = Math.round(
+                (Math.min(x.correct, x.questions) / x.questions) * 100);
               chips.push('<span class="study-chip">✏️ ' + x.questions + ' تست • ' + acc + '٪</span>');
             }
             if (x.note) chips.push('<span class="study-chip">📝</span>');
@@ -8673,153 +8821,72 @@
             });
         };
         // ═══════════════════════════════════════
-        // STREAK MAP v2 — پنجره متحرک ۱۲ هفته
+        // ACTIVITY MAP v3 (v6.5)
+        // Rows = weeks, columns = weekdays. Reads like a Persian calendar,
+        // needs no horizontal scrolling, and the cells are big enough to hit
+        // with a thumb. Range adapts to how much data actually exists.
         // ═══════════════════════════════════════
+        var smRange = 8; // weeks shown; user can switch
+
         function renderStreakMap() {
-          var rows = window._app.state().rows || [];
-          var cardEl =
-            document.querySelector('.streak-map') ||
-            document.querySelector('.card');
-          var cardW = cardEl ? cardEl.offsetWidth : window.innerWidth - 32;
-          var cellSize = 12;
-          var cellGap = 3;
-          if (window.innerWidth >= 1024) cellSize = 16;
-          else if (window.innerWidth >= 600) cellSize = 13;
-          var ylabelW = 20;
-          var paddingW = 16;
-          var availW = cardW - ylabelW - paddingW;
-          var maxFromWidth = Math.floor(availW / (cellSize + cellGap));
-          maxFromWidth = Math.min(Math.max(maxFromWidth, 6), 52);
-          var WEEKS = maxFromWidth;
-          if (rows.length) {
-            var sorted = rows.slice().sort(function (a, b) {
-              return a.jdate > b.jdate ? 1 : -1;
-            });
-            var firstDate = sorted[0].jdate;
-            var todayStr2 = window._app.Jalali.today();
-            var diffDays = 0;
-            var cur = firstDate;
-            while (cur <= todayStr2 && diffDays < 400) {
-              cur = window._app.Jalali.addDays(cur, 1);
-              diffDays++;
-            }
-            var weeksNeeded = Math.ceil(diffDays / 7) + 1;
-            WEEKS = Math.min(Math.max(weeksNeeded, maxFromWidth), maxFromWidth);
-          }
-
-          var dateMap = {};
-          rows.forEach(function (r) {
-            if (r.jdate) dateMap[r.jdate] = r;
-          });
-
-          var FA_DAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
-          var FA_MONTHS = [
-            'فروردین',
-            'اردیبهشت',
-            'خرداد',
-            'تیر',
-            'مرداد',
-            'شهریور',
-            'مهر',
-            'آبان',
-            'آذر',
-            'دی',
-            'بهمن',
-            'اسفند',
-          ];
-          var DOW_MAP = {
-            شنبه: 0,
-            یک‌شنبه: 1,
-            دوشنبه: 2,
-            سه‌شنبه: 3,
-            چهارشنبه: 4,
-            پنج‌شنبه: 5,
-            جمعه: 6,
-          };
-
+          var A2 = window._app;
+          var rows = A2.state().rows || [];
           var mapEl = document.getElementById('streakMap');
-          var labelEl = document.getElementById('streakLabel');
           if (!mapEl) return;
 
-          var todayStr = window._app.Jalali.today();
-          var todayDow = DOW_MAP[window._app.Jalali.weekdayName(todayStr)] || 0;
-          var todayParsed = window._app.Jalali.parseKey(todayStr);
-          var goals = window._app.state().goals || {};
-          var sleepGoalMin = (goals.sleepGoalHours || 6.5) * 60;
+          var FA_DAYS = ['ش', 'ی', 'د', 'س', 'چ', 'پ', 'ج'];
+          var FA_MONTHS = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور',
+            'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+          var DOW_MAP = { 'شنبه': 0, 'یک‌شنبه': 1, 'دوشنبه': 2, 'سه‌شنبه': 3,
+            'چهارشنبه': 4, 'پنج‌شنبه': 5, 'جمعه': 6 };
+
+          var todayStr = A2.Jalali.today();
+          var todayParsed = A2.Jalali.parseKey(todayStr);
+          var goals = A2.state().goals || {};
+          var sleepGoalH = goals.sleepGoalHours || 6.5;
           var actGoalMin = goals.activityGoalMin || 20;
-          var futsalSet = new Set(
-            (window._app.state().futsal || []).map(function (f) {
-              return f.jdate;
-            }),
-          );
 
+          var dateMap = {};
+          rows.forEach(function (r) { if (r.jdate) dateMap[r.jdate] = r; });
+          var futsalSet = {};
+          (A2.state().futsal || []).forEach(function (f) { futsalSet[f.jdate] = true; });
+
+          // How many weeks of history actually exist? Never render a wall of
+          // empty squares — an honest short map beats a fake long one.
+          var oldest = todayStr;
+          rows.forEach(function (r) {
+            if (r.jdate && A2.Jalali.cmp(r.jdate, oldest) < 0) oldest = r.jdate;
+          });
+          var daysOfHistory = Math.max(0, A2.Jalali.diffDays(todayStr, oldest));
+          var weeksAvailable = Math.ceil((daysOfHistory + 1) / 7) + 1;
+          var weeksToShow = Math.max(4, Math.min(smRange, weeksAvailable));
+
+          // Week rows are anchored on Saturday, like the rest of the app.
+          var todayDow = DOW_MAP[A2.Jalali.weekdayName(todayStr)] || 0;
+          var thisWeekStart = A2.Jalali.addDays(todayStr, -todayDow);
+
+          // Score a day 0..100 using the same ideas as momentum: real training
+          // matters most, sleep near the goal helps, energy is a small bonus.
           function scoreDay(r) {
-            if (!r) return 0;
+            if (!r) return null;
             var sc = 0;
-            if (r.completed) sc += 35;
-            if ((r.runMin || 0) >= 5) sc += 20;
-            if ((r.runMin || 0) + (r.walkMin || 0) >= actGoalMin) sc += 15;
-            if (r.sleepBlocks && r.sleepBlocks.length) {
-              var tot = 0;
-              r.sleepBlocks.forEach(function (b) {
-                if (!b.start || !b.end) return;
-                var s2 = b.start.split(':').map(Number);
-                var e2 = b.end.split(':').map(Number);
-                var m = e2[0] * 60 + e2[1] - (s2[0] * 60 + s2[1]);
-                if (m < 0) m += 1440;
-                tot += m;
-              });
-              if (tot >= sleepGoalMin) sc += 15;
-            }
-            sc += Math.round(((r.energy || 0) / 10) * 15);
-            return Math.min(sc, 100);
+            if (A2.isTrainingDay(r)) sc += 40;
+            var planned = (Number(r.runMin) || 0) + (Number(r.walkMin) || 0);
+            if (planned > 0) sc += Math.min(25, (planned / Math.max(1, actGoalMin)) * 25);
+            var sh = A2.sleepInfo(r.sleepBlocks).totalH;
+            var q = A2.sleepQuality(sh, sleepGoalH);
+            if (q !== null) sc += q * 20;
+            var e = Number(r.energy);
+            if (Number.isFinite(e) && e > 0) sc += (e / 10) * 15;
+            return Math.max(0, Math.min(100, Math.round(sc)));
           }
-
           function toLevel(sc) {
-            if (sc === 0) return 0;
-            if (sc <= 25) return 1;
-            if (sc <= 50) return 2;
-            if (sc <= 75) return 3;
+            if (sc === null) return null;
+            if (sc < 12) return 0;
+            if (sc < 32) return 1;
+            if (sc < 55) return 2;
+            if (sc < 78) return 3;
             return 4;
-          }
-
-          var gridData = [];
-          var monthLabels = {};
-          var lastMonth = -1;
-          var lastLabelCol = -1;
-
-          for (var col = 0; col < WEEKS; col++) {
-            var colArr = [];
-            for (var row = 0; row < 7; row++) {
-              var daysBack = (WEEKS - 1 - col) * 7 + (todayDow - row);
-              if (daysBack < 0) {
-                colArr.push({ future: true });
-              } else {
-                var ds = window._app.Jalali.addDays(todayStr, -daysBack);
-                var parsed = window._app.Jalali.parseKey(ds);
-                var r = dateMap[ds];
-                var sc = scoreDay(r);
-                if (parsed && parsed.jd === 14 && parsed.jm !== lastMonth) {
-                  if (lastLabelCol === -1 || col - lastLabelCol >= 3) {
-                    monthLabels[col] = FA_MONTHS[parsed.jm - 1];
-                    lastLabelCol = col;
-                  }
-                  lastMonth = parsed.jm;
-                }
-                colArr.push({
-                  ds: ds,
-                  row: r,
-                  sc: sc,
-                  level: r ? toLevel(sc) : 0,
-                  noData: !r,
-                  isFutsal: futsalSet.has(ds),
-                  isToday: daysBack === 0,
-                  jd: parsed ? parsed.jd : 0,
-                  jm: parsed ? parsed.jm : 0,
-                });
-              }
-            }
-            gridData.push(colArr);
           }
 
           var tip = document.getElementById('smTip');
@@ -8830,9 +8897,16 @@
             document.body.appendChild(tip);
           }
 
-          mapEl.innerHTML =
+          var firstWeekStart = A2.Jalali.addDays(thisWeekStart, -7 * (weeksToShow - 1));
+          var firstParsed = A2.Jalali.parseKey(firstWeekStart);
+          var rangeLabel = firstParsed
+            ? firstParsed.jd + ' ' + FA_MONTHS[firstParsed.jm - 1] + ' تا امروز'
+            : '';
+
+          var head =
             '<div class="sm-header">' +
-            '<span class="sm-title">🗓️ نقشه فعالیت</span>' +
+            '<span class="sm-range">📆 <b>' + weeksToShow + '</b> هفته اخیر • ' +
+            escapeHTML(rangeLabel) + '</span>' +
             '<div class="sm-legend">' +
             '<span>کم</span>' +
             '<div class="sm-leg-cell sm-l0"></div>' +
@@ -8841,264 +8915,211 @@
             '<div class="sm-leg-cell sm-l3"></div>' +
             '<div class="sm-leg-cell sm-l4"></div>' +
             '<span>زیاد</span>' +
-            '</div>' +
-            '</div>' +
-            '<div class="sm-scroll">' +
-            '<div class="sm-wrap">' +
-            '<div class="sm-ylabels" id="smYLabels"></div>' +
-            '<div class="sm-gridwrap">' +
-            '<div class="sm-xlabels" id="smXLabels"></div>' +
-            '<div class="sm-cols" id="smCols"></div>' +
-            '</div>' +
-            '</div>' +
-            '</div>' +
+            '</div></div>';
+
+          // Build the calendar grid.
+          var cal = '<div class="sm-cal" id="smCal">';
+          cal += '<div class="sm-wk"></div>';
+          FA_DAYS.forEach(function (d) { cal += '<div class="sm-dow">' + d + '</div>'; });
+
+          var cells = [];
+          var lastMonth = -1;
+          for (var w = weeksToShow - 1; w >= 0; w--) {
+            var wkStart = A2.Jalali.addDays(thisWeekStart, -7 * w);
+            var wkParsed = A2.Jalali.parseKey(wkStart);
+            // Month heading when a new month begins inside this week.
+            if (wkParsed && wkParsed.jm !== lastMonth) {
+              cal += '<div class="sm-month">' + FA_MONTHS[wkParsed.jm - 1] +
+                ' ' + wkParsed.jy + '</div>';
+              lastMonth = wkParsed.jm;
+            }
+            cal += '<div class="sm-wk">' +
+              (wkParsed ? wkParsed.jd + '/' + wkParsed.jm : '') + '</div>';
+            for (var d2 = 0; d2 < 7; d2++) {
+              var ds = A2.Jalali.addDays(wkStart, d2);
+              var isFuture = A2.Jalali.cmp(ds, todayStr) > 0;
+              if (isFuture) {
+                cal += '<div class="sm-cell sm-future"></div>';
+                continue;
+              }
+              var r2 = dateMap[ds];
+              var sc = scoreDay(r2);
+              var lvl = toLevel(sc);
+              var p = A2.Jalali.parseKey(ds);
+              var cls = 'sm-cell ' + (r2 ? 'sm-l' + lvl : 'sm-nodata');
+              if (futsalSet[ds]) cls += ' sm-futsal';
+              if (ds === todayStr) cls += ' sm-today';
+              var idx = cells.length;
+              cells.push({ ds: ds, row: r2, sc: sc, noData: !r2, isFutsal: !!futsalSet[ds] });
+              cal += '<div class="' + cls + '" data-sm="' + idx + '">' +
+                '<span class="sm-d">' + (p ? p.jd : '') + '</span></div>';
+            }
+          }
+          cal += '</div>';
+
+          // Range switcher — small, out of the way, but lets a long-time user
+          // zoom out without the map becoming unreadable by default.
+          var opts = [4, 8, 12, 20].filter(function (n, i) {
+            return i === 0 || n <= weeksAvailable + 4;
+          });
+          var switcher = '<div class="sm-range-btns" style="display:flex;gap:6px;' +
+            'margin-top:11px;flex-wrap:wrap;justify-content:center">' +
+            opts.map(function (n) {
+              return '<button type="button" class="btn btn-ghost btn-sm sm-rb' +
+                (n === weeksToShow ? ' active' : '') + '" data-smw="' + n +
+                '" style="padding:5px 12px;font-size:.7rem;min-height:34px' +
+                (n === weeksToShow
+                  ? ';background:rgba(var(--accent-rgb),.18);border-color:var(--accent)'
+                  : '') + '">' + n + ' هفته</button>';
+            }).join('') + '</div>';
+
+          mapEl.innerHTML = head + cal + switcher +
             '<div class="sm-stats" id="smStatCards"></div>';
 
-          var ylEl = document.getElementById('smYLabels');
-          if (ylEl) {
-            ylEl.innerHTML = FA_DAYS.map(function (d) {
-              return '<div class="sm-ylabel">' + d + '</div>';
-            }).join('');
-          }
-
-          var xlEl = document.getElementById('smXLabels');
-          if (xlEl) {
-            xlEl.style.position = 'relative';
-            xlEl.style.height = '16px';
-            xlEl.style.width = '100%';
-            xlEl.style.direction = 'ltr'; // مهم: کانتینر رو LTR کن تا محاسبات ساده بشه
-            xlEl.innerHTML = '';
-          }
-
-          var colsEl = document.getElementById('smCols');
-          if (colsEl) {
-            colsEl.innerHTML = '';
-            gridData.forEach(function (colArr) {
-              var colDiv = document.createElement('div');
-              colDiv.className = 'sm-col';
-              colArr.forEach(function (cell) {
-                var div = document.createElement('div');
-                if (cell.future) {
-                  div.className = 'sm-cell sm-future';
-                } else {
-                  var cls = 'sm-cell sm-l' + cell.level;
-                  if (cell.isFutsal) cls += ' sm-futsal';
-                  if (cell.isToday) cls += ' sm-today';
-                  div.className = cls;
-                  (function (d, c) {
-                    d.addEventListener('mouseenter', function () {
-                      var html =
-                        '<span class="sm-tip-date">📅 ' + c.ds + '</span>';
-                      if (c.noData) {
-                        html +=
-                          '<span style="color:var(--muted)">ثبت نشده</span>';
-                      } else {
-                        var rr = c.row;
-                        if (rr.completed) html += '✅ روز کامل<br>';
-                        else html += '❌ ناقص<br>';
-                        if (rr.runMin)
-                          html += '🏃 ' + formatMin(rr.runMin) + '<br>';
-                        if (rr.walkMin)
-                          html += '🚶 ' + formatMin(rr.walkMin) + '<br>';
-                        if (rr.energy != null)
-                          html += '⚡ ' + rr.energy + '/10<br>';
-                        if (c.isFutsal) html += '⚽ فوتسال<br>';
-                        html +=
-                          '<span style="color:var(--muted);font-size:.62rem">امتیاز: ' +
-                          c.sc +
-                          '/100</span>';
-                      }
-                      tip.innerHTML = html;
-                      tip.classList.add('on');
-                      var rect = d.getBoundingClientRect();
-                      var top = rect.top - tip.offsetHeight - 6;
-                      var left = rect.left - 60;
-                      if (top < 8) top = rect.bottom + 6;
-                      if (left < 4) left = 4;
-                      if (left + 160 > window.innerWidth)
-                        left = window.innerWidth - 164;
-                      tip.style.top = top + 'px';
-                      tip.style.left = left + 'px';
-                    });
-
-                    d.addEventListener('mouseleave', function () {
-                      tip.classList.remove('on');
-                    });
-
-                    d.addEventListener('click', function () {
-                      if (c.noData) return;
-                      tip.classList.remove('on');
-                      window._app.goto('log');
-                      setTimeout(function () {
-                        var search = document.getElementById('logSearch');
-                        if (search) {
-                          search.value = c.ds;
-                          search.dispatchEvent(new Event('input'));
-                        }
-                      }, 300);
-                    });
-
-                    var tapCount = 0;
-                    d.addEventListener(
-                      'touchend',
-                      function (e) {
-                        e.preventDefault();
-                        tapCount++;
-                        if (tapCount === 1) {
-                          d.dispatchEvent(new MouseEvent('mouseenter'));
-                          setTimeout(function () {
-                            tapCount = 0;
-                          }, 500);
-                        } else {
-                          tapCount = 0;
-                          tip.classList.remove('on');
-                          if (!c.noData) {
-                            window._app.goto('log');
-                            setTimeout(function () {
-                              var search = document.getElementById('logSearch');
-                              if (search) {
-                                search.value = c.ds;
-                                search.dispatchEvent(new Event('input'));
-                              }
-                            }, 300);
-                          }
-                        }
-                        setTimeout(function () {
-                          tip.classList.remove('on');
-                        }, 3000);
-                      },
-                      { passive: false },
-                    );
-                  })(div, cell);
+          // ── interactions ──────────────────────────────────────────────
+          var calEl = document.getElementById('smCal');
+          if (calEl) {
+            var showTip = function (el, c) {
+              var html = '<span class="sm-tip-date">📅 ' + c.ds + '</span>';
+              if (c.noData) {
+                html += '<span style="color:var(--muted)">ثبت نشده</span>';
+              } else {
+                var rr = c.row;
+                html += (A2.isTrainingDay(rr) ? '✅ روز تمرین' : '⭕️ بدون تمرین') + '<br>';
+                if (rr.runMin) html += '🏃 ' + formatMin(rr.runMin) + '<br>';
+                if (rr.walkMin) html += '🚶 ' + formatMin(rr.walkMin) + '<br>';
+                if (rr.walkDailyMin) html += '👣 روزمره ' + formatMin(rr.walkDailyMin) + '<br>';
+                var si = A2.sleepInfo(rr.sleepBlocks);
+                if (si.totalMin > 0) html += '😴 ' + si.totalDisplay + '<br>';
+                if (Number(rr.energy) > 0) html += '⚡ ' + rr.energy + '/10<br>';
+                if (c.isFutsal) html += '⚽ فوتسال<br>';
+                if (rr.missReason && A2.MISS_LABELS[rr.missReason]) {
+                  html += A2.MISS_LABELS[rr.missReason] + '<br>';
                 }
-                colDiv.appendChild(div);
-              });
-              colsEl.appendChild(colDiv);
+                html += '<span style="color:var(--muted);font-size:.64rem">امتیاز روز: ' +
+                  c.sc + '/100</span>';
+              }
+              tip.innerHTML = html;
+              tip.classList.add('on');
+              var rect = el.getBoundingClientRect();
+              var top = rect.top - tip.offsetHeight - 8;
+              var left = rect.left + rect.width / 2 - tip.offsetWidth / 2;
+              if (top < 8) top = rect.bottom + 8;
+              if (left < 6) left = 6;
+              if (left + tip.offsetWidth > window.innerWidth - 6) {
+                left = window.innerWidth - tip.offsetWidth - 6;
+              }
+              tip.style.top = top + 'px';
+              tip.style.left = left + 'px';
+            };
+            var hideTip = function () { tip.classList.remove('on'); };
+            var openDay = function (c) {
+              hideTip();
+              if (c.noData) {
+                // Empty day: offer to fill it in, which is the useful action.
+                if (A2.openDayModalFor) A2.openDayModalFor(c.ds);
+                return;
+              }
+              A2.goto('log');
+              setTimeout(function () {
+                var search = document.getElementById('logSearch');
+                if (search) {
+                  search.value = c.ds;
+                  search.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+              }, 280);
+            };
+
+            calEl.addEventListener('mouseover', function (e) {
+              var el = e.target.closest('.sm-cell[data-sm]');
+              if (el) showTip(el, cells[Number(el.getAttribute('data-sm'))]);
+            });
+            calEl.addEventListener('mouseout', function (e) {
+              if (e.target.closest('.sm-cell[data-sm]')) hideTip();
+            });
+            // Touch: first tap previews, second tap opens. One handler, no
+            // per-cell listeners, so a 20-week map stays light.
+            var lastTapIdx = -1, lastTapAt = 0;
+            calEl.addEventListener('click', function (e) {
+              var el = e.target.closest('.sm-cell[data-sm]');
+              if (!el) return;
+              var i = Number(el.getAttribute('data-sm'));
+              var c = cells[i];
+              if (!c) return;
+              var isTouch = !window.matchMedia('(hover: hover)').matches;
+              if (!isTouch) { openDay(c); return; }
+              var now = Date.now();
+              if (lastTapIdx === i && now - lastTapAt < 2600) {
+                lastTapIdx = -1;
+                openDay(c);
+              } else {
+                lastTapIdx = i;
+                lastTapAt = now;
+                showTip(el, c);
+                setTimeout(function () {
+                  if (lastTapIdx === i) hideTip();
+                }, 2600);
+              }
+            });
+            document.addEventListener('scroll', hideTip, { passive: true });
+          }
+
+          var rbWrap = mapEl.querySelector('.sm-range-btns');
+          if (rbWrap) {
+            rbWrap.addEventListener('click', function (e) {
+              var b = e.target.closest('[data-smw]');
+              if (!b) return;
+              smRange = Number(b.getAttribute('data-smw')) || 8;
+              renderStreakMap();
             });
           }
 
+          // ── stat cards ────────────────────────────────────────────────
           var statsEl = document.getElementById('smStatCards');
           if (statsEl) {
+            // "Active days" beats "streak" for someone training every other
+            // day: a 2-day streak looks like failure when the plan is 3/week.
+            var last30 = 0, logged30 = 0;
+            for (var i2 = 0; i2 < 30; i2++) {
+              var dd = A2.Jalali.addDays(todayStr, -i2);
+              var rr2 = dateMap[dd];
+              if (rr2) {
+                logged30++;
+                if (A2.isTrainingDay(rr2)) last30++;
+              }
+            }
             var curStreak = 0;
-            for (var i = 0; i < 365; i++) {
-              var ds2 = window._app.Jalali.addDays(todayStr, -i);
-              var rr = dateMap[ds2];
-              if (rr && rr.completed) curStreak++;
+            for (var i3 = 0; i3 < 365; i3++) {
+              var d3 = A2.Jalali.addDays(todayStr, -i3);
+              var r3 = dateMap[d3];
+              if (r3 && A2.isTrainingDay(r3)) curStreak++;
               else break;
             }
-
-            var bestStreak = 0,
-              tmpS = 0;
-            var allRows = rows
-              .filter(function (r) {
-                return r.completed && r.jdate;
-              })
-              .sort(function (a, b) {
-                return a.jdate > b.jdate ? 1 : -1;
-              });
-            allRows.forEach(function (r, i) {
-              if (i === 0) {
-                tmpS = 1;
-              } else {
-                var prev = window._app.Jalali.addDays(r.jdate, -1);
-                tmpS = dateMap[prev] && dateMap[prev].completed ? tmpS + 1 : 1;
-              }
-              if (tmpS > bestStreak) bestStreak = tmpS;
-            });
-            if (curStreak > bestStreak) bestStreak = curStreak;
-
             var dowCount = [0, 0, 0, 0, 0, 0, 0];
-            var FA_DAYS_FULL = [
-              'شنبه',
-              'یک‌شنبه',
-              'دوشنبه',
-              'سه‌شنبه',
-              'چهارشنبه',
-              'پنج‌شنبه',
-              'جمعه',
-            ];
+            var FA_DAYS_FULL = ['شنبه', 'یک‌شنبه', 'دوشنبه', 'سه‌شنبه',
+              'چهارشنبه', 'پنج‌شنبه', 'جمعه'];
             rows.forEach(function (r) {
-              if (!r.completed || !r.jdate) return;
-              var wd = DOW_MAP[window._app.Jalali.weekdayName(r.jdate)];
+              if (!A2.isTrainingDay(r) || !r.jdate) return;
+              var wd = DOW_MAP[A2.Jalali.weekdayName(r.jdate)];
               if (wd !== undefined) dowCount[wd]++;
             });
-            var bestDow = dowCount.indexOf(Math.max.apply(null, dowCount));
-
-            var curPrefix =
-              todayParsed.jy + '-' + String(todayParsed.jm).padStart(2, '0');
+            var maxDow = Math.max.apply(null, dowCount);
+            var bestDowName = maxDow > 0 ? FA_DAYS_FULL[dowCount.indexOf(maxDow)] : '—';
+            var curPrefix = todayParsed.jy + '-' + String(todayParsed.jm).padStart(2, '0');
             var activeMonth = rows.filter(function (r) {
-              return r.jdate && r.jdate.startsWith(curPrefix) && r.completed;
+              return r.jdate && r.jdate.indexOf(curPrefix) === 0 && A2.isTrainingDay(r);
             }).length;
 
-            var bestDowName = FA_DAYS_FULL[bestDow] || '—';
             statsEl.innerHTML =
-              '<div class="sm-stat"><span class="sm-stat-val">🔥 ' +
-              curStreak +
-              '</span><span class="sm-stat-lbl">استریک فعلی</span></div>' +
-              '<div class="sm-stat"><span class="sm-stat-val">🏆 ' +
-              bestStreak +
-              '</span><span class="sm-stat-lbl">بهترین استریک</span></div>' +
-              '<div class="sm-stat"><span class="sm-stat-val">📅 ' +
-              bestDowName +
-              '</span><span class="sm-stat-lbl">فعال‌ترین روز</span></div>' +
-              '<div class="sm-stat"><span class="sm-stat-val">📈 ' +
-              activeMonth +
-              '/' +
-              todayParsed.jd +
-              '</span><span class="sm-stat-lbl">فعال ماه جاری</span></div>';
-          } // رندر label ماه‌ها با absolute positioning (RTL-aware)
-          requestAnimationFrame(function () {
-            requestAnimationFrame(function () {
-              var xlEl2 = document.getElementById('smXLabels');
-              var colsEl2 = document.getElementById('smCols');
-              if (!xlEl2 || !colsEl2) return;
-              xlEl2.innerHTML = '';
-              xlEl2.style.position = 'relative';
-              xlEl2.style.width = '100%';
-              xlEl2.style.height = '16px';
-
-              var colEls = colsEl2.querySelectorAll('.sm-col');
-              var gridRect = colsEl2.getBoundingClientRect();
-              // تشخیص RTL بودن
-              var isRTL = getComputedStyle(colsEl2).direction === 'rtl';
-
-              Object.keys(monthLabels).forEach(function (col) {
-                var colEl = colEls[parseInt(col)];
-                if (!colEl) return;
-                var colRect = colEl.getBoundingClientRect();
-
-                var span = document.createElement('span');
-                span.textContent = monthLabels[col];
-
-                var baseStyle = [
-                  'position:absolute',
-                  'transform:translateX(-50%)',
-                  'top:0',
-                  'font-size:0.6rem',
-                  'color:var(--text)',
-                  'font-weight:600',
-                  'white-space:nowrap',
-                  'line-height:16px',
-                  'text-align:center',
-                  'pointer-events:none',
-                ];
-
-                if (isRTL) {
-                  // در RTL: از راست حساب کن، نه از چپ
-                  var colCenterFromRight =
-                    gridRect.right - (colRect.left + colRect.width / 2);
-                  baseStyle.push('right:' + colCenterFromRight + 'px');
-                } else {
-                  var colCenterFromLeft =
-                    colRect.left - gridRect.left + colRect.width / 2;
-                  baseStyle.push('left:' + colCenterFromLeft + 'px');
-                }
-
-                span.style.cssText = baseStyle.join(';');
-                xlEl2.appendChild(span);
-              });
-            });
-          });
+              '<div class="sm-stat"><span class="sm-stat-val">🏃 ' + last30 +
+              '</span><span class="sm-stat-lbl">روز تمرین در ۳۰ روز</span></div>' +
+              '<div class="sm-stat"><span class="sm-stat-val">📝 ' + logged30 +
+              '/30</span><span class="sm-stat-lbl">روز ثبت‌شده</span></div>' +
+              '<div class="sm-stat"><span class="sm-stat-val">📅 ' + bestDowName +
+              '</span><span class="sm-stat-lbl">فعال‌ترین روز هفته</span></div>' +
+              '<div class="sm-stat"><span class="sm-stat-val">🔥 ' + activeMonth +
+              '</span><span class="sm-stat-lbl">تمرین این ماه</span></div>';
+          }
         }
 
         function renderInsights() {
@@ -9893,17 +9914,18 @@
         // Someone who has never seen the app should understand a screenshot.
         const CHART_EXPLAIN = {
           sleep: 'هر نقطه یک شب است و ارتفاعش یعنی چند ساعت خوابیدی. ' +
-            'خط نارنجی میانگین ۷ روزه است (روند کلی) و خط قرمز چین هدف خوابت. ' +
-            'هرجا خط زیر قرمز باشد، آن شب کم‌خوابی داشتی.',
-          energy: 'دو خط: انرژی و حالِ روحی، هرکدام از ۱۰. ' +
-            'بالا بهتر است. نقطه‌های خالی یعنی آن روز ثبت نشده.',
+            'خط نارنجی چین میانگین ۷ روزه است (روند کلی) و خط بنفش کم‌رنگِ چین، هدف خوابت. ' +
+            'هرجا نقطه‌ها خیلی بالاتر یا پایین‌تر از خط هدف باشند، آن شب از ریتم خارج شدی.',
+          energy: 'خط پررنگ انرژی است و خط آبی حالِ روحی، هرکدام از ۱۰. ' +
+            'خط نارنجی چین روند ۷ روزه‌ی انرژی است. نقطه‌های خالی یعنی آن روز ثبت نشده.',
           activity: 'ستون‌های هر روز نشان می‌دهد چقدر دویدی و چقدر پیاده‌روی ورزشی کردی. ' +
             'ارتفاع کل ستون یعنی مجموع تمرین برنامه‌ریزی‌شده‌ی آن روز.',
           bedtime: 'هر نقطه ساعتی است که خوابیدی یا بیدار شدی. ' +
             'اگر نقطه‌ها پخش‌وپلا باشند یعنی ساعت خوابت نامنظم است؛ ' +
             'هرچه در یک خط افقی جمع‌تر باشند، منظم‌تری.',
-          weekly: 'هر گروه ستون یک هفته است و پنج شاخص را کنار هم مقایسه می‌کند. ' +
-            'برای دیدن پیشرفت هفته‌به‌هفته مفید است، نه روزبه‌روز.',
+          weekly: 'هر هفته دو ستون دارد: ستون پررنگ تعداد روزهای تمرین (محور راست) ' +
+            'و ستون کم‌رنگ میانگین خواب (محور چپ). خط نارنجی چین هدف هفتگی توست — ' +
+            'هر ستونی که از آن رد شود یعنی آن هفته را بردی.',
           radar: 'سه هفته‌ی آخر روی پنج محور. ' +
             'هرچه شکل بزرگ‌تر و پرتر باشد، آن هفته بهتر بوده. ' +
             'فرورفتگی هر ضلع یعنی نقطه‌ضعف همان بخش.',
@@ -10260,14 +10282,25 @@
           const sleepGoal = state().goals
             ? state().goals.sleepGoalHours || 7
             : 7;
-          const accent =
-            getComputedStyle(document.documentElement)
-              .getPropertyValue('--accent')
-              .trim() || '#8b5cf6';
-          const accentRgb = getComputedStyle(document.documentElement)
-            .getPropertyValue('--accent-rgb').trim() || '139,92,246';
+          const cs = getComputedStyle(document.documentElement);
+          const accent = cs.getPropertyValue('--accent').trim() || '#8b5cf6';
+          const accent2 = cs.getPropertyValue('--accent2').trim() || '#a78bfa';
+          const accentRgb = cs.getPropertyValue('--accent-rgb').trim() || '139,92,246';
           const accentAlpha = function (alpha) { return 'rgba(' + accentRgb + ',' + alpha + ')'; };
           const isMobile = window.innerWidth < 760;
+          // v6.5: read the real theme values instead of hardcoding grey/green.
+          // Every chart now follows whichever palette is active, and the text
+          // is bright enough to read on a phone in daylight.
+          const cText = cs.getPropertyValue('--text').trim() || '#f2efff';
+          const cMuted = cs.getPropertyValue('--muted').trim() || '#a69dc6';
+          const cGrid = 'rgba(' + accentRgb + ',.13)';
+          const cGridSoft = 'rgba(' + accentRgb + ',.08)';
+          const cCard = cs.getPropertyValue('--card2').trim() || '#221a40';
+          const cBorder = cs.getPropertyValue('--border').trim() || '#3b2f66';
+          // Secondary series colours: analogous to the accent, not random.
+          const cSecond = cs.getPropertyValue('--blue').trim() || '#0ea5e9';
+          const cThird = cs.getPropertyValue('--pink').trim() || '#ec4899';
+          const cWarn = cs.getPropertyValue('--yellow').trim() || '#f59e0b';
 
           function ma(arr, n) {
             return arr.map(function (_, i) {
@@ -10280,33 +10313,67 @@
 
           const font = {
             family: getComputedStyle(document.body).fontFamily,
-            size: 12,
+            size: isMobile ? 11 : 12,
+          };
+          // Shared tooltip styling: on a phone the default tiny black box is
+          // hard to read, so it gets the card background, a themed border and
+          // a bigger tap-friendly body.
+          const tooltipStyle = {
+            titleFont: { family: font.family, size: isMobile ? 12 : 13, weight: 'bold' },
+            bodyFont: { family: font.family, size: isMobile ? 12 : 12 },
+            backgroundColor: cCard,
+            borderColor: accent,
+            borderWidth: 1,
+            titleColor: accent2,
+            bodyColor: cText,
+            padding: 10,
+            cornerRadius: 10,
+            displayColors: true,
+            boxPadding: 4,
+            caretSize: 6,
           };
           const opts = {
             responsive: true,
             maintainAspectRatio: false,
-            animation: { duration: isMobile ? 450 : 900, easing: 'easeOutQuart' },
+            animation: { duration: isMobile ? 380 : 800, easing: 'easeOutQuart' },
             interaction: { mode: 'index', intersect: false },
+            layout: { padding: { top: 4, right: 2, bottom: 0, left: 2 } },
             plugins: {
               legend: {
-                labels: { color: '#ddd', font: font, padding: 12 },
+                labels: {
+                  color: cText,
+                  font: { family: font.family, size: isMobile ? 11 : 12 },
+                  padding: isMobile ? 10 : 12,
+                  boxWidth: isMobile ? 14 : 18,
+                  boxHeight: isMobile ? 9 : 12,
+                  usePointStyle: true,
+                  pointStyle: 'rectRounded',
+                },
                 position: 'top',
               },
-              tooltip: { titleFont: font, bodyFont: font },
+              tooltip: tooltipStyle,
             },
             scales: {
               x: {
                 ticks: {
-                  color: '#aaa',
-                  font: { family: font.family, size: 10 },
-                  maxRotation: 45,
-                  maxTicksLimit: isMobile ? 7 : 14,
+                  color: cMuted,
+                  font: { family: font.family, size: isMobile ? 10 : 11 },
+                  maxRotation: 0,
+                  autoSkip: true,
+                  maxTicksLimit: isMobile ? 5 : 12,
                 },
-                grid: { color: 'rgba(255,255,255,.05)' },
+                grid: { color: cGridSoft, drawTicks: false },
+                border: { color: cBorder },
               },
               y: {
-                ticks: { color: '#aaa', font: font },
-                grid: { color: 'rgba(255,255,255,.06)' },
+                ticks: {
+                  color: cMuted,
+                  font: { family: font.family, size: isMobile ? 10 : 12 },
+                  maxTicksLimit: isMobile ? 6 : 9,
+                  padding: 4,
+                },
+                grid: { color: cGrid, drawTicks: false },
+                border: { display: false },
               },
             },
           };
@@ -10320,34 +10387,36 @@
                 labels: labels,
                 datasets: [
                   {
-                    label: 'خواب (h)',
+                    label: 'خواب',
                     data: sleepData,
                     borderColor: accent,
-                    backgroundColor: accentAlpha(.18),
+                    backgroundColor: accentAlpha(.2),
                     fill: true,
-                    tension: 0.4,
-                    pointRadius: isMobile ? 2 : 3,
-                    pointHoverRadius: 6,
+                    tension: 0.35,
+                    pointRadius: isMobile ? 2.5 : 3,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: accent2,
+                    pointBorderColor: accent,
                     spanGaps: false,
                     borderWidth: 2.5,
                   },
                   {
                     label: 'میانگین ۷ روزه',
                     data: ma(sleepData, 7),
-                    borderColor: '#f59e0b',
+                    borderColor: cWarn,
                     borderDash: [6, 4],
                     pointRadius: 0,
-                    tension: 0.4,
+                    tension: 0.35,
                     fill: false,
                     borderWidth: 2,
                   },
                   {
-                    label: 'هدف (' + sleepGoal + 'h)',
+                    label: 'هدف ' + sleepGoal + 'h',
                     data: labels.map(function () {
                       return sleepGoal;
                     }),
-                    borderColor: 'rgba(239,68,68,.6)',
-                    borderDash: [8, 4],
+                    borderColor: accentAlpha(.55),
+                    borderDash: [8, 5],
                     pointRadius: 0,
                     fill: false,
                     borderWidth: 1.5,
@@ -10373,6 +10442,21 @@
                 }),
                 scales: Object.assign({}, opts.scales, {
                   y: Object.assign({}, opts.scales.y, {
+                    // v6.5: Chart.js used to auto-fit the axis to the data, so
+                    // with 7-8h nights the axis started at 6.5 and the goal
+                    // line sat welded to the very bottom edge — you could not
+                    // tell "on target" from "under target". Always keep at
+                    // least one hour of air on both sides of the goal.
+                    suggestedMin: Math.max(0, Math.min(
+                      sleepGoal - 1.5,
+                      sleepData.reduce(function (m, v) {
+                        return v !== null && v < m ? v : m;
+                      }, sleepGoal) - 0.5)),
+                    suggestedMax: Math.max(
+                      sleepGoal + 1.5,
+                      sleepData.reduce(function (m, v) {
+                        return v !== null && v > m ? v : m;
+                      }, sleepGoal) + 0.5),
                     ticks: Object.assign({}, opts.scales.y.ticks, {
                       callback: function (v) {
                         return formatHour(v);
@@ -10393,42 +10477,37 @@
                 labels: labels,
                 datasets: [
                   {
-                    label: 'انرژی',
+                    label: '⚡ انرژی',
                     data: energyData,
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16,185,129,.12)',
+                    borderColor: accent,
+                    backgroundColor: accentAlpha(.16),
                     fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
+                    tension: 0.35,
+                    pointRadius: isMobile ? 2.5 : 3,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: accent2,
                     borderWidth: 2.5,
                   },
                   {
-                    label: 'حال',
+                    label: '🙂 حال',
                     data: moodData,
-                    borderColor: '#ec4899',
-                    backgroundColor: 'rgba(236,72,153,.12)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3,
-                    borderWidth: 2.5,
+                    borderColor: cSecond,
+                    backgroundColor: 'transparent',
+                    fill: false,
+                    tension: 0.35,
+                    pointRadius: isMobile ? 2 : 3,
+                    pointHoverRadius: 7,
+                    borderWidth: 2.2,
                   },
                   {
-                    label: 'MA7 انرژی',
+                    label: 'روند انرژی',
                     data: ma(energyData, 7),
-                    borderColor: 'rgba(16,185,129,.5)',
-                    borderDash: [5, 5],
+                    borderColor: cWarn,
+                    borderDash: [6, 4],
                     pointRadius: 0,
-                    tension: 0.4,
+                    tension: 0.35,
                     fill: false,
-                  },
-                  {
-                    label: 'MA7 حال',
-                    data: ma(moodData, 7),
-                    borderColor: 'rgba(236,72,153,.5)',
-                    borderDash: [5, 5],
-                    pointRadius: 0,
-                    tension: 0.4,
-                    fill: false,
+                    borderWidth: 2,
                   },
                 ],
               },
@@ -10451,35 +10530,40 @@
                   {
                     label: '🏃 دویدن',
                     data: runData,
-                    backgroundColor: accentAlpha(.75),
-                    borderRadius: 6,
-                    barPercentage: 0.85,
-                    categoryPercentage: 0.9,
+                    backgroundColor: accentAlpha(.9),
+                    borderRadius: 5,
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.92,
                   },
                   {
                     label: '🚶 پیاده',
                     data: walkData,
-                    backgroundColor: 'rgba(14,165,233,.55)',
-                    borderRadius: 6,
-                    barPercentage: 0.85,
-                    categoryPercentage: 0.9,
+                    backgroundColor: accentAlpha(.38),
+                    borderRadius: 5,
+                    barPercentage: 0.9,
+                    categoryPercentage: 0.92,
                   },
                 ],
               },
               options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 900 },
+                animation: { duration: isMobile ? 380 : 800 },
+                interaction: { mode: 'index', intersect: false },
                 plugins: Object.assign({}, opts.plugins, {
-                  tooltip: {
-                    titleFont: font,
-                    bodyFont: font,
+                  tooltip: Object.assign({}, tooltipStyle, {
                     callbacks: {
                       label: function (ctx) {
                         return ctx.dataset.label + ': ' + formatMin(ctx.raw);
                       },
+                      footer: function (items) {
+                        var t = items.reduce(function (a, i) { return a + (Number(i.raw) || 0); }, 0);
+                        return t > 0 ? 'مجموع: ' + formatMin(t) : '';
+                      },
                     },
-                  },
+                    footerFont: { family: font.family, size: isMobile ? 11 : 12 },
+                    footerColor: accent2,
+                  }),
                 }),
                 scales: {
                   x: Object.assign({}, opts.scales.x, {
@@ -10531,23 +10615,26 @@
                   {
                     label: '🛏️ ساعت خواب',
                     data: btData,
-                    borderColor: '#8b5cf6',
-                    backgroundColor: 'rgba(var(--accent-rgb),.15)',
+                    borderColor: accent,
+                    backgroundColor: accentAlpha(.15),
                     fill: false,
                     tension: 0.3,
-                    pointRadius: 4,
+                    pointRadius: isMobile ? 3 : 4,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: accent2,
                     borderWidth: 2.5,
                     spanGaps: true,
                   },
                   {
                     label: '⏰ ساعت بیداری',
                     data: wkData,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245,158,11,.15)',
+                    borderColor: cWarn,
+                    backgroundColor: 'transparent',
                     fill: false,
                     tension: 0.3,
-                    pointRadius: 4,
-                    borderWidth: 2.5,
+                    pointRadius: isMobile ? 3 : 4,
+                    pointHoverRadius: 7,
+                    borderWidth: 2.2,
                     spanGaps: true,
                   },
                 ],
@@ -10573,18 +10660,36 @@
                   }),
                 }),
                 scales: Object.assign({}, opts.scales, {
-                  y: Object.assign({}, opts.scales.y, {
-                    min: 0,
-                    max: 32,
-                    ticks: Object.assign({}, opts.scales.y.ticks, {
-                      stepSize: 4,
-                      callback: function (v) {
-                        return (
-                          String(Math.floor(v) % 24).padStart(2, '0') + ':00'
-                        );
-                      },
-                    }),
-                  }),
+                  y: Object.assign({}, opts.scales.y, (function () {
+                    // v6.5: the axis used to be pinned at 0..32 no matter what,
+                    // so a normal person (asleep ~23:30, awake ~07:00) got two
+                    // flat lines squashed into a third of the canvas with the
+                    // other two thirds empty. Fit the axis to the real hours.
+                    var all = btData.concat(wkData).filter(function (v) {
+                      return v !== null && Number.isFinite(v);
+                    });
+                    var lo = all.length ? Math.floor(Math.min.apply(null, all)) - 1 : 0;
+                    var hi = all.length ? Math.ceil(Math.max.apply(null, all)) + 1 : 32;
+                    if (hi - lo < 8) { var mid = (hi + lo) / 2; lo = mid - 4; hi = mid + 4; }
+                    // Snap to a whole-hour step so every gridline is a real
+                    // clock time (05:00, 08:00 …) instead of 11:40-style noise.
+                    var step = (hi - lo) > 15 ? 3 : (hi - lo) > 8 ? 2 : 1;
+                    lo = Math.floor(lo / step) * step;
+                    hi = Math.ceil(hi / step) * step;
+                    return {
+                      min: lo,
+                      max: hi,
+                      ticks: Object.assign({}, opts.scales.y.ticks, {
+                        stepSize: step,
+                        maxTicksLimit: 12,
+                        autoSkip: false,
+                        callback: function (v) {
+                          return String(((Math.floor(v) % 24) + 24) % 24)
+                            .padStart(2, '0') + ':00';
+                        },
+                      }),
+                    };
+                  })()),
                 }),
               }),
             });
@@ -10595,85 +10700,101 @@
           if (cW) {
             const weeks = weeklyBreakdown();
             if (weeks.length > 0) {
-              const MAX_W = isMobile ? 6 : 12;
+              // v6.5: this used to draw 5 datasets x 6 weeks = 30 bars, which
+              // came out 8.5px wide on a Pixel — unreadable and untappable.
+              // On a phone we now show the two things that actually answer
+              // "was this a good week": training days and average sleep. The
+              // rest stays available on a wide screen.
+              const MAX_W = isMobile ? 5 : 12;
               const wksShow =
                 weeks.length > MAX_W ? weeks.slice(-MAX_W) : weeks;
+              const target = A.effectiveWeeklyTarget
+                ? A.effectiveWeeklyTarget() : 0;
+              const datasets = [
+                {
+                  label: '✅ روز تمرین',
+                  data: wksShow.map(function (w) { return w.completedCount || 0; }),
+                  backgroundColor: accentAlpha(.92),
+                  borderRadius: 6,
+                  barPercentage: 0.88,
+                  categoryPercentage: 0.86,
+                  yAxisID: 'y',
+                  order: 2,
+                },
+                {
+                  label: '😴 میانگین خواب',
+                  data: wksShow.map(function (w) { return w.avgSleep || 0; }),
+                  backgroundColor: accentAlpha(.3),
+                  borderRadius: 6,
+                  barPercentage: 0.88,
+                  categoryPercentage: 0.86,
+                  yAxisID: 'y1',
+                  order: 3,
+                },
+              ];
+              if (!isMobile) {
+                datasets.push({
+                  label: '⚡ انرژی',
+                  data: wksShow.map(function (w) { return w.avgEnergy || 0; }),
+                  backgroundColor: cSecond + 'cc',
+                  borderRadius: 6,
+                  barPercentage: 0.88,
+                  categoryPercentage: 0.86,
+                  yAxisID: 'y1',
+                  order: 4,
+                });
+                datasets.push({
+                  label: '🙂 حال',
+                  data: wksShow.map(function (w) { return w.avgMood || 0; }),
+                  backgroundColor: cThird + 'aa',
+                  borderRadius: 6,
+                  barPercentage: 0.88,
+                  categoryPercentage: 0.86,
+                  yAxisID: 'y1',
+                  order: 5,
+                });
+              }
+              // A dashed line at the weekly target turns the bars into a
+              // pass/fail read instead of five numbers you have to compare.
+              if (target > 0) {
+                datasets.unshift({
+                  type: 'line',
+                  label: 'هدف هفته (' + target + ' روز)',
+                  data: wksShow.map(function () { return target; }),
+                  borderColor: cWarn,
+                  borderDash: [7, 5],
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  fill: false,
+                  yAxisID: 'y',
+                  order: 1,
+                });
+              }
               chartInstances.weekly = new Chart(cW, {
                 type: 'bar',
                 data: {
-                  labels: wksShow.map(function (w) {
-                    return w.label;
-                  }),
-                  datasets: [
-                    {
-                      label: '😴 خواب',
-                      data: wksShow.map(function (w) {
-                        return w.avgSleep || 0;
-                      }),
-                      backgroundColor: accentAlpha(.75),
-                      borderRadius: 4,
-                      barPercentage: 0.85,
-                      categoryPercentage: 0.9,
-                    },
-                    {
-                      label: '⚡ انرژی',
-                      data: wksShow.map(function (w) {
-                        return w.avgEnergy || 0;
-                      }),
-                      backgroundColor: 'rgba(16,185,129,.75)',
-                      borderRadius: 4,
-                      barPercentage: 0.85,
-                      categoryPercentage: 0.9,
-                    },
-                    {
-                      label: '🙂 حال',
-                      data: wksShow.map(function (w) {
-                        return w.avgMood || 0;
-                      }),
-                      backgroundColor: 'rgba(236,72,153,.75)',
-                      borderRadius: 4,
-                      barPercentage: 0.85,
-                      categoryPercentage: 0.9,
-                    },
-                    {
-                      label: '🏃÷۵',
-                      data: wksShow.map(function (w) {
-                        return (w.totalRun || 0) / 5;
-                      }),
-                      backgroundColor: 'rgba(245,158,11,.65)',
-                      borderRadius: 4,
-                      barPercentage: 0.85,
-                      categoryPercentage: 0.9,
-                    },
-                    {
-                      label: '✅ فعال',
-                      data: wksShow.map(function (w) {
-                        return w.completedCount || 0;
-                      }),
-                      backgroundColor: 'rgba(14,165,233,.65)',
-                      borderRadius: 4,
-                      barPercentage: 0.85,
-                      categoryPercentage: 0.9,
-                    },
-                  ],
+                  labels: wksShow.map(function (w) { return w.label; }),
+                  datasets: datasets,
                 },
                 options: {
                   responsive: true,
                   maintainAspectRatio: false,
-                  animation: { duration: 900 },
+                  animation: { duration: isMobile ? 380 : 800 },
+                  interaction: { mode: 'index', intersect: false },
                   plugins: {
                     legend: {
                       labels: {
-                        color: '#ddd',
+                        color: cText,
                         font: { family: font.family, size: isMobile ? 10 : 12 },
                         padding: isMobile ? 8 : 12,
-                        boxWidth: isMobile ? 12 : 16,
+                        boxWidth: isMobile ? 13 : 16,
+                        boxHeight: isMobile ? 9 : 12,
+                        usePointStyle: true,
+                        pointStyle: 'rectRounded',
                       },
                       position: 'top',
                     },
-                    tooltip: {
-                      titleFont: font,
-                      bodyFont: font,
+                    tooltip: Object.assign({}, tooltipStyle, {
                       callbacks: {
                         label: function (ctx) {
                           var label = ctx.dataset.label || '';
@@ -10681,29 +10802,52 @@
                           if (label.indexOf('خواب') !== -1) {
                             return label + ': ' + formatHour(val);
                           }
-                          if (label.indexOf('🏃') !== -1) {
-                            return '🏃 دویدن: ' + formatMin(val * 5);
+                          if (label.indexOf('روز تمرین') !== -1) {
+                            return label + ': ' + val + ' روز';
                           }
-                          return label + ': ' + val;
+                          return label + ': ' + (Math.round(val * 10) / 10);
                         },
                       },
-                    },
+                    }),
                   },
                   scales: {
                     x: {
                       offset: true,
                       ticks: {
-                        color: '#aaa',
+                        color: cMuted,
                         font: { family: font.family, size: isMobile ? 9 : 11 },
-                        maxRotation: isMobile ? 45 : 0,
-                        minRotation: isMobile ? 45 : 0,
+                        maxRotation: isMobile ? 40 : 0,
+                        minRotation: isMobile ? 40 : 0,
+                        autoSkip: false,
                       },
-                      grid: { color: 'rgba(255,255,255,.05)' },
+                      grid: { color: cGridSoft, drawTicks: false },
+                      border: { color: cBorder },
                     },
                     y: {
-                      ticks: { color: '#aaa', font: font },
-                      grid: { color: 'rgba(255,255,255,.06)' },
+                      position: 'right',
                       beginAtZero: true,
+                      suggestedMax: Math.max(4, target + 1),
+                      ticks: {
+                        color: accent2,
+                        font: { family: font.family, size: isMobile ? 10 : 12 },
+                        stepSize: 1,
+                        precision: 0,
+                        callback: function (v) { return v + ' روز'; },
+                      },
+                      grid: { color: cGrid, drawTicks: false },
+                      border: { display: false },
+                    },
+                    y1: {
+                      position: 'left',
+                      beginAtZero: true,
+                      suggestedMax: 10,
+                      ticks: {
+                        color: cMuted,
+                        font: { family: font.family, size: isMobile ? 9 : 11 },
+                        maxTicksLimit: 5,
+                      },
+                      grid: { drawOnChartArea: false },
+                      border: { display: false },
                     },
                   },
                 },
@@ -10715,10 +10859,12 @@
           const c4 = document.getElementById('chartRadar');
           if (c4) {
             const weeks = weeklyBreakdown().slice(-3);
+            // Oldest -> newest reads as faded -> solid, so "am I improving?"
+            // is answerable at a glance instead of decoding the legend.
             const colors = [
-              accentAlpha(.75),
-              'rgba(16,185,129,.75)',
-              'rgba(245,158,11,.75)',
+              accentAlpha(.42),
+              accentAlpha(.7),
+              accentAlpha(1),
             ];
             chartInstances.radar = new Chart(c4, {
               type: 'radar',
@@ -10735,30 +10881,48 @@
                       w.totalWalk / 10,
                     ],
                     borderColor: colors[i % 3],
-                    backgroundColor: colors[i % 3].replace('.75', '.18'),
+                    backgroundColor: accentAlpha(0.06 + i * 0.07),
                     pointBackgroundColor: colors[i % 3],
-                    pointRadius: 4,
-                    borderWidth: 2,
+                    pointBorderColor: cCard,
+                    pointRadius: isMobile ? 3.5 : 4,
+                    pointHoverRadius: 7,
+                    borderWidth: i === 2 ? 2.6 : 1.8,
                   };
                 }),
               },
               options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 1000 },
+                animation: { duration: isMobile ? 400 : 900 },
                 scales: {
                   r: {
-                    grid: { color: 'rgba(255,255,255,.1)' },
-                    angleLines: { color: 'rgba(255,255,255,.08)' },
+                    beginAtZero: true,
+                    grid: { color: cGrid },
+                    angleLines: { color: cGridSoft },
                     ticks: {
-                      color: '#aaa',
+                      color: cMuted,
                       backdropColor: 'transparent',
-                      font: font,
+                      font: { family: font.family, size: isMobile ? 9 : 11 },
+                      maxTicksLimit: 5,
+                      showLabelBackdrop: false,
                     },
-                    pointLabels: { color: '#ddd', font: font },
+                    pointLabels: {
+                      color: cText,
+                      font: { family: font.family, size: isMobile ? 10 : 12, weight: '600' },
+                    },
                   },
                 },
-                plugins: { legend: { labels: { color: '#ddd', font: font } } },
+                plugins: {
+                  legend: {
+                    labels: {
+                      color: cText,
+                      font: { family: font.family, size: isMobile ? 10 : 12 },
+                      usePointStyle: true, pointStyle: 'rectRounded',
+                      boxWidth: isMobile ? 13 : 16, padding: isMobile ? 8 : 12,
+                    },
+                  },
+                  tooltip: tooltipStyle,
+                },
               },
             });
           }
@@ -10783,10 +10947,10 @@
                   {
                     label: 'خواب امشب → انرژی فردا',
                     data: points,
-                    backgroundColor: accentAlpha(.65),
-                    pointRadius: 7,
-                    pointHoverRadius: 10,
-                    borderColor: accent,
+                    backgroundColor: accentAlpha(.55),
+                    pointRadius: isMobile ? 6 : 7,
+                    pointHoverRadius: 11,
+                    borderColor: accent2,
                     borderWidth: 1.5,
                   },
                 ],
@@ -10794,45 +10958,63 @@
               options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 1000 },
+                animation: { duration: isMobile ? 400 : 900 },
                 scales: {
                   x: {
                     title: {
                       display: true,
-                      text: 'خواب (ساعت)',
-                      color: '#aaa',
-                      font: font,
+                      text: 'خواب شب قبل (ساعت)',
+                      color: cMuted,
+                      font: { family: font.family, size: isMobile ? 10 : 12 },
                     },
-                    ticks: { color: '#aaa', font: font },
-                    grid: { color: 'rgba(255,255,255,.06)' },
+                    ticks: {
+                      color: cMuted,
+                      font: { family: font.family, size: isMobile ? 10 : 11 },
+                      maxTicksLimit: isMobile ? 6 : 10,
+                      callback: function (v) { return formatHour(v); },
+                    },
+                    grid: { color: cGridSoft, drawTicks: false },
+                    border: { color: cBorder },
                   },
                   y: {
                     title: {
                       display: true,
                       text: 'انرژی فردا',
-                      color: '#aaa',
-                      font: font,
+                      color: cMuted,
+                      font: { family: font.family, size: isMobile ? 10 : 12 },
                     },
-                    ticks: { color: '#aaa', font: font },
-                    grid: { color: 'rgba(255,255,255,.06)' },
+                    ticks: {
+                      color: cMuted,
+                      font: { family: font.family, size: isMobile ? 10 : 11 },
+                      stepSize: 2,
+                    },
+                    grid: { color: cGrid, drawTicks: false },
+                    border: { display: false },
                     min: 0,
                     max: 10,
                   },
                 },
                 plugins: {
-                  legend: { labels: { color: '#ddd', font: font } },
-                  tooltip: {
+                  legend: {
+                    labels: {
+                      color: cText,
+                      font: { family: font.family, size: isMobile ? 10 : 12 },
+                      usePointStyle: true, pointStyle: 'circle',
+                      boxWidth: isMobile ? 13 : 16,
+                    },
+                  },
+                  tooltip: Object.assign({}, tooltipStyle, {
                     callbacks: {
                       label: function (ctx) {
                         return (
                           'خواب: ' +
                           formatHour(ctx.parsed.x) +
-                          ' | انرژی: ' +
+                          ' → انرژی: ' +
                           ctx.parsed.y
                         );
                       },
                     },
-                  },
+                  }),
                 },
               },
             });
@@ -11207,6 +11389,7 @@
               note: document.getElementById('mdNote').value,
               trainHour: (document.getElementById('mdTrainHour') || {}).value || '',
               walkDailyMin: Number((document.getElementById('mdWalkDaily') || {}).value) || 0,
+              missReason: (document.getElementById('mdMissReason') || {}).value || '',
               officialWake: document.getElementById('mdOfficialWake').value,
               sleepBlocks: deepClone(sleepBlocksData),
             };
@@ -11242,6 +11425,7 @@
           document.getElementById('mdActivity').value = String(draft.activity || '').slice(0, 500);
           document.getElementById('mdNote').value = String(draft.note || '').slice(0, 5000);
           setWalkDailyValue(Number(draft.walkDailyMin) || 0);
+          fillMissChips(draft.missReason || '');
           setTrainHourValue(draft.trainHour === '' || draft.trainHour == null ? null : draft.trainHour);
           document.getElementById('mdOfficialWake').value = draft.officialWake || '';
           renderSleepBlocks(Array.isArray(draft.sleepBlocks) ? draft.sleepBlocks : []);
@@ -11408,6 +11592,25 @@
             b.classList.toggle('active', Number(b.dataset.daily) === Number(n));
           });
         }
+        function bindMissControls() {
+          const chips = stEl('mdMissChips');
+          const sel = stEl('mdCompleted');
+          if (chips && chips.dataset.bound !== '1') {
+            chips.dataset.bound = '1';
+            chips.addEventListener('click', function (e) {
+              const b = e.target.closest('.chip');
+              if (!b) return;
+              const cur = stEl('mdMissReason').value;
+              fillMissChips(b.dataset.miss === cur ? '' : b.dataset.miss);
+              scheduleDayDraft();
+            });
+          }
+          if (sel && sel.dataset.missBound !== '1') {
+            sel.dataset.missBound = '1';
+            sel.addEventListener('change', syncMissVisibility);
+          }
+        }
+
         function bindWalkDailyControls() {
           const wrap = document.getElementById('mdWalkDailyChips');
           const input = document.getElementById('mdWalkDaily');
@@ -11428,6 +11631,28 @@
           }
         }
 
+        // v6.4: the "why not" chips only make sense on a day marked not-done.
+        function fillMissChips(selected) {
+          const box = stEl('mdMissChips');
+          if (!box) return;
+          box.innerHTML = A.MISS_REASONS.map(function (k) {
+            return '<button type="button" class="chip' +
+              (k === selected ? ' active' : '') + '" data-miss="' + k + '">' +
+              escapeHTML(A.MISS_LABELS[k]) + '</button>';
+          }).join('');
+          const hid = stEl('mdMissReason');
+          if (hid) hid.value = selected || '';
+        }
+        function syncMissVisibility() {
+          const sel = stEl('mdCompleted');
+          const wrap = stEl('mdMissWrap');
+          if (!sel || !wrap) return;
+          const notDone = sel.value === 'false';
+          wrap.style.display = notDone ? '' : 'none';
+          // Clearing on "done" prevents a stale reason being saved.
+          if (!notDone) fillMissChips('');
+        }
+
         function setTrainHourValue(v) {
           const el = ensureTrainHourOptions();
           if (!el) return;
@@ -11444,6 +11669,7 @@
           RatingSlider.init();
           ensureTrainHourOptions();
           bindWalkDailyControls();
+          bindMissControls();
           if (id) {
             const row = state().rows.find(function (r) {
               return r.id === id;
@@ -11493,6 +11719,7 @@
             document.getElementById('mdActivity').value = row.activity || '';
             document.getElementById('mdNote').value = row.note || '';
             setWalkDailyValue(row.walkDailyMin || 0);
+            fillMissChips(row.missReason || '');
             setTrainHourValue(row.trainHour);
             document.getElementById('mdOfficialWake').value =
               row.officialWake || '';
@@ -11515,6 +11742,7 @@
             document.getElementById('mdActivity').value = '';
             document.getElementById('mdNote').value = '';
             setWalkDailyValue(0);
+            fillMissChips('');
             setTrainHourValue(null);
             document.getElementById('mdOfficialWake').value = '07:00';
             renderSleepBlocks([
@@ -11523,9 +11751,21 @@
             document.getElementById('mdDelete').style.display = 'none';
           }
           if (!id) restoreDayDraft();
+          syncMissVisibility();
           updateStepperUI();
           modal.classList.add('open');
           updateSleepPreview();
+        }
+
+        // v6.5: tapping an empty square on the activity map should let you fill
+        // that exact day in, not dump you on today's blank form.
+        function openDayModalFor(jdate) {
+          if (!Jalali.isValidDate(jdate)) { openDayModal(); return; }
+          const existing = state().rows.find(function (r) { return r.jdate === jdate; });
+          if (existing) { openDayModal(existing.id); return; }
+          openDayModal();
+          const el = document.getElementById('mdDate');
+          if (el) el.value = jdate;
         }
 
         function closeDayModal(skipDraftCapture) {
@@ -11703,6 +11943,11 @@
             futsalRef: document.getElementById('mdFutsalRef').checked,
             runMin: runValue,
             walkMin: walkValue,
+            missReason: (function () {
+              const done = document.getElementById('mdCompleted').value === 'true';
+              const el = document.getElementById('mdMissReason');
+              return done ? '' : (el ? el.value : '');
+            })(),
             walkDailyMin: (function () {
               const el = document.getElementById('mdWalkDaily');
               const v = el ? Math.round(Number(el.value) || 0) : 0;
@@ -11984,7 +12229,9 @@
               if (x.focus > 0) tags.push('<span class="tag">تمرکز ' + faNum(x.focus) + '</span>');
               if (x.difficulty > 0) tags.push('<span class="tag">سختی ' + faNum(x.difficulty) + '</span>');
               if (x.questions > 0) {
-                const acc = Math.round((x.correct / x.questions) * 100);
+                // v6.5: clamp — this goes into a report a friend may forward.
+                const acc = Math.round(
+                  (Math.min(x.correct, x.questions) / x.questions) * 100);
                 tags.push('<span class="tag">' + faNum(x.questions) + ' تست • ' + faNum(acc) + '٪</span>');
               }
               return '<div class="sess">' +
@@ -13321,7 +13568,7 @@
           }).sort();
           const snapshot = {
             format: 'sport-report-gist-snapshot-v1',
-            appVersion: '6.0',
+            appVersion: '6.5',
             createdAt: new Date().toISOString(),
             reason: mode === 'all' ? 'automatic-before-v56-first-write' : 'manual-snapshot',
             files: {},
@@ -15007,6 +15254,10 @@
             quickLog.addEventListener('click', function () {
               openDayModal();
             });
+          // Cross-script bridge: the activity map (script 5) needs to open the
+          // day form (script 6). Without this export the tap silently dies.
+          A.openDayModal = openDayModal;
+          A.openDayModalFor = openDayModalFor;
           const addDayBtn = document.getElementById('addDayBtn');
           if (addDayBtn)
             addDayBtn.addEventListener('click', function () {
@@ -15046,18 +15297,81 @@
 
           // ===== v6.3 STUDY WIRING =====
           function applyStudyVisibility() {
+            const st = A.state();
+            const mode = st.appMode || 'sport';
+            // v6.4: study-only users should not have to look at sport tabs, and
+            // vice versa. The study module follows the chosen mode.
+            const wantStudy = mode === 'study' || mode === 'both';
+            if (wantStudy && !st.studyConfig.enabled) {
+              st.studyConfig.enabled = true;
+              A.save();
+            }
             const on = A.studyEnabled();
             document.querySelectorAll('.study-only').forEach(function (el) {
               el.hidden = !on;
             });
-            // If the module is switched off while its tab is open, fall back.
-            const view = document.getElementById('view-study');
-            if (!on && view && view.classList.contains('active')) {
-              const home = document.querySelector('.bottom-nav [data-tab="dashboard"]');
-              if (home) home.click();
+            // In study-only mode hide the sport-specific tabs.
+            const sportTabs = ['log', 'futsal', 'charts', 'ai'];
+            document.querySelectorAll('[data-tab]').forEach(function (el) {
+              const tab = el.getAttribute('data-tab');
+              if (sportTabs.indexOf(tab) === -1) return;
+              // never hide entries inside the settings drawer's shortcut list
+              if (el.closest('#settingsMenu')) return;
+              el.hidden = mode === 'study';
+            });
+            document.body.classList.toggle('mode-study', mode === 'study');
+            document.body.classList.toggle('mode-sport', mode === 'sport');
+
+            const view = document.querySelector('.view.active');
+            const activeId = view ? view.id : '';
+            if (!on && activeId === 'view-study') A.goto('dashboard');
+            if (mode === 'study' && sportTabs.indexOf(activeId.replace('view-', '')) >= 0) {
+              A.goto('study');
             }
+            // The card holds the study preferences (goal, subjects, report
+            // options), so it must be VISIBLE whenever study is in use and
+            // hidden only for sport-only users.
+            const card = document.getElementById('studyModuleCard');
+            if (card) card.style.display = on ? '' : 'none';
+            const body = document.getElementById('studySettingsBody');
+            if (body) body.style.display = on ? '' : 'none';
+            const cardSw = document.getElementById('studyEnabled');
+            if (cardSw) cardSw.checked = on;
             if (on) A.renderStudyAll();
           }
+
+          function applyMode(mode) {
+            const st = A.state();
+            st.appMode = mode;
+            if (mode === 'sport') st.studyConfig.enabled = false;
+            if (mode === 'study' || mode === 'both') st.studyConfig.enabled = true;
+            st._sync.fields.study = A.nextRevision();
+            if (!A.save()) { toast('ذخیره ناموفق بود', 'error', 4000); return; }
+            syncModeUI();
+            applyStudyVisibility();
+            A.renderDashboard();
+            const names = { sport: 'فقط ورزش', study: 'فقط مطالعه', both: 'هر دو' };
+            toast('🎛️ حالت: ' + names[mode], 'success', 2600);
+            scheduleCloudSync('after-save');
+          }
+          A.applyMode = applyMode;
+
+          function syncModeUI() {
+            const mode = A.state().appMode || 'sport';
+            document.querySelectorAll('#modePicker .mode-opt').forEach(function (b) {
+              b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+            });
+            const sw = document.getElementById('studyEnabledMenu');
+            if (sw) sw.checked = A.studyEnabled();
+          }
+          A.syncModeUI = syncModeUI;
+
+          const modePicker = document.getElementById('modePicker');
+          if (modePicker)
+            modePicker.addEventListener('click', function (e) {
+              const b = e.target.closest('.mode-opt');
+              if (b) applyMode(b.getAttribute('data-mode'));
+            });
           A.applyStudyVisibility = applyStudyVisibility;
 
           function loadStudySettingsUI() {
@@ -15081,6 +15395,8 @@
 
           function setStudyEnabled(on) {
             const s = A.state();
+            // Keep the mode consistent with the quick switch.
+            s.appMode = on ? (s.appMode === 'study' ? 'study' : 'both') : 'sport';
             s.studyConfig.enabled = !!on;
             s._sync.fields.study = A.nextRevision();
             if (!A.save()) { toast('ذخیره ناموفق بود', 'error', 4000); return false; }
@@ -15092,6 +15408,7 @@
             const body = document.getElementById('studySettingsBody');
             if (body) body.style.display = on ? '' : 'none';
             applyStudyVisibility();
+            if (A.syncModeUI) A.syncModeUI();
             toast(on ? '📚 بخش مطالعه فعال شد — تب «مطالعه» پایین صفحه اضافه شد'
                      : 'بخش مطالعه خاموش شد', 'success', 3200);
             scheduleCloudSync('after-save');
@@ -15602,6 +15919,26 @@
           });
           const chartDownloadBtn = document.getElementById('chartDownloadBtn');
           if (chartDownloadBtn) chartDownloadBtn.addEventListener('click', A.downloadActiveChart);
+          // v6.5: the four summary numbers are useful but they used to eat the
+          // top third of the screen before you ever saw a chart. Collapsed by
+          // default, one tap away, and the choice is remembered.
+          const chartSummaryBtn = document.getElementById('chartSummaryBtn');
+          if (chartSummaryBtn) {
+            const box = document.getElementById('chartSummary');
+            const applySummary = function (open) {
+              if (box) box.hidden = !open;
+              chartSummaryBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+              chartSummaryBtn.classList.toggle('btn-primary', open);
+              chartSummaryBtn.classList.toggle('btn-ghost', !open);
+              try { A.safeStorage.setItem('sport_chart_summary_v1', open ? '1' : '0'); } catch (e) {}
+            };
+            let saved = '0';
+            try { saved = A.safeStorage.getItem('sport_chart_summary_v1') || '0'; } catch (e) {}
+            applySummary(saved === '1');
+            chartSummaryBtn.addEventListener('click', function () {
+              applySummary(box ? box.hidden : true);
+            });
+          }
           document.addEventListener('fullscreenchange', function () {
             const view = document.getElementById('view-charts');
             if (view && view.classList.contains('chart-focus-mode') && !document.fullscreenElement) A.setChartFocus(false);
@@ -15767,6 +16104,7 @@
             renderAll();
             // v6.3: reveal the study tab only when the module is switched on.
             if (typeof A.applyStudyVisibility === 'function') A.applyStudyVisibility();
+            if (typeof A.syncModeUI === 'function') A.syncModeUI();
             if (typeof A.loadStudySettingsUI === 'function') A.loadStudySettingsUI();
             startAutoSync();
             if (window.__sportStorageWarning || !safeStorage.isPersistent()) {
