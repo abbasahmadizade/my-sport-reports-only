@@ -16,14 +16,14 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-B7c3X8ueoi/jqp5mcIEkk9rrWyyZPP5pnayoXgl20LM=' 'sha256-EC7y3jhBl3LeFINotBnqjw8J+iB58b32pQBZCfQiIWw=' 'sha256-CqdKwyiHc92nAbrqI5cevdhobOzcUU6qXl6F6vumIOI='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-B7c3X8ueoi/jqp5mcIEkk9rrWyyZPP5pnayoXgl20LM=' 'sha256-EC7y3jhBl3LeFINotBnqjw8J+iB58b32pQBZCfQiIWw=' 'sha256-az+6NxFLfmLo4uqD7yRXUy6u1UdHhXF95Vwn7qDKCFI='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sport Report" />
-    <title>🏃 گزارش ورزش، خواب و انرژی — v6.6.1</title>
+    <title>🏃 گزارش ورزش، خواب و انرژی — v6.6.2</title>
 
     <link
       rel="icon"
@@ -3222,7 +3222,7 @@
       }
     </style>
   </head>
-  <body data-version="v6.6.1">
+  <body data-version="v6.6.2">
     <!-- ============================================================ -->
     <!-- ██████ PART 1/5 - HEAD + CSS - END ██████ -->
     <!-- ============================================================ -->
@@ -3302,8 +3302,13 @@
     >
       <button type="button" class="menu-primary" data-tab="settings">
         ⚙️ تنظیمات کامل
-        <small>مطالعه • اهداف • تم رنگی</small>
+        <small>باشگاه • مطالعه • اهداف • تم رنگی</small>
       </button>
+      <div class="menu-label">🎛️ بخش‌های فعال</div>
+      <label class="menu-switch">
+        <span>🏋️ فعال کردن بخش باشگاه</span>
+        <input type="checkbox" id="gymEnabledMenu" />
+      </label>
       <label class="menu-switch">
         <span>📚 فعال کردن بخش مطالعه</span>
         <input type="checkbox" id="studyEnabledMenu" />
@@ -4914,6 +4919,18 @@
                 <label for="gSleepEnergy">⚡ انرژی امروز صبح (۰ = ثبت نکردم)</label>
                 <input type="number" class="form-input" id="gSleepEnergy"
                   min="0" max="10" step="1" value="0" inputmode="numeric" />
+              </div>
+              <div class="form-group">
+                <label for="gNapMin">😴 چرت امروز <span class="lbl-opt">(اختیاری)</span></label>
+                <div class="daily-manual">
+                  <input type="number" id="gNapMin" value="0" min="0" max="600"
+                    step="5" inputmode="numeric" aria-label="دقیقه چرت" />
+                  <span class="unit">دقیقه</span>
+                </div>
+                <div class="field-hint">
+                  اگر وسط روز خوابیدی. جدا از خواب شب ثبت می‌شود و در گزارش‌ها
+                  هم جدا دیده می‌شود.
+                </div>
               </div>
             </div>
           </details>
@@ -14007,6 +14024,12 @@
                   sleepBit = '<span class="tag sleep">😴 ' + faNum(b.start) + '–' +
                     faNum(b.end || '') + ' (' + faNum(si.totalDisplay) + ')</span>';
                 }
+                // v6.6.2: naps are logged as extra sleep blocks; showing only
+                // block[0] hid them and made the day look like less rest.
+                const nap = aiNapCell(row);
+                if (nap) {
+                  sleepBit += '<span class="tag sleep">😴 چرت ' + faNum(nap) + '′</span>';
+                }
               }
             }
             const rows = items.map(function (x) {
@@ -14311,13 +14334,19 @@
                   ' می‌خوابد و ' + faNum(rhythm.wake) + ' بیدار می‌شود ' +
                   '(نوسان ±' + faNum(rhythm.bedVar) + ' دقیقه).</p>';
               }
+              const shownRows = rows.slice(-14).reverse();
+              const anyNapR = shownRows.some(function (r) { return aiNapCell(r); });
               sleepHtml += '<table><thead><tr><th>تاریخ</th><th>خواب</th><th>بیداری</th>' +
-                '<th>مدت</th><th>انرژی</th></tr></thead><tbody>' +
-                rows.slice(-14).reverse().map(function (r) {
+                (anyNapR ? '<th>چرت</th>' : '') +
+                '<th>مدت کل</th><th>انرژی</th></tr></thead><tbody>' +
+                shownRows.map(function (r) {
                   const si = sleepInfo(r.sleepBlocks);
+                  const nap = aiNapCell(r);
                   return '<tr><td class="c-sub">' + faNum(r.jdate) + '</td>' +
                     '<td class="c-mid">' + faNum(si.bedtime || '—') + '</td>' +
                     '<td class="c-mid">' + faNum(si.wakeTime || '—') + '</td>' +
+                    (anyNapR ? '<td class="c-mid soft">' +
+                      (nap ? faNum(nap) + '′' : '—') + '</td>' : '') +
                     '<td class="c-mid">' + faNum(si.totalDisplay) + '</td>' +
                     '<td class="c-mid">' + (Number(r.energy) > 0 ? faNum(r.energy) : '—') +
                     '</td></tr>';
@@ -14716,7 +14745,20 @@
           gEl('gSleepStart').value = si && si.bedtime && si.bedtime !== '--:--' ? si.bedtime : '';
           gEl('gSleepEnd').value = si && si.wakeTime && si.wakeTime !== '--:--' ? si.wakeTime : '';
           gEl('gSleepEnergy').value = dayRow ? (dayRow.energy || 0) : 0;
-          if (sleepWrap) sleepWrap.open = !!(si && si.totalMin > 0);
+          const existingNap = dayRow ? (function () {
+            let t = 0;
+            (dayRow.sleepBlocks || []).forEach(function (b) {
+              const l = (b.label || '');
+              const isNap = l.indexOf('چرت') !== -1 || l.toLowerCase().indexOf('nap') !== -1;
+              if (!isNap || !b.start || !b.end) return;
+              let d = A.timeToMin(b.end) - A.timeToMin(b.start);
+              if (d < 0) d += 1440;
+              t += d;
+            });
+            return t;
+          })() : 0;
+          gEl('gNapMin').value = existingNap || 0;
+          if (sleepWrap) sleepWrap.open = !!(si && si.totalMin > 0) || existingNap > 0;
           const sleepHint = gEl('gSleepHint');
           if (sleepHint) {
             sleepHint.textContent = dayRow
@@ -14761,6 +14803,13 @@
           toast('🔁 ساختار جلسه‌ی قبل آورده شد — فقط عددها را اصلاح کن', 'success', 3200);
         }
 
+        function existingNapOnSave(row) {
+          return (row.sleepBlocks || []).some(function (b) {
+            const l = b.label || '';
+            return l.indexOf('چرت') !== -1 || l.toLowerCase().indexOf('nap') !== -1;
+          });
+        }
+
         function saveGymSession() {
           const jdate = (gEl('gDate').value || '').trim();
           if (!Jalali.isValidDate(jdate)) { toast('تاریخ معتبر نیست', 'error', 3500); return; }
@@ -14801,7 +14850,8 @@
           const sStart = gEl('gSleepStart').value;
           const sEnd = gEl('gSleepEnd').value;
           const sEnergy = Number(gEl('gSleepEnergy').value) || 0;
-          if ((s.modules || {}).sleep && (sStart || sEnd || sEnergy)) {
+          const sNap = Math.max(0, Math.min(600, Number(gEl('gNapMin').value) || 0));
+          if ((s.modules || {}).sleep && (sStart || sEnd || sEnergy || sNap)) {
             if (!Array.isArray(s.rows)) s.rows = [];
             let row = s.rows.find(function (r) { return r.jdate === jdate; });
             if (!row) {
@@ -14815,12 +14865,26 @@
               }] }).rows[0];
               s.rows.push(row);
             }
+            const isNapBlock = function (b) {
+              const l = b.label || '';
+              return l.indexOf('چرت') !== -1 || l.toLowerCase().indexOf('nap') !== -1;
+            };
             if (sStart && sEnd) {
-              const others = (row.sleepBlocks || []).filter(function (b) {
-                const l = b.label || '';
-                return l.indexOf('چرت') !== -1 || l.toLowerCase().indexOf('nap') !== -1;
-              });
+              const others = (row.sleepBlocks || []).filter(isNapBlock);
               row.sleepBlocks = [{ label: 'خواب شب', start: sStart, end: sEnd }].concat(others);
+            }
+            // The nap is entered as a duration here (nobody remembers the exact
+            // clock time of a nap), so anchor it at 14:00 and store a block.
+            const nights = (row.sleepBlocks || []).filter(function (b) {
+              return !isNapBlock(b);
+            });
+            if (sNap > 0) {
+              row.sleepBlocks = nights.concat([{
+                label: 'چرت', start: '14:00', end: minToTime(14 * 60 + sNap),
+              }]);
+            } else if (existingNapOnSave(row)) {
+              // cleared to zero: drop the nap block instead of leaving a ghost
+              row.sleepBlocks = nights;
             }
             if (sEnergy > 0) row.energy = sEnergy;
             row._updatedAt = A.nextRevision();
@@ -15682,10 +15746,25 @@
           lines.push('- میانگین خواب ' + stats.avgSleepDisplay +
             ' | هدف ' + (g.sleepGoalHours || 7) + 'h | میانگین انرژی ' +
             compactNum(stats.avgEnergy) + '/10');
-          lines.push('قالب: `تاریخ|خواب(از-تا)|انرژی`');
-          withSleep.slice(-14).forEach(function (r) {
-            lines.push(r.jdate.slice(5) + '|' + aiSleepCell(r) + '|' +
-              (Number(r.energy) > 0 ? r.energy : ''));
+          // v6.6.2: naps were only surfaced in the sport export. A gym or
+          // study report that hides them makes the night look shorter than the
+          // person's real total sleep, which is misleading to a coach.
+          const shown = withSleep.slice(-14);
+          const anyNap = shown.some(function (r) { return aiNapCell(r); });
+          if (anyNap) {
+            const napDays = withSleep.filter(function (r) { return aiNapCell(r); });
+            const napTotal = napDays.reduce(function (a, r) {
+              return a + (Number(aiNapCell(r)) || 0); }, 0);
+            lines.push('- چرت: در ' + napDays.length + ' روز، مجموع ' +
+              napTotal + ' دقیقه (جدا از خواب شب)');
+          }
+          lines.push('قالب: `تاریخ|خواب شب(از-تا)' + (anyNap ? '|چرت(دقیقه)' : '') +
+            '|انرژی` • خالی = ثبت نشده');
+          shown.forEach(function (r) {
+            const cells = [r.jdate.slice(5), aiSleepCell(r)];
+            if (anyNap) cells.push(aiNapCell(r));
+            cells.push(Number(r.energy) > 0 ? String(r.energy) : '');
+            lines.push(cells.join('|'));
           });
           return lines.join('\n');
         }
@@ -16536,7 +16615,7 @@
           }).sort();
           const snapshot = {
             format: 'sport-report-gist-snapshot-v1',
-            appVersion: '6.6.1',
+            appVersion: '6.6.2',
             createdAt: new Date().toISOString(),
             reason: mode === 'all' ? 'automatic-before-v56-first-write' : 'manual-snapshot',
             files: {},
@@ -17562,7 +17641,7 @@
 
           // === VERSION ===
           results.push('<b style="color:#a78bfa;font-size:1rem">📦 نسخه</b>');
-          results.push(info + ' Version: v6.6.1 One-File');
+          results.push(info + ' Version: v6.6.2 One-File');
           results.push(
             info + ' تاریخ چک: ' + new Date().toLocaleString('fa-IR'),
           );
@@ -18127,6 +18206,11 @@
             if (backdrop) backdrop.classList.remove('open');
             document.body.style.overflow = '';
           }
+          // v6.6.2: anything that navigates away from inside the drawer must be
+          // able to close it. Without this the backdrop stays up and the whole
+          // screen becomes untappable — which is exactly what happened when the
+          // gym switch jumped to the gym page.
+          A.closeSettingsMenu = closeM;
 
           btn.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -18897,7 +18981,23 @@
           const studyEnabledMenu = document.getElementById('studyEnabledMenu');
           if (studyEnabledMenu)
             studyEnabledMenu.addEventListener('change', function () {
-              setStudyEnabled(this.checked);
+              const wanted = this.checked;
+              if (!setStudyEnabled(wanted)) { this.checked = !wanted; return; }
+              if (A.closeSettingsMenu) A.closeSettingsMenu();
+              if (wanted) A.goto('study');
+            });
+          // v6.6.2: the drawer only ever had a study switch. Someone looking
+          // for "turn on the gym" tapped the gear, saw nothing, and concluded
+          // the feature did not exist. Same one-tap access for every module.
+          const gymEnabledMenu = document.getElementById('gymEnabledMenu');
+          if (gymEnabledMenu)
+            gymEnabledMenu.addEventListener('change', function () {
+              const wanted = this.checked;
+              if (!setModule('gym', wanted)) { this.checked = !wanted; return; }
+              const cardSw = document.getElementById('modGym');
+              if (cardSw) cardSw.checked = wanted;
+              if (A.closeSettingsMenu) A.closeSettingsMenu();
+              if (wanted) A.goto('gym');
             });
           // Any [data-tab] inside the drawer should close it first, otherwise the
           // backdrop stays and the page underneath is left scroll-locked.
@@ -19815,7 +19915,7 @@
         }
       })();
     </script>
-  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2b7944eca34aa26',t:'MTc4Njc5MDQwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </body>
 </html>
 <!-- ============================================================ -->
 <!-- ██████ PART 5/5 - JS FINAL - END ██████ -->
