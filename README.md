@@ -9,14 +9,14 @@
 <br>
 
 [![Live Demo](https://img.shields.io/badge/دمو_زنده-GitHub_Pages-8b5cf6?style=for-the-badge&logo=github&logoColor=white)](https://abbasahmadizade.github.io/my-sport-reports-only/)
-[![Version](https://img.shields.io/badge/version-6.6.3-a78bfa?style=for-the-badge)](https://github.com/abbasahmadizade/my-sport-reports-only/releases)
+[![Version](https://img.shields.io/badge/version-6.6.4-a78bfa?style=for-the-badge)](https://github.com/abbasahmadizade/my-sport-reports-only/releases)
 [![Single File](https://img.shields.io/badge/single-file_app-6d28d9?style=for-the-badge)](https://github.com/abbasahmadizade/my-sport-reports-only/blob/main/index.html)
 
 [![Vanilla JS](https://img.shields.io/badge/Vanilla_JS-no_framework-f7df1e?style=flat-square&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![RTL](https://img.shields.io/badge/UI-Persian_RTL-8b5cf6?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/CSS/direction)
 [![Offline](https://img.shields.io/badge/offline-ready-10b981?style=flat-square)](#why-single-file)
 [![CSP](https://img.shields.io/badge/CSP-hardened-ef4444?style=flat-square&logo=letsencrypt&logoColor=white)](#security)
-[![Tests](https://img.shields.io/badge/tests-1196_passing-22c55e?style=flat-square)](#tests)
+[![Tests](https://img.shields.io/badge/tests-1199_passing-22c55e?style=flat-square)](#tests)
 
 **۱۰۰٪ از ایران بدون VPN کار می‌کند** ✅
 
@@ -926,7 +926,7 @@ index.html
 
 ## 🧪 تست و کیفیت
 
-این پروژه **۱۱۹۶ تست خودکار** دارد که با مرورگر واقعی (Playwright) روی
+این پروژه **۱۱۹۹ تست خودکار** دارد که با مرورگر واقعی (Playwright) روی
 اندازه‌های واقعی گوشی اجرا می‌شوند — نه شبیه‌سازی.
 
 </div>
@@ -1135,7 +1135,22 @@ console.log(window._app.state().modules)        // which modules are on
 ## 🗓️ تاریخچه
 
 <details open>
-<summary><b>v6.6.3</b> — نسخه‌ی فعلی</summary>
+<summary><b>v6.6.4</b> — نسخه‌ی فعلی</summary>
+
+<br>
+
+**🔢 نمایش نسخه در برنامه**
+- شماره‌ی نسخه زیر «⚙️ تنظیمات کامل» در کشو دیده می‌شود
+- دیگر لازم نیست حدس بزنی کدام بیلد در حال اجراست
+
+**🧪 تست سناریوی واقعی کاربر**
+- مورد `00:50-07:00` + `18:00-18:50` مستقیم به مجموعه‌ی تست اضافه شد
+- به‌علاوه‌ی حالت سختش: خواب عصرِ **بلندتر** از شبِ کوتاه — شب باید برنده شود
+
+</details>
+
+<details>
+<summary><b>v6.6.3</b></summary>
 
 <br>
 
@@ -1458,7 +1473,7 @@ exercise name on them means they simply stop logging.
 | ☁️ | Conflict-safe sync — pull, merge, push, verify — with per-device shards, deletion tombstones and automatic pre-write backups |
 | 🔒 | Strict CSP with per-script hashes, zero inline handlers, PBKDF2-SHA256 at 210k iterations |
 | 📱 | Mobile-first RTL interface, responsive from 320px |
-| 🧪 | 1196 automated tests running in a real browser at real phone sizes |
+| 🧪 | 1199 automated tests running in a real browser at real phone sizes |
 
 **Try it:** [abbasahmadizade.github.io/my-sport-reports-only](https://abbasahmadizade.github.io/my-sport-reports-only/)
 

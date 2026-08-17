@@ -16,14 +16,14 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-gINpWqZNnwbkAOo9BlcD3kUQrET9I8dNp+OeeNHJpmg=' 'sha256-abm5BctqaKtNcvxPBnfY85B87o9VcUHLO8paYsCxInI=' 'sha256-gWfr3Wz0B+KtqyK7Z4oTBHwqtHKIN3OZr3mthMerUbc='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-gINpWqZNnwbkAOo9BlcD3kUQrET9I8dNp+OeeNHJpmg=' 'sha256-abm5BctqaKtNcvxPBnfY85B87o9VcUHLO8paYsCxInI=' 'sha256-eITfppLdt+F5S91grTsk3Goo1cCLrLLC5gia56Tlc08='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sport Report" />
-    <title>🏃 گزارش ورزش، خواب و انرژی — v6.6.3</title>
+    <title>🏃 گزارش ورزش، خواب و انرژی — v6.6.4</title>
 
     <link
       rel="icon"
@@ -2099,6 +2099,12 @@
       }
 
       /* v6.6: independent module switches */
+      .menu-version {
+        font-size: .66rem; color: var(--muted); text-align: center;
+        padding: 4px 0 8px; border-bottom: 1px solid var(--border);
+        margin-bottom: 6px; letter-spacing: .3px;
+      }
+
       .mod-list { display: flex; flex-direction: column; gap: 8px; }
       .mod-row {
         display: grid; grid-template-columns: auto 1fr auto;
@@ -3222,7 +3228,7 @@
       }
     </style>
   </head>
-  <body data-version="v6.6.3">
+  <body data-version="v6.6.4">
     <!-- ============================================================ -->
     <!-- ██████ PART 1/5 - HEAD + CSS - END ██████ -->
     <!-- ============================================================ -->
@@ -3304,6 +3310,9 @@
         ⚙️ تنظیمات کامل
         <small>باشگاه • مطالعه • اهداف • تم رنگی</small>
       </button>
+      <!-- v6.6.4: the running version, visible without opening the console.
+           "Did my upload actually go through?" should be a two-second check. -->
+      <div class="menu-version" id="menuVersion">نسخه v6.6.4</div>
       <div class="menu-label">🎛️ بخش‌های فعال</div>
       <label class="menu-switch">
         <span>🏋️ فعال کردن بخش باشگاه</span>
@@ -16740,7 +16749,7 @@
           }).sort();
           const snapshot = {
             format: 'sport-report-gist-snapshot-v1',
-            appVersion: '6.6.3',
+            appVersion: '6.6.4',
             createdAt: new Date().toISOString(),
             reason: mode === 'all' ? 'automatic-before-v56-first-write' : 'manual-snapshot',
             files: {},
@@ -17766,7 +17775,7 @@
 
           // === VERSION ===
           results.push('<b style="color:#a78bfa;font-size:1rem">📦 نسخه</b>');
-          results.push(info + ' Version: v6.6.3 One-File');
+          results.push(info + ' Version: v6.6.4 One-File');
           results.push(
             info + ' تاریخ چک: ' + new Date().toLocaleString('fa-IR'),
           );
@@ -20040,7 +20049,7 @@
         }
       })();
     </script>
-  </body>
+  <script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a2ca4735cf22bf09',t:'MTc4Njk4NjQ3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
 <!-- ============================================================ -->
 <!-- ██████ PART 5/5 - JS FINAL - END ██████ -->
