@@ -9,14 +9,14 @@
 <br>
 
 [![Live Demo](https://img.shields.io/badge/دمو_زنده-GitHub_Pages-8b5cf6?style=for-the-badge&logo=github&logoColor=white)](https://abbasahmadizade.github.io/my-sport-reports-only/)
-[![Version](https://img.shields.io/badge/version-6.6.2-a78bfa?style=for-the-badge)](https://github.com/abbasahmadizade/my-sport-reports-only/releases)
+[![Version](https://img.shields.io/badge/version-6.6.3-a78bfa?style=for-the-badge)](https://github.com/abbasahmadizade/my-sport-reports-only/releases)
 [![Single File](https://img.shields.io/badge/single-file_app-6d28d9?style=for-the-badge)](https://github.com/abbasahmadizade/my-sport-reports-only/blob/main/index.html)
 
 [![Vanilla JS](https://img.shields.io/badge/Vanilla_JS-no_framework-f7df1e?style=flat-square&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![RTL](https://img.shields.io/badge/UI-Persian_RTL-8b5cf6?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/CSS/direction)
 [![Offline](https://img.shields.io/badge/offline-ready-10b981?style=flat-square)](#why-single-file)
 [![CSP](https://img.shields.io/badge/CSP-hardened-ef4444?style=flat-square&logo=letsencrypt&logoColor=white)](#security)
-[![Tests](https://img.shields.io/badge/tests-1157_passing-22c55e?style=flat-square)](#tests)
+[![Tests](https://img.shields.io/badge/tests-1196_passing-22c55e?style=flat-square)](#tests)
 
 **۱۰۰٪ از ایران بدون VPN کار می‌کند** ✅
 
@@ -841,7 +841,8 @@ index.html
     activity:      string,
     note:          string,
     futsalRef:     boolean,
-    sleepBlocks:   [{ label, start: "23:30", end: "07:15" }],  // naps included
+    sleepBlocks:   [{ label, start: "23:30", end: "07:15" }],  // main + extras;
+                               // classified by TIME, not by the label text
     officialWake:  string|null,
     _updatedAt:    number      // drives cross-device merge
   }],
@@ -925,7 +926,7 @@ index.html
 
 ## 🧪 تست و کیفیت
 
-این پروژه **۱۱۵۷ تست خودکار** دارد که با مرورگر واقعی (Playwright) روی
+این پروژه **۱۱۹۶ تست خودکار** دارد که با مرورگر واقعی (Playwright) روی
 اندازه‌های واقعی گوشی اجرا می‌شوند — نه شبیه‌سازی.
 
 </div>
@@ -1134,7 +1135,46 @@ console.log(window._app.state().modules)        // which modules are on
 ## 🗓️ تاریخچه
 
 <details open>
-<summary><b>v6.6.2</b> — نسخه‌ی فعلی</summary>
+<summary><b>v6.6.3</b> — نسخه‌ی فعلی</summary>
+
+<br>
+
+**🐞 باگ جدی در بلوک‌های خواب**
+
+بلوک‌های خواب بر اساس **نام** دسته‌بندی می‌شدند و کد فقط «چرت» و `nap` را
+می‌شناخت. هر اسم دیگری — «خواب بعدازظهر»، «خواب دوم»، «استراحت ظهر»،
+«قیلوله» — به‌اشتباه **خواب شب** حساب می‌شد.
+
+نتیجه‌اش این بود که ساعت بیداری به‌جای `06:45` می‌شد `15:20`، و این عدد غلط
+وارد نمودار ساعت خواب، تحلیل ریتم، پیش‌پرکردن فرم باشگاه و همه‌ی گزارش‌ها
+می‌شد.
+
+**حالا دسته‌بندی بر اساس زمان است، نه اسم:**
+- خواب اصلی = بلندترین بلوکی که در بازه‌ی شب (۱۸:۰۰ تا ۱۱:۵۹) شروع شود
+- بقیه = خواب دوم، با هر اسمی که خودت گذاشته باشی
+- کارگر شیفت شب هم پشتیبانی می‌شود (اگر هیچ بلوکی در بازه‌ی شب نباشد)
+- خواب چندتکه: بلندترین بلوک شب، خواب اصلی است
+
+**🕐 نام و ساعت دقیق در همه‌ی خروجی‌ها**
+- قبلاً فقط مجموع دقیقه زیر برچسب «چرت» می‌آمد
+- حالا: `خواب بعدازظهر 14:00-15:20` — با نام واقعی و ساعت شروع و پایان
+- در خروجی AI (هر چهار حالت) و گزارش‌های چاپی
+- خلاصه هم می‌گوید کاربر از چه عنوان‌هایی استفاده می‌کند
+
+**🧠 تحلیل جدید: آیا امروز به خواب روز نیاز دارم؟**
+- **رابطه‌ی شب کوتاه ← خواب روز:** «روزهایی که خواب دوم داشتی، شب قبلش
+  به‌طور میانگین ۲:۴۵ کمتر خوابیده بودی»
+- **اثر خواب روز روی شب بعد:** «بعد از خواب‌های روزِ بلند (۴۵ دقیقه به بالا)،
+  شب بعدش حدود ۳۵ دقیقه کمتر خوابیدی»
+- جایگزین تحلیل قبلی که فقط تعداد چرت‌ها را می‌شمرد
+
+**🐞 رفع باگ دیگر**
+- فرم باشگاه موقع ثبت چرت، بلوک خواب شب را پاک می‌کرد
+
+</details>
+
+<details>
+<summary><b>v6.6.2</b></summary>
 
 <br>
 
@@ -1418,7 +1458,7 @@ exercise name on them means they simply stop logging.
 | ☁️ | Conflict-safe sync — pull, merge, push, verify — with per-device shards, deletion tombstones and automatic pre-write backups |
 | 🔒 | Strict CSP with per-script hashes, zero inline handlers, PBKDF2-SHA256 at 210k iterations |
 | 📱 | Mobile-first RTL interface, responsive from 320px |
-| 🧪 | 1157 automated tests running in a real browser at real phone sizes |
+| 🧪 | 1196 automated tests running in a real browser at real phone sizes |
 
 **Try it:** [abbasahmadizade.github.io/my-sport-reports-only](https://abbasahmadizade.github.io/my-sport-reports-only/)
 

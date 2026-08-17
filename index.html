@@ -16,14 +16,14 @@
     />
     <meta name="theme-color" content="#0e0b18" />
     <meta name="referrer" content="no-referrer" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-B7c3X8ueoi/jqp5mcIEkk9rrWyyZPP5pnayoXgl20LM=' 'sha256-EC7y3jhBl3LeFINotBnqjw8J+iB58b32pQBZCfQiIWw=' 'sha256-az+6NxFLfmLo4uqD7yRXUy6u1UdHhXF95Vwn7qDKCFI='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'sha256-sLZ7D9JtEur/XD6VG6i2l30V19mE7Z/xG6aNjjCFBak=' 'sha256-MkibpruPlXTWFznWTRuhQjK1EVc1FjvjOOtWt8Rs16c=' 'sha256-pUIIhgIKf55NvN0Y7vTD+jjhci+Gyue6UjxJxG6pl2g=' 'sha256-gINpWqZNnwbkAOo9BlcD3kUQrET9I8dNp+OeeNHJpmg=' 'sha256-abm5BctqaKtNcvxPBnfY85B87o9VcUHLO8paYsCxInI=' 'sha256-gWfr3Wz0B+KtqyK7Z4oTBHwqtHKIN3OZr3mthMerUbc='; script-src-attr 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.jsdelivr.net; object-src 'none'; base-uri 'none'; form-action 'self'; upgrade-insecure-requests" />
     <meta name="description" content="ثبت امن ورزش، خواب و انرژی با تقویم شمسی" />
     <meta name="application-name" content="Sport Report" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Sport Report" />
-    <title>🏃 گزارش ورزش، خواب و انرژی — v6.6.2</title>
+    <title>🏃 گزارش ورزش، خواب و انرژی — v6.6.3</title>
 
     <link
       rel="icon"
@@ -3222,7 +3222,7 @@
       }
     </style>
   </head>
-  <body data-version="v6.6.2">
+  <body data-version="v6.6.3">
     <!-- ============================================================ -->
     <!-- ██████ PART 1/5 - HEAD + CSS - END ██████ -->
     <!-- ============================================================ -->
@@ -7564,45 +7564,78 @@
           return h + ':' + String(m).padStart(2, '0');
         }
 
-        function sleepInfo(blocks) {
-          if (!blocks || !blocks.length) {
-            return {
-              totalMin: 0,
-              totalH: 0,
-              totalDisplay: '0:00',
-              wakeTime: '--:--',
-              bedtime: '--:--',
-            };
-          }
-          let totalMin = 0;
-          let lastNonNapEnd = null;
-          let firstBedtime = null;
-
-          blocks.forEach(function (b) {
-            if (!b.start || !b.end) return;
+        // v6.6.3: a sleep block is classified by WHEN it happened, not by what
+        // the user called it. The label is free text — people write
+        // "خواب بعدازظهر", "خواب دوم", "استراحت ظهر", "قیلوله" — and the old
+        // name-matching only knew "چرت"/"nap". Everything else was treated as
+        // night sleep, which made wakeTime report 15:20 instead of 06:45 and
+        // corrupted the bedtime chart, the rhythm summary and every report.
+        //
+        // Rule: the MAIN sleep is the longest block that starts in the night
+        // window (18:00–11:59). Everything else is a secondary block (a nap by
+        // any name). A block that starts in the afternoon is never the night.
+        function isNightStart(startMin) {
+          // 18:00 -> 23:59  or  00:00 -> 11:59
+          return startMin >= 1080 || startMin < 720;
+        }
+        function classifySleepBlocks(blocks) {
+          const parsed = [];
+          (blocks || []).forEach(function (b, i) {
+            if (!b || !b.start || !b.end) return;
             const s = timeToMin(b.start);
             const e = timeToMin(b.end);
             let dur = e - s;
             if (dur < 0) dur += 1440;
             if (dur === 0) return;
-            totalMin += dur;
-            const lb = (b.label || '').toLowerCase();
-            if (!lb.includes('چرت') && !lb.includes('nap')) {
-              if (!firstBedtime) firstBedtime = b.start;
-              lastNonNapEnd = b.end;
-            }
+            parsed.push({
+              idx: i,
+              label: cleanText(b.label, 120),
+              start: b.start,
+              end: b.end,
+              startMin: s,
+              min: dur,
+              night: isNightStart(s),
+            });
           });
+          if (!parsed.length) return { main: null, extras: [], all: [] };
+          // Prefer the longest night-window block; if the user logged nothing
+          // in the night window at all, fall back to the longest block overall
+          // so a shift worker still gets a sensible "main sleep".
+          const nightCandidates = parsed.filter(function (p) { return p.night; });
+          const pool = nightCandidates.length ? nightCandidates : parsed;
+          let main = pool[0];
+          pool.forEach(function (p) { if (p.min > main.min) main = p; });
+          const extras = parsed.filter(function (p) { return p !== main; });
+          return { main: main, extras: extras, all: parsed };
+        }
 
+        function sleepInfo(blocks) {
+          if (!blocks || !blocks.length) {
+            return {
+              totalMin: 0, totalH: 0, totalDisplay: '0:00',
+              wakeTime: '--:--', bedtime: '--:--',
+              mainMin: 0, mainDisplay: '0:00',
+              extras: [], extraMin: 0,
+            };
+          }
+          const c = classifySleepBlocks(blocks);
+          let totalMin = 0;
+          c.all.forEach(function (p) { totalMin += p.min; });
+          const extraMin = c.extras.reduce(function (a, p) { return a + p.min; }, 0);
           return {
             totalMin: totalMin,
             totalH: +(totalMin / 60).toFixed(2),
             totalDisplay: formatSleepDuration(totalMin),
-            wakeTime:
-              lastNonNapEnd ||
-              (blocks[blocks.length - 1]
-                ? blocks[blocks.length - 1].end
-                : '--:--'),
-            bedtime: firstBedtime || (blocks[0] ? blocks[0].start : '--:--'),
+            // bedtime/wakeTime now always describe the MAIN sleep.
+            wakeTime: c.main ? c.main.end : '--:--',
+            bedtime: c.main ? c.main.start : '--:--',
+            mainMin: c.main ? c.main.min : 0,
+            mainDisplay: formatSleepDuration(c.main ? c.main.min : 0),
+            // Every secondary block, with its real name and exact times.
+            extras: c.extras.map(function (p) {
+              return { label: p.label, start: p.start, end: p.end, min: p.min };
+            }),
+            extraMin: extraMin,
           };
         }
 
@@ -8963,6 +8996,7 @@
         window._app.minToTime = minToTime;
         window._app.formatSleepDuration = formatSleepDuration;
         window._app.sleepInfo = sleepInfo;
+        window._app.classifySleepBlocks = classifySleepBlocks;
         window._app.computeStats = computeStats;
         window._app.statsLastN = statsLastN;
         window._app.rowsInLastDays = rowsInLastDays;
@@ -9073,6 +9107,9 @@
         const DEFAULT_DATA = A.DEFAULT_DATA;
         const RatingSlider = A.RatingSlider;
         const escapeHTML = A.escapeHTML;
+        // v6.6.3: lives in script 4. Using it without importing fails only
+        // at runtime — the syntax check cannot catch it.
+        const formatSleepDuration = A.formatSleepDuration;
 
         function state() {
           return A.state();
@@ -9191,24 +9228,89 @@
             }
           }
 
-          let totalNaps = 0,
-            daysWithNap = 0;
+          // v6.6.3: the actually useful nap question is not "how many naps did
+          // I take" — it is "does last night predict whether I need one, and
+          // does napping cost me tonight's sleep?". Both are answerable from
+          // the data the user already logs.
+          const napDays = [];
+          const noNapDays = [];
           sorted.forEach(function (r) {
-            const naps = (r.sleepBlocks || []).filter(function (b) {
-              const lb = (b.label || '').toLowerCase();
-              return lb.includes('چرت') || lb.includes('nap');
-            });
-            if (naps.length > 0) {
-              totalNaps += naps.length;
-              daysWithNap++;
-            }
+            const si = sleepInfo(r.sleepBlocks);
+            if (!si.totalMin) return;
+            (si.extras.length ? napDays : noNapDays).push({ r: r, si: si });
           });
-          if (daysWithNap >= 3) {
+
+          if (napDays.length >= 3) {
+            const avg = function (arr, f) {
+              if (!arr.length) return null;
+              return arr.reduce(function (a, x) { return a + f(x); }, 0) / arr.length;
+            };
+            const napMainH = avg(napDays, function (x) { return x.si.mainMin / 60; });
+            const noNapMainH = avg(noNapDays, function (x) { return x.si.mainMin / 60; });
+            const napLen = avg(napDays, function (x) { return x.si.extraMin; });
+
+            // 1) Does a short night predict a nap the same day?
+            if (noNapDays.length >= 3 && napMainH !== null && noNapMainH !== null) {
+              const gap = noNapMainH - napMainH;
+              if (Math.abs(gap) >= 0.4) {
+                patterns.push({
+                  type: 'info', emoji: '💤',
+                  text: gap > 0
+                    ? 'روزهایی که خواب دوم داشتی، شب قبلش به‌طور میانگین ' +
+                      formatSleepDuration(Math.round(gap * 60)) +
+                      ' کمتر خوابیده بودی — یعنی خواب روز داره کمبود شب رو جبران می‌کنه.'
+                    : 'خواب دوم‌هات ربطی به کوتاه‌بودن شب قبل ندارن؛ ' +
+                      'بیشتر عادت یا برنامه‌ی روزانه‌ان تا جبران کمبود.',
+                });
+              }
+            }
+
+            // 2) Does napping shorten the FOLLOWING night?
+            const pairs = [];
+            napDays.forEach(function (x) {
+              const next = sorted.find(function (r2) {
+                return r2.jdate === Jalali.addDays(x.r.jdate, 1);
+              });
+              if (!next) return;
+              const nsi = sleepInfo(next.sleepBlocks);
+              if (nsi.mainMin > 0) pairs.push({ nap: x.si.extraMin, nextNight: nsi.mainMin });
+            });
+            if (pairs.length >= 4) {
+              const withLong = pairs.filter(function (p) { return p.nap >= 45; });
+              const withShort = pairs.filter(function (p) { return p.nap < 45; });
+              if (withLong.length >= 2 && withShort.length >= 2) {
+                const a = avg(withLong, function (p) { return p.nextNight; });
+                const b = avg(withShort, function (p) { return p.nextNight; });
+                const d = Math.round(b - a);
+                if (Math.abs(d) >= 20) {
+                  patterns.push({
+                    type: d > 0 ? 'warn' : 'good', emoji: '🌙',
+                    text: d > 0
+                      ? 'بعد از خواب‌های روزِ بلند (۴۵ دقیقه به بالا)، شب بعدش ' +
+                        'حدود ' + formatSleepDuration(d) + ' کمتر خوابیدی. ' +
+                        'اگه شب‌ها سخت خوابت می‌بره، خواب روز رو کوتاه‌تر کن.'
+                      : 'خواب روزِ بلند به شب بعدت لطمه نزده — ' +
+                        'الگوی فعلی برات جواب می‌دهد.',
+                  });
+                }
+              }
+            }
+
+            // 3) A plain, honest summary with the real names the user uses.
+            const names = {};
+            napDays.forEach(function (x) {
+              x.si.extras.forEach(function (e) {
+                const n = (e.label || '').trim();
+                if (n) names[n] = (names[n] || 0) + 1;
+              });
+            });
+            const topNames = Object.keys(names).sort(function (a, b) {
+              return names[b] - names[a]; }).slice(0, 3);
             patterns.push({
-              type: 'info',
-              emoji: '💤',
-              text:
-                'تو ' + daysWithNap + ' روز چرت زدی (کل ' + totalNaps + ' چرت)',
+              type: 'info', emoji: '😴',
+              text: 'در ' + napDays.length + ' روز خواب دوم داشتی' +
+                (topNames.length ? ' (' + topNames.join('، ') + ')' : '') +
+                (napLen ? '، میانگین ' + Math.round(napLen) + ' دقیقه' : '') + '.',
             });
           }
 
@@ -11014,16 +11116,19 @@
                 const si = sleepInfo(r.sleepBlocks);
                 const blocks = r.sleepBlocks || [];
                 let bars = '';
-                blocks.forEach(function (b) {
+                // v6.6.3: which bar is the "main" sleep is decided by the same
+                // time-based rule as everywhere else, so a block called
+                // "خواب بعدازظهر" is drawn as a secondary block, not a night.
+                const cls = A.classifySleepBlocks(blocks);
+                const mainIdx = cls.main ? cls.main.idx : -1;
+                blocks.forEach(function (b, bi) {
                   if (!b.start || !b.end) return;
                   const s = timeToMin(b.start);
                   const e = timeToMin(b.end);
                   let dur = e - s;
                   if (dur < 0) dur += 1440;
                   if (dur === 0) return;
-                  const isNap =
-                    (b.label || '').toLowerCase().includes('چرت') ||
-                    (b.label || '').toLowerCase().includes('nap');
+                  const isNap = bi !== mainIdx;
                   const w = Math.max((dur / 1440) * 100, 2);
                   const left = (s / 1440) * 100;
                   const rightEdge = left + w;
@@ -14026,10 +14131,12 @@
                 }
                 // v6.6.2: naps are logged as extra sleep blocks; showing only
                 // block[0] hid them and made the day look like less rest.
-                const nap = aiNapCell(row);
-                if (nap) {
-                  sleepBit += '<span class="tag sleep">😴 چرت ' + faNum(nap) + '′</span>';
-                }
+                // v6.6.3: show each secondary block with its own name and times
+                sleepInfo(row.sleepBlocks).extras.forEach(function (x) {
+                  sleepBit += '<span class="tag sleep">😴 ' +
+                    reportEscape(x.label || 'خواب دوم') + ' ' +
+                    faNum(x.start) + '–' + faNum(x.end) + '</span>';
+                });
               }
             }
             const rows = items.map(function (x) {
@@ -14335,18 +14442,23 @@
                   '(نوسان ±' + faNum(rhythm.bedVar) + ' دقیقه).</p>';
               }
               const shownRows = rows.slice(-14).reverse();
-              const anyNapR = shownRows.some(function (r) { return aiNapCell(r); });
+              const anyNapR = shownRows.some(function (r) {
+                return sleepInfo(r.sleepBlocks).extras.length > 0;
+              });
               sleepHtml += '<table><thead><tr><th>تاریخ</th><th>خواب</th><th>بیداری</th>' +
-                (anyNapR ? '<th>چرت</th>' : '') +
+                (anyNapR ? '<th>خواب دوم</th>' : '') +
                 '<th>مدت کل</th><th>انرژی</th></tr></thead><tbody>' +
                 shownRows.map(function (r) {
                   const si = sleepInfo(r.sleepBlocks);
-                  const nap = aiNapCell(r);
+                  const extras = si.extras.map(function (x) {
+                    return reportEscape(x.label || 'خواب دوم') + ' ' +
+                      faNum(x.start) + '–' + faNum(x.end);
+                  }).join('<br>');
                   return '<tr><td class="c-sub">' + faNum(r.jdate) + '</td>' +
                     '<td class="c-mid">' + faNum(si.bedtime || '—') + '</td>' +
                     '<td class="c-mid">' + faNum(si.wakeTime || '—') + '</td>' +
                     (anyNapR ? '<td class="c-mid soft">' +
-                      (nap ? faNum(nap) + '′' : '—') + '</td>' : '') +
+                      (extras || '—') + '</td>' : '') +
                     '<td class="c-mid">' + faNum(si.totalDisplay) + '</td>' +
                     '<td class="c-mid">' + (Number(r.energy) > 0 ? faNum(r.energy) : '—') +
                     '</td></tr>';
@@ -14745,18 +14857,8 @@
           gEl('gSleepStart').value = si && si.bedtime && si.bedtime !== '--:--' ? si.bedtime : '';
           gEl('gSleepEnd').value = si && si.wakeTime && si.wakeTime !== '--:--' ? si.wakeTime : '';
           gEl('gSleepEnergy').value = dayRow ? (dayRow.energy || 0) : 0;
-          const existingNap = dayRow ? (function () {
-            let t = 0;
-            (dayRow.sleepBlocks || []).forEach(function (b) {
-              const l = (b.label || '');
-              const isNap = l.indexOf('چرت') !== -1 || l.toLowerCase().indexOf('nap') !== -1;
-              if (!isNap || !b.start || !b.end) return;
-              let d = A.timeToMin(b.end) - A.timeToMin(b.start);
-              if (d < 0) d += 1440;
-              t += d;
-            });
-            return t;
-          })() : 0;
+          // v6.6.3: sum every secondary block, whatever the user named it.
+          const existingNap = si ? si.extraMin : 0;
           gEl('gNapMin').value = existingNap || 0;
           if (sleepWrap) sleepWrap.open = !!(si && si.totalMin > 0) || existingNap > 0;
           const sleepHint = gEl('gSleepHint');
@@ -14804,10 +14906,7 @@
         }
 
         function existingNapOnSave(row) {
-          return (row.sleepBlocks || []).some(function (b) {
-            const l = b.label || '';
-            return l.indexOf('چرت') !== -1 || l.toLowerCase().indexOf('nap') !== -1;
-          });
+          return A.sleepInfo(row.sleepBlocks).extras.length > 0;
         }
 
         function saveGymSession() {
@@ -14865,27 +14964,36 @@
               }] }).rows[0];
               s.rows.push(row);
             }
-            const isNapBlock = function (b) {
-              const l = b.label || '';
-              return l.indexOf('چرت') !== -1 || l.toLowerCase().indexOf('nap') !== -1;
-            };
+            // v6.6.3: "which block is the night?" is a time question, not a
+            // name one. Resolve it ONCE against the current array, split into
+            // main + extras, then rebuild — recomputing an index after the
+            // array changes silently drops blocks.
+            const before = A.classifySleepBlocks(row.sleepBlocks || []);
+            const mainIdx = before.main ? before.main.idx : -1;
+            const keptExtras = (row.sleepBlocks || []).filter(function (b, bi) {
+              return bi !== mainIdx && b && b.start && b.end;
+            });
+            let mainBlock = before.main
+              ? { label: before.main.label || 'خواب شب',
+                  start: before.main.start, end: before.main.end }
+              : null;
             if (sStart && sEnd) {
-              const others = (row.sleepBlocks || []).filter(isNapBlock);
-              row.sleepBlocks = [{ label: 'خواب شب', start: sStart, end: sEnd }].concat(others);
+              mainBlock = { label: (mainBlock && mainBlock.label) || 'خواب شب',
+                start: sStart, end: sEnd };
             }
             // The nap is entered as a duration here (nobody remembers the exact
             // clock time of a nap), so anchor it at 14:00 and store a block.
-            const nights = (row.sleepBlocks || []).filter(function (b) {
-              return !isNapBlock(b);
-            });
+            let extras = keptExtras;
             if (sNap > 0) {
-              row.sleepBlocks = nights.concat([{
-                label: 'چرت', start: '14:00', end: minToTime(14 * 60 + sNap),
-              }]);
-            } else if (existingNapOnSave(row)) {
-              // cleared to zero: drop the nap block instead of leaving a ghost
-              row.sleepBlocks = nights;
+              extras = [{ label: 'خواب دوم', start: '14:00',
+                end: minToTime(14 * 60 + sNap) }];
+            } else if (keptExtras.length) {
+              // cleared to zero: drop the secondary blocks instead of ghosts
+              extras = [];
             }
+            const rebuilt = [];
+            if (mainBlock) rebuilt.push(mainBlock);
+            row.sleepBlocks = rebuilt.concat(extras);
             if (sEnergy > 0) row.energy = sEnergy;
             row._updatedAt = A.nextRevision();
           }
@@ -15448,20 +15556,24 @@
         }
         // Naps are logged as extra sleep blocks; the main row only shows the
         // night, so surface them separately or they silently vanish.
+        // v6.6.3: every secondary sleep block, with its REAL name and exact
+        // clock times — not just a minute total under the label "چرت".
+        // "خوابیدم 14:00-15:20" and "خوابیدم 80 دقیقه یه‌جایی بعدازظهر" are
+        // different facts, and only the first one lets a coach say anything
+        // useful about whether the nap is eating into the night.
         function aiNapCell(r) {
-          const blocks = (r.sleepBlocks || []).filter(function (b) {
-            if (!b.start || !b.end) return false;
-            const label = (b.label || '');
-            return label.indexOf('چرت') !== -1 || label.toLowerCase().indexOf('nap') !== -1;
-          });
-          if (!blocks.length) return '';
-          let total = 0;
-          blocks.forEach(function (b) {
-            let d = timeToMin(b.end) - timeToMin(b.start);
-            if (d < 0) d += 1440;
-            total += d;
-          });
-          return total > 0 ? String(Math.round(total)) : '';
+          const extras = sleepInfo(r.sleepBlocks).extras;
+          if (!extras.length) return '';
+          return String(Math.round(extras.reduce(function (a, x) {
+            return a + x.min; }, 0)));
+        }
+        function aiNapDetail(r) {
+          const extras = sleepInfo(r.sleepBlocks).extras;
+          if (!extras.length) return '';
+          return extras.map(function (x) {
+            const name = (x.label || '').replace(/[|—]/g, ' ').trim();
+            return (name ? name + ' ' : '') + x.start + '-' + x.end;
+          }).join(' + ');
         }
         function aiMinCell(v) {
           const n = Number(v) || 0;
@@ -15498,7 +15610,7 @@
           const cols = ['تاریخ', 'روز', 'ورزش', 'انرژی', 'حال', 'دویدن', 'پیاده'];
           if (anyDaily) cols.push('روزمره');
           cols.push('خواب(از-تا)');
-          if (anyNap) cols.push('چرت');
+          if (anyNap) cols.push('خواب‌دوم(از-تا)');
           if (anyRecord) cols.push('رکورددو');
           if (anyHour) cols.push('ساعت');
           if (anyMiss) cols.push('چرانرفتم');
@@ -15522,7 +15634,7 @@
             ];
             if (anyDaily) cells.push(dailyMin(r) > 0 ? String(Math.round(dailyMin(r))) : '');
             cells.push(aiSleepCell(r));
-            if (anyNap) cells.push(aiNapCell(r));
+            if (anyNap) cells.push(aiNapDetail(r));
             if (anyRecord) cells.push(aiMinCell(r.longestRun));
             if (anyHour) {
               const th = r.trainHour;
@@ -15750,19 +15862,32 @@
           // study report that hides them makes the night look shorter than the
           // person's real total sleep, which is misleading to a coach.
           const shown = withSleep.slice(-14);
-          const anyNap = shown.some(function (r) { return aiNapCell(r); });
+          const anyNap = shown.some(function (r) { return aiNapDetail(r); });
           if (anyNap) {
-            const napDays = withSleep.filter(function (r) { return aiNapCell(r); });
+            const napDays = withSleep.filter(function (r) { return aiNapDetail(r); });
             const napTotal = napDays.reduce(function (a, r) {
               return a + (Number(aiNapCell(r)) || 0); }, 0);
-            lines.push('- چرت: در ' + napDays.length + ' روز، مجموع ' +
-              napTotal + ' دقیقه (جدا از خواب شب)');
+            // Which names does this person actually use? Tell the model, so it
+            // does not have to guess what "قیلوله" means.
+            const names = {};
+            napDays.forEach(function (r) {
+              sleepInfo(r.sleepBlocks).extras.forEach(function (x) {
+                const n = (x.label || '').trim();
+                if (n) names[n] = (names[n] || 0) + 1;
+              });
+            });
+            const nameList = Object.keys(names).sort(function (a, b) {
+              return names[b] - names[a]; }).slice(0, 5);
+            lines.push('- خواب‌های دوم: در ' + napDays.length + ' روز، مجموع ' +
+              napTotal + ' دقیقه (جدا از خواب اصلی)' +
+              (nameList.length ? ' • عنوان‌ها: ' + nameList.join('، ') : ''));
           }
-          lines.push('قالب: `تاریخ|خواب شب(از-تا)' + (anyNap ? '|چرت(دقیقه)' : '') +
+          lines.push('قالب: `تاریخ|خواب اصلی(از-تا)' +
+            (anyNap ? '|خواب‌دوم(نام و از-تا)' : '') +
             '|انرژی` • خالی = ثبت نشده');
           shown.forEach(function (r) {
             const cells = [r.jdate.slice(5), aiSleepCell(r)];
-            if (anyNap) cells.push(aiNapCell(r));
+            if (anyNap) cells.push(aiNapDetail(r));
             cells.push(Number(r.energy) > 0 ? String(r.energy) : '');
             lines.push(cells.join('|'));
           });
@@ -16615,7 +16740,7 @@
           }).sort();
           const snapshot = {
             format: 'sport-report-gist-snapshot-v1',
-            appVersion: '6.6.2',
+            appVersion: '6.6.3',
             createdAt: new Date().toISOString(),
             reason: mode === 'all' ? 'automatic-before-v56-first-write' : 'manual-snapshot',
             files: {},
@@ -17270,7 +17395,7 @@
           msg += '    "sleepBlocks": [\n';
           msg +=
             '      {"label": "خواب شب", "start": "00:30", "end": "07:00"},\n';
-          msg += '      {"label": "چرت", "start": "13:00", "end": "13:30"}\n';
+          msg += '      {"label": "خواب بعدازظهر", "start": "13:00", "end": "13:30"}\n';
           msg += '    ],\n';
           msg += '    "officialWake": "07:00"\n';
           msg += '  }],\n';
@@ -17641,7 +17766,7 @@
 
           // === VERSION ===
           results.push('<b style="color:#a78bfa;font-size:1rem">📦 نسخه</b>');
-          results.push(info + ' Version: v6.6.2 One-File');
+          results.push(info + ' Version: v6.6.3 One-File');
           results.push(
             info + ' تاریخ چک: ' + new Date().toLocaleString('fa-IR'),
           );
